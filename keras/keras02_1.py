@@ -12,9 +12,10 @@ y_test = np.array([901,909,917,925,933])
 
 ## 노드, 레이어의 개수를 정하는 근거는? 쌓은 경험과 외부의 좋은 모델을 가져와서 해결하는것이 가장 가성비가 좋다.
 ## output, input 순으로 노드 개수를 정함, add한만큼 레이어 개수
+## bias의 값이 큰것으로 보이면 레이어의 개수를 늘려야 적합이 잘 되는 것으로 보인다.
+## 반대로 weight의 값이 크면 노드의 개수를 늘려야 적합이 잘 되는것으로 보인다.
 model = Sequential()
 model.add(Dense(10, input_dim=1, activation='relu'))
-'''
 model.add(Dense(10))
 model.add(Dense(10))
 model.add(Dense(10))
@@ -31,7 +32,6 @@ model.add(Dense(10))
 model.add(Dense(10))
 model.add(Dense(10))
 model.add(Dense(10))
-'''
 model.add(Dense(1, activation='relu'))
 
 ##모델의 파라미터 개수(한 시행동안 연산 개수)를 알수 있다.
