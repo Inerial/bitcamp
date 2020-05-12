@@ -35,6 +35,7 @@ model.add(Dense(10))
 model.add(Dense(1, activation='relu'))
 
 ##모델의 파라미터 개수(한 시행동안 연산 개수)를 알수 있다.
+##bias와 weight 값을 추정하고, 적당한 비율을 맞추어 연산속도 또한 맞춰줄 필요가 있다.
 model.summary()
 
 model.compile(loss='mse', optimizer='adam',metrics=['accuracy'])
