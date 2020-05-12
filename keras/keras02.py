@@ -14,7 +14,7 @@ model.add(Dense(10))
 model.add(Dense(1, activation='relu'))
 
 model.summary()
-'''
+
 model.compile(loss='mse', optimizer='adam',metrics=['accuracy'])
 
 model.fit(x_train, y_train, epochs=600, batch_size=1, validation_data = (x_test, y_test))
@@ -25,4 +25,3 @@ print("acc : ",acc)
 
 output = model.predict(x_test)
 print("결과물 : \n", output)
-'''
