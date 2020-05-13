@@ -9,37 +9,48 @@ x_pred = np.array([16,17,18])
 #2. 모델구성
 from keras.models import Sequential
 from keras.layers import Dense #DNN구조의 베이스가 되는 구조
-model = Sequential()
 
-model.add(Dense(20,input_dim = 1))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(20))
-model.add(Dense(1))
+min = 1000
+max = 0
+total_mse = 0
+n = 100
+for i in range(1,n):
+    model = Sequential()
 
-## 두가지 방법 회귀와 분류
+    model.add(Dense(40,input_dim = 1))
+    model.add(Dense(40))
+    model.add(Dense(40))
+    model.add(Dense(40))
+    model.add(Dense(40))
+    model.add(Dense(1))
 
-#3. 훈련
-## MSE는 mean square error로 예측한 값과 실제 값의 차이(잔차)의 제곱 평균을 말한다. == 회귀지표
-## acc는 분류지표 == 서로 다름
-model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
-model.fit(x_train ,y_train , epochs=100, batch_size=1)
+    ## 두가지 방법 회귀와 분류
 
-#4. 평가와 예측
-loss, mse = model.evaluate(x_test, y_test, batch_size=1)
-print("loss : " , loss , '\n' , "mse : " , mse)
+    ## 학생수능점수, 온도, 날씨, 하이닉스, 유가, 환율, 금시계, 금리 등으로 삼성주가등을 사용 가능 (피쳐 임포턴스)
+    ## 피처 임포턴스 위의 각각 변수
+    ## train, test를 한 데이터에서 %로 나누어서 각각 진행
+    ##다양항 변수를 고려해줘야한다.
+    
 
-y_pred = model.predict(x_pred)
-print("y_predict : ", y_pred)
+    #3. 훈련
+    ## MSE는 mean square error로 예측한 값과 실제 값의 차이(잔차)의 제곱 평균을 말한다. == 회귀지표
+    ## acc는 분류지표 == 서로 다름
+    model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
+    model.fit(x_train ,y_train , epochs=100, batch_size=1)
+
+    #4. 평가와 예측
+    loss, mse = model.evaluate(x_test, y_test, batch_size=1)
+    print("loss : " , loss , '\n' , "mse : " , mse)
+    total_mse += mse
+    if mse > max:
+        max = mse
+    if mse < min:
+        min = mse
+
+
+    y_pred = model.predict(x_pred)
+    print("set ",i,"\ny_predict : ", y_pred)
+    
+    print("mean_mse : ", total_mse/i)
+    print("min : ", min)
+    print("max : ", max)
