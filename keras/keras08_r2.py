@@ -63,3 +63,8 @@ print("RMSE : ", RMSE(y_test, y_pred))
 
 # 오차제곱합이란? SE == 평균을 안낸 mse
 # 편차제곱합이란? ST == 실제값과 실제값의 평균값간의 차이 == 분산 * n
+
+## 결정계수 구하기
+from sklearn.metrics import r2_score
+r2_y = r2_score(y_test,y_pred)
+print("결정계수 : ", r2_y)
