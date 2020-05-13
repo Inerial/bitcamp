@@ -24,7 +24,7 @@ y_test = np.array([10012,10013,10014,10015,10016])
 ## 레이어나 노드의 개수가 특정 개수 이상 들어가면 효과가 미미한가? (epochs를 건드리지 않는한 레이어나 노드를 계속 늘리는것은 어느순간부터 유의미한 결과를 보이지 않았다.)
 
 model = Sequential()
-model.add(Dense(10, input_dim=1, activation='relu'))
+model.add(Dense(10, input_dim=1))
 model.add(Dense(10))
 model.add(Dense(10))
 model.add(Dense(10))
@@ -37,7 +37,7 @@ model.add(Dense(10))
 model.add(Dense(10))
 model.add(Dense(10))
 model.add(Dense(10))
-model.add(Dense(1, activation='relu'))
+model.add(Dense(1))
 
 ##모델의 파라미터 개수(한 시행동안 연산 개수)를 알수 있다.
 ##bias와 weight 값을 추정하고, 적당한 비율을 맞추어 연산속도 또한 맞춰줄 필요가 있다.
@@ -47,7 +47,7 @@ model.compile(loss='mse', optimizer='adam',metrics=['accuracy'])
 
 ##적합과정,  epochs = 시행횟수, batch_size = 한번에  x를 쓰는 횟수
 ##batch_size 디폴트값 32 (train의 개수를 100개로 두면 32개씩 처리하는것을 확인할 수 있었다.)
-model.fit(x_train, y_train, epochs=200, batch_size = 1, validation_data = (x_test, y_test))
+model.fit(x_train, y_train, epochs=2000, batch_size = 1, validation_data = (x_test, y_test))
 loss,acc = model.evaluate(x_test ,y_test, batch_size=1 )
 
 print("loss : ", loss)
