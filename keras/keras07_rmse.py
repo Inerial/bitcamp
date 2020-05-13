@@ -41,11 +41,18 @@ print("loss : " , loss , '\n' , "mse : " , mse)
 ##y_pred = model.predict(x_pred)
 ##print("y_predict : ", y_pred)
 
+## x_test값을 이용하여 y_test의 추정치 생산
 y_pred = model.predict(x_test)
 print(y_pred)
 
+## sklearn의 mse를 이용하여 rmse함수 생성
 from sklearn.metrics import mean_squared_error
 def RMSE(y_test, y_pred):
     return np.sqrt(mean_squared_error(y_test, y_pred))
-
+##rmse함수 실행
 print("RMSE : ", RMSE(y_test, y_pred))
+
+
+#회귀모델의 지표
+#mse : mean squared error
+#rmse : mse의 제곱근
