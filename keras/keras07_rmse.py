@@ -38,8 +38,14 @@ loss, mse = model.evaluate(x_test, y_test, batch_size=1)
 print("loss : " , loss , '\n' , "mse : " , mse)
 
 
-y_pred = model.predict(x_pred)
-print("y_predict : ", y_pred)
+##y_pred = model.predict(x_pred)
+##print("y_predict : ", y_pred)
+
+y_pred = model.predict(x_test)
+print(y_pred)
 
 from sklearn.metrics import mean_squared_error
-def RMSE
+def RMSE(y_test, y_pred):
+    return np.sqrt(mean_squared_error(y_test, y_pred))
+
+print("RMSE : ", RMSE(y_test, y_pred))
