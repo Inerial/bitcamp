@@ -6,14 +6,37 @@
 import numpy as np
 x = np.array(range(1,101))
 y = np.array(range(101,201))
+'''
 x_train = x[:60]
 y_train = y[:60]
 x_val = x[60:80]
 y_val = y[60:80]
 x_test = x[80:]
 y_test = y[80:]
+'''
+from sklearn.model_selection import train_test_split
 
+##1번
+x_train, x_test, y_train, y_test = train_test_split(
+    #x,y ,random_state = 6666,train_size = 0.6
+    x,y, shuffle = False, train_size = 0.7
+)
+x_test, x_val, y_test, y_val = train_test_split(
+    #x_test,y_test,shuffle = False, random_state = 6666, test_size = 0.5
+    x_test, y_test, shuffle = False, test_size = 12 / 30
+ )
+
+'''
+##2번
+x_train, x_test, y_train, y_test = train_test_split(
+    x,y,random_state = 66, train_size=0.6, test_size = 0.2,
+ )
+
+ ##중복되는값이 있으면 하나만 들어가도 죄다 빼버리므로 안됨
+x_val = np.setdiff1d(np.setdiff1d(x, x_train), x_test)
+y_val = np.setdiff1d(np.setdiff1d(y, y_train), y_test)
 #x_pred = np.array([16,17,18])
+'''
 
 #2. 모델구성
 from keras.models import Sequential
