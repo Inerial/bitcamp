@@ -1,6 +1,3 @@
-## 과제 : R2 가 음수가 아닌 0.5 이하로 줄이기.
-## 레이어는 인풋과 아웃풋을 포함 5개 이상, 노드는 레이어당 각각 5개 이상
-## batch_size = 1, epochs = 100 이상
 
 #1. 데이터
 import numpy as np
@@ -42,17 +39,9 @@ y_val = np.setdiff1d(np.setdiff1d(y, y_train), y_test)
 from keras.models import Sequential
 from keras.layers import Dense #DNN구조의 베이스가 되는 구조
 
-##과제의 조건을 맞추기위한 모델링방법
-##결정계수의 식은 1 - 잔차제곱합/편차제곱합
-## 이는 1 - 시그마(실제값 - 예측값)/시그마(실제값 - 평균) < 0.5 가 되어야 한다.
-## 이때 예측값이 모두 평균에 수렴하는 값이 나올수록 결정계수의 값이 작아진다고 생각했다.
-## 따라서  y = wx + b 의 형태를 가진 식에서 weight가 0에 가까워지고, b가 평균에 가까워지면 결정계수의 값이 0에 가까워질것이라고 판단했다.
-## 검색을 통해 vanishing gradient problem을 알게되었고 이때 sigmoid function을 사용하면 weight가 제데로 적용이 안되는 문제가 발생한다는것을 확인하였다.
-## 따라서 모델의 윗부분에 sigmoid 함수를 적용하고, 아랫부분은 그대로 두어 w의 값은 제데로 적용이 안되면서 mse를 줄이려는 움직임이
-## 결정계수의 값을 0에 수렴하게 만들지 않을까 생각했고 이 생각은 어느정도는 맞았다.
-## 하지만 편차가 정확하게 평균가까이 안착하지 못하는 경우가 많아 결정계수가 음수로 가는 경우의 수가 많이 발견되었다.(절댓값으로 치면 거의다 0.5이하)
-model = Sequential()
 
+
+model = Sequential()
 model.add(Dense(15,input_dim = 1))
 model.add(Dense(15))
 model.add(Dense(15))
