@@ -1,13 +1,12 @@
-
 #1. 데이터
 import numpy as np
 x = np.array(range(1,101))
 y = np.array(range(101,201))
 
 from sklearn.model_selection import train_test_split
-## train, test값을 train 0.7사이즈로 분류
+## train, test값을 train 0.8사이즈로 분류
 x_train, x_test, y_train, y_test = train_test_split(
-    x,y ,train_size = 0.8
+    x,y ,random_state = 66,train_size = 0.8
 )
 
 #2. 모델구성
@@ -32,7 +31,8 @@ model.add(Dense(1))
 ## MSE는 mean square error로 예측한 값과 실제 값의 차이(잔차)의 제곱 평균을 말한다. == 회귀지표
 ## acc는 분류지표 == 서로 다름
 model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
-## 받은 train 데이터에서 0.3크기만큼 validation 데이터로 활용
+## 받은 train 데이터에서 0.25크기만큼 validation 데이터로 활용
+## train 데이터는 전체 데이터의 0.8크기이므로 val데이터는 전체의 0.2
 model.fit(x_train ,y_train , epochs=100, batch_size=3, validation_split=0.25)
 
 
@@ -40,6 +40,9 @@ model.fit(x_train ,y_train , epochs=100, batch_size=3, validation_split=0.25)
 loss, mse = model.evaluate(x_test, y_test, batch_size=1)
 print("loss : " , loss , '\n' , "mse : " , mse)
 
+
+##y_pred = model.predict(x_pred)
+##print("y_predict : ", y_pred)
 
 ## x_test값을 이용하여 y_test의 추정치 생산
 y_pred = model.predict(x_test)
