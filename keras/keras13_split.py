@@ -18,8 +18,7 @@ from sklearn.model_selection import train_test_split
 
 ##1번
 x_train, x_test, y_train, y_test = train_test_split(
-    #x,y ,random_state = 6666,train_size = 0.6
-    x,y, shuffle = False, train_size = 0.7
+    x,y ,random_state = 66,train_size = 0.7
 )
 
 #2. 모델구성
@@ -61,7 +60,7 @@ model.add(Dense(1))
 ## MSE는 mean square error로 예측한 값과 실제 값의 차이(잔차)의 제곱 평균을 말한다. == 회귀지표
 ## acc는 분류지표 == 서로 다름
 model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
-model.fit(x_train ,y_train , epochs=100, batch_size=3, validation_split=0.25)
+model.fit(x_train ,y_train , epochs=100, batch_size=3, validation_split=0.3)
 
 
 #4. 평가와 예측
