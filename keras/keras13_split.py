@@ -21,22 +21,6 @@ x_train, x_test, y_train, y_test = train_test_split(
     #x,y ,random_state = 6666,train_size = 0.6
     x,y, shuffle = False, train_size = 0.7
 )
-x_test, x_val, y_test, y_val = train_test_split(
-    #x_test,y_test,shuffle = False, random_state = 6666, test_size = 0.5
-    x_test, y_test, shuffle = False, test_size = 12 / 30
- )
-
-'''
-##2번
-x_train, x_test, y_train, y_test = train_test_split(
-    x,y,random_state = 66, train_size=0.6, test_size = 0.2,
- )
-
- ##중복되는값이 있으면 하나만 들어가도 죄다 빼버리므로 안됨
-x_val = np.setdiff1d(np.setdiff1d(x, x_train), x_test)
-y_val = np.setdiff1d(np.setdiff1d(y, y_train), y_test)
-#x_pred = np.array([16,17,18])
-'''
 
 #2. 모델구성
 from keras.models import Sequential
@@ -77,7 +61,7 @@ model.add(Dense(1))
 ## MSE는 mean square error로 예측한 값과 실제 값의 차이(잔차)의 제곱 평균을 말한다. == 회귀지표
 ## acc는 분류지표 == 서로 다름
 model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
-model.fit(x_train ,y_train , epochs=100, batch_size=3, validation_data=(x_val, y_val))
+model.fit(x_train ,y_train , epochs=100, batch_size=3, validation_split=0.25)
 
 
 #4. 평가와 예측
