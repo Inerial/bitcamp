@@ -19,15 +19,18 @@ model.add(Dense(1))
 '''
 input1 = Input(shape = (3,))
 
-dense1 = Dense(5, activation='relu')(input1)
-dense2 = Dense(4, activation='relu')(dense1)
+dense1 = Dense(25, activation='relu')(input1)
+dense2 = Dense(15, activation='relu')(dense1)
+dense3 = Dense(5, activation='relu')(dense2)
+dense4 = Dense(15, activation='relu')(dense3)
+dense6 = Dense(25, activation='relu')(dense4)
 
-output1 = Dense(1)(dense2)
+output1 = Dense(1)(dense6)
 
 
 model = Model(inputs=input1, outputs = output1)
 model.summary()
-'''
+
 model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
 
 ## verbose = 0 : 과정을 보여주지 않는다.
@@ -53,4 +56,3 @@ print("RMSE : ", RMSE(y_test, y_pred))
 from sklearn.metrics import r2_score
 r2_y = r2_score(y_test,y_pred)
 print("결정계수 : ", r2_y)
-'''
