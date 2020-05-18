@@ -41,8 +41,6 @@ dense2_4 = Dense(5, activation='relu', name="right-input4")(dense2_3)
 from keras.layers.merge import concatenate
 merge1 = concatenate([dense1_5, dense2_4])
 
-
-
 ###### output
 
 middle1 = Dense(30, name="middle1")(merge1)
@@ -65,15 +63,11 @@ output3_3 = Dense(2, name="right-output3")(output3_2)
 model = Model(inputs = [input1, input2], outputs=[output1_3,output2_3, output3_3])
 model.summary()
 
-
+# 3. 훈련
 model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
-
-
-model.fit([x1_train, x2_train] ,[y1_train, y2_train, y3_train] , epochs=100, batch_size=3, validation_split=0.25)
+model.fit([x1_train, x2_train] ,[y1_train, y2_train, y3_train] , epochs=100, batch_size=3, validation_split=0.25, verbose=1)
 
 eval = model.evaluate([x1_test, x2_test], [y1_test,y2_test,y3_test], batch_size=1)
-
-##asdf = dict(zip(["loss_total", "loss1","loss2","mse1","mse2"], model.evaluate([x1_test, x2_test], [y1_test,y2_test], batch_size=1)))
 
 print("loss_total : " , eval[0])
 esize = np.int(np.size(eval)/2)
