@@ -25,15 +25,16 @@ dense1_1 = Dense(25, activation='relu', name="left-input1")(input1)
 dense1_2 = Dense(15, activation='relu', name="left-input2")(dense1_1)
 dense1_3 = Dense(5, activation='relu', name="left-input3")(dense1_2)
 dense1_4 = Dense(15, activation='relu', name="left-input4")(dense1_3)
-dense1_5 = Dense(25, activation='relu', name="left-input5")(dense1_4)
+dense1_5 = Dense(20, activation='relu', name="left-input5")(dense1_4)
 
 input2 = Input(shape = (3,))
 dense2_1 = Dense(25, activation='relu', name="right-input1")(input2)
 dense2_2 = Dense(15, activation='relu', name="right-input2")(dense2_1)
 dense2_3 = Dense(5, activation='relu', name="right-input3")(dense2_2)
+dense2_4 = Dense(5, activation='relu', name="right-input4")(dense2_3)
 
 from keras.layers.merge import concatenate
-merge1 = concatenate([dense1_5, dense2_3])
+merge1 = concatenate([dense1_5, dense2_4])
 
 
 
@@ -75,13 +76,20 @@ print(y2_pred)
 from sklearn.metrics import mean_squared_error
 def RMSE(y_test, y_pred):
     return np.sqrt(mean_squared_error(y_test, y_pred))
+RMSE1 = RMSE(y1_test, y1_pred)
+RMSE2 = RMSE(y2_test, y2_pred)
 
-print("RMSE1 : ", RMSE(y1_test, y1_pred))
-print("RMSE2 : ", RMSE(y2_test, y2_pred))
+print("RMSE1 : ", RMSE1)
+print("RMSE2 : ", RMSE2)
+print("RMSE : ", (RMSE1+RMSE2)/2)
+print("RMSE_total : ", RMSE(np.vstack([y1_test, y2_test]), np.vstack([y1_pred, y2_pred])))
 
 
 from sklearn.metrics import r2_score
 r2_y1 = r2_score(y1_test,y1_pred)
 r2_y2 = r2_score(y2_test,y2_pred)
-print("결정계수 : ", r2_y1)
-print("결정계수 : ", r2_y2)
+r2_total = r2_score(np.vstack([y1_test, y2_test]), np.vstack([y1_pred, y2_pred]))
+print("y1결정계수 : ", r2_y1)
+print("y2결정계수 : ", r2_y2)
+print("결정계수 : ", (r2_y1 + r2_y2)/2)
+print("total 결정계수 : ", r2_total)
