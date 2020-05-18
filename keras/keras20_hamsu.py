@@ -33,10 +33,7 @@ model.summary()
 
 model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
 
-## verbose = 0 : 과정을 보여주지 않는다.
-## verbose = 1 : 디폴트
-## verbose = 2 : 진행과정이 안나옴
-## verbose = 3 : epochs위치만 확인
+
 model.fit(x_train ,y_train , epochs=100, batch_size=3, validation_split=0.25, verbose=0)
 
 loss, mse = model.evaluate(x_test, y_test, batch_size=3)
