@@ -10,17 +10,24 @@ x_train, x_test, y_train, y_test = train_test_split(
 )
 
 from keras.models import Sequential, Model
-from keras.layers import Dense
+from keras.layers import Dense, Input
 '''
 model = Sequential()
 model.add(Dense(5,input_dim = 3))
 model.add(Dense(4))
 model.add(Dense(1))
 '''
-Input
+input1 = Input(shape = (3,))
+
+dense1 = Dense(5, activation='relu')(input1)
+dense2 = Dense(4, activation='relu')(dense1)
+
+output1 = Dense(1)(dense2)
 
 
-
+model = Model(inputs=input1, outputs = output1)
+model.summary()
+'''
 model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
 
 ## verbose = 0 : 과정을 보여주지 않는다.
@@ -46,3 +53,4 @@ print("RMSE : ", RMSE(y_test, y_pred))
 from sklearn.metrics import r2_score
 r2_y = r2_score(y_test,y_pred)
 print("결정계수 : ", r2_y)
+'''
