@@ -21,15 +21,15 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Input
 
 input1 = Input(shape = (3,))
-dense1_1 = Dense(25, activation='relu', name="left-input1")(input1)
+dense1_1 = Dense(125, activation='relu', name="left-input1")(input1)
 dense1_2 = Dense(15, activation='relu', name="left-input2")(dense1_1)
 dense1_3 = Dense(5, activation='relu', name="left-input3")(dense1_2)
-dense1_4 = Dense(15, activation='relu', name="left-input4")(dense1_3)
-dense1_5 = Dense(20, activation='relu', name="left-input5")(dense1_4)
+dense1_4 = Dense(115, activation='relu', name="left-input4")(dense1_3)
+dense1_5 = Dense(120, activation='relu', name="left-input5")(dense1_4)
 
 input2 = Input(shape = (3,))
-dense2_1 = Dense(25, activation='relu', name="right-input1")(input2)
-dense2_2 = Dense(15, activation='relu', name="right-input2")(dense2_1)
+dense2_1 = Dense(125, activation='relu', name="right-input1")(input2)
+dense2_2 = Dense(115, activation='relu', name="right-input2")(dense2_1)
 dense2_3 = Dense(5, activation='relu', name="right-input3")(dense2_2)
 dense2_4 = Dense(5, activation='relu', name="right-input4")(dense2_3)
 
@@ -40,16 +40,16 @@ merge1 = concatenate([dense1_5, dense2_4])
 
 ###### output
 
-middle1 = Dense(30, name="middle1")(merge1)
+middle1 = Dense(130, name="middle1")(merge1)
 middle1 = Dense(5, name="middle2")(middle1)
 middle1 = Dense(7, name="middle3")(middle1)
 
 
-output1_1 = Dense(30, name="left-output1")(middle1)
+output1_1 = Dense(130, name="left-output1")(middle1)
 output1_2 = Dense(7, name="left-output2")(output1_1)
 output1_3 = Dense(3, name="left-output3")(output1_2)
 
-output2_1 = Dense(30, name="right-output1")(middle1)
+output2_1 = Dense(130, name="right-output1")(middle1)
 output2_2 = Dense(7, name="right-output2")(output2_1)
 output2_3 = Dense(3, name="right-output3")(output2_2)
 
