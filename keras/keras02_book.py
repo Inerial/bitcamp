@@ -15,7 +15,7 @@ model.add(Dense(1, activation='relu'))
 
 model.summary()
 
-model.compile(loss='mse', optimizer='adam',metrics=['accuracy'])
+model.compile(loss='mse', optimizer='adam',metrics=['mse','accuracy'])
 
 model.fit(x_train, y_train, epochs=600, batch_size=1, validation_data = (x_test, y_test))
 loss,acc = model.evaluate(x_test ,y_test ,batch_size=1)
