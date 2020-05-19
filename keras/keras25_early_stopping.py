@@ -16,20 +16,15 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Input
 
 input1 = Input(shape = (3,))
-dense1_1 = Dense(250, activation='relu', name="left-input1")(input1)
-dense1_2 = Dense(150, activation='relu', name="left-input2")(dense1_1)
-dense1_3 = Dense(50, activation='relu', name="left-input3")(dense1_2)
-dense1_4 = Dense(150, activation='relu', name="left-input4")(dense1_3)
-dense1_5 = Dense(200, activation='relu', name="left-input5")(dense1_4)
+dense1 = Dense(50, activation='relu')(input1)
+dense1 = Dense(50, activation='relu')(dense1)
 
 input2 = Input(shape = (3,))
-dense2_1 = Dense(250, activation='relu', name="right-input1")(input2)
-dense2_2 = Dense(150, activation='relu', name="right-input2")(dense2_1)
-dense2_3 = Dense(50, activation='relu', name="right-input3")(dense2_2)
-dense2_4 = Dense(50, activation='relu', name="right-input4")(dense2_3)
+dense2 = Dense(50, activation='relu')(input2)
+dense2 = Dense(50, activation='relu')(dense2)
 
 from keras.layers.merge import concatenate
-merge1 = concatenate([dense1_5, dense2_4])
+merge1 = concatenate([dense1, dense2])
 
 ###### output
 
@@ -41,7 +36,11 @@ model.summary()
 
 # 3. 훈련
 model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
-model.fit([x1_train, x2_train] ,[y1_train] , epochs=100, batch_size=3, validation_split=0.25, verbose=1)
+
+from keras.callbacks import EarlyStopping
+# mode는 min, max, auto가 있으며 min은 최솟값에서, max는 최댓값에서, auto는 둘중하나 탐지해서 각 값에서 10번흔들렸을때 값을 구한다
+early_stopping = EarlyStopping(monitor="loss", patience=10,mode = "auto")
+model.fit([x1_train, x2_train] ,[y1_train] , epochs=1000, batch_size=3, validation_split=0.25, verbose=1, callbacks=[early_stopping])
 
 eval = model.evaluate([x1_test, x2_test], [y1_test], batch_size=1)
 if(len(eval) != 2):

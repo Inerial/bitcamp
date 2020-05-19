@@ -3,7 +3,7 @@ import numpy as np
 
 x1 = np.array([range(1,101), range(301,401)]).T
 
-y1 = np.array([range(711,811), range(711,811)]).T
+y1 = np.array([range(711,811), range(611,711)]).T
 y2 = np.array([range(101,201), range(411,511)]).T
 
 from sklearn.model_selection import train_test_split
@@ -16,19 +16,24 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Input
 
 input1 = Input(shape = (2,))
+'''
 dense1 = Dense(25, activation='relu', name="left-input1")(input1)
 dense1 = Dense(15, activation='relu', name="left-input2")(dense1)
 ###### output
 
 middle1 = Dense(10, name="middle1")(dense1)
+'''
+dense2 = Dense(300)(input1)
+dense2 = Dense(120)(dense2)
+dense2 = Dense(20)(dense2)
+dense2 = Dense(20)(dense2)
+dense2 = Dense(2)(dense2)
 
-dense2 = Dense(30, name="left_out1")(middle1)
-dense2 = Dense(20, name="left_out2")(dense2)
-dense2 = Dense(2, name="left_out3")(dense2)
-
-dense3 = Dense(30, name="right_out1")(middle1)
-dense3 = Dense(20, name="right_out2")(dense3)
-dense3 = Dense(2, name="right_out3")(dense3)
+dense3 = Dense(300)(input1)
+dense3 = Dense(120)(dense3)
+dense3 = Dense(20)(dense3)
+dense3 = Dense(20)(dense3)
+dense3 = Dense(2)(dense3)
 
 model = Model(inputs = [input1], outputs=[dense2, dense3])
 model.summary()
