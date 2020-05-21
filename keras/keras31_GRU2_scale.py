@@ -31,7 +31,7 @@ model.summary()
 #3. 실행
 model.compile(loss = 'mse', optimizer='adam')
 
-model.fit(x,y,epochs=2000,batch_size = 32)
+model.fit(x,y,epochs=4000,batch_size = 32)
 
 x_pred = x_pred.reshape(1,3,1)  ## 같은 크기의 행렬로 만들어줌
 

@@ -20,16 +20,11 @@ input_length = time_steps, input_dim = feature
 
 #2. 모델구성
 model = Sequential()
-model.add(LSTM(20, activation = 'relu', input_shape = (3,1))) 
+model.add(LSTM(150, activation = 'relu', input_shape = (3,1))) 
 # 데이터의 개수인 행은 무시하고 x의 shape
-model.add(Dense(20, activation = 'relu'))
-model.add(Dense(20))
-model.add(Dense(20, activation = 'relu'))
-model.add(Dense(20))
-model.add(Dense(20, activation = 'relu'))
-model.add(Dense(20))
-model.add(Dense(20, activation = 'relu'))
-model.add(Dense(20))
+model.add(Dense(100))
+model.add(Dense(100))
+model.add(Dense(100))
 model.add(Dense(1))
 
 model.summary()

@@ -16,22 +16,23 @@ x2 = x2.reshape(x2.shape[0], x2.shape[1], 1)
 
 #2. 모델구성
 input1 = Input(shape=(3,1))
-lstm1 = LSTM(20, activation = 'relu')(input1) 
-dense1 = Dense(20)(lstm1)
-dense1 = Dense(20)(dense1)
+lstm1 = LSTM(100, activation = 'relu')(input1) 
+dense1 = Dense(100)(lstm1)
+dense1 = Dense(100)(dense1)
+dense1 = Dense(100)(dense1)
 
 
 
 input2 = Input(shape=(3,1))
-lstm2 = LSTM(20, activation = 'relu')(input2) 
-dense2 = Dense(20)(lstm2)
-dense2 = Dense(20)(dense2)
+lstm2 = LSTM(100, activation = 'relu')(input2) 
+dense2 = Dense(100)(lstm2)
+dense2 = Dense(100)(dense2)
+dense2 = Dense(100)(dense2)
 
 from keras.layers import concatenate
 middle1 = concatenate(inputs = [dense1, dense2])
 
-middle1 = Dense(20)(middle1)
-middle1 = Dense(20)(middle1)
+
 middle1 = Dense(1)(middle1)
 
 # 데이터의 개수인 행은 무시하고 x의 shape
@@ -39,7 +40,7 @@ model = Model(inputs=[input1,input2], outputs=middle1)
 model.summary()
 
 #3. 실행
-model.compile(loss = 'mse', optimizer='adam')
+model.compile(loss = 'mae', optimizer='adam')
 model.fit([x1,x2],y,epochs=2000,batch_size = 32)
 
 x1_pred = x1_pred.reshape(1,3,1)  ## 같은 크기의 행렬로 만들어줌
