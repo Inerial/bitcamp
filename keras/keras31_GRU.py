@@ -1,6 +1,6 @@
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Dense, LSTM
+from keras.layers import Dense, GRU
 
 #1. 데이터
 x = np.array([[1,2,3], [2,3,4], [3,4,5], [4,5,6]])
@@ -22,7 +22,7 @@ input_length = time_steps, input_dim = feature
 #2. 모델구성
 model = Sequential()
 #model.add(LSTM(10, activation='relu', input_shape=(3,1))) 
-model.add(LSTM(100, input_length = 3, input_dim = 1)) 
+model.add(GRU(100, input_length = 3, input_dim = 1)) 
 # 데이터의 개수인 행은 무시하고 x의 shape
 model.add(Dense(100))
 model.add(Dense(1))
