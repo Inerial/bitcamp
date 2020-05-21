@@ -66,7 +66,6 @@ RNN = Recurrent Neural Network (순환 신경망)
 RNN의 가장 대표적인 방법 LSTM (Long Short Term Memory model)
 최근에는 TF 2.0 + keras
 레거시한 머신러닝모델은 속도가 훨신 빠름
-RNN종류 = simpleRNN , GRU, LSTM
 
 keras 추가방법 model.add(Dense ..) -> model.add(LSTM ..) 로 바꾼후 input output 데이터값 건드리면 됨
 
@@ -74,3 +73,31 @@ keras 추가방법 model.add(Dense ..) -> model.add(LSTM ..) 로 바꾼후 input
 벡터 : 스칼라들의 배열
 행렬 : 벡터의 배열
 텐서 : 행렬의 배열 
+
+데이터 분류법 : (batch_size, time_step, feature) 의 형태로 분류
+batch_size는 분류된 데이터의 개수, time_step은 분류한 시계열 데이터의 길이, feature은 데이터가 가지고있는 변수개수
+
+ex) 실제 시간에 따라 1,2,3,4,5,6,7 순의 데이터가 있다고 하면
+
+    time_step
+ b  [1] [2] [3] | [4]
+ a  [2] [3] [4] | [5]
+ t  [3] [4] [5] | [6]
+ c  [4] [5] [6] | [7]
+ h
+이런식으로 분류할 수 있고
+이때 time_step = 3, feature = 1로 되어 batch_size = 4 가 되었다.
+
+
+RNN종류 = simpleRNN , GRU, LSTM
+각각의 parameter 계산법
+
+simpleRNN : (input_dim + output + 1) * output
+GRU : (input_dim + output + 1) * output * 3
+LSTM : (input_dim + output + 1) * output * 4
+
+각각의 계산식은 비슷한테 곱해주는 상수가 다른 이유?
+전체적인 틀은 같지만 내부에서 곱하는 weight의 갯수가 다름 => simpleRNN -> GRU -> LSTM 으로 갈수록 내부적으로 복잡한 계산구조를 가짐
+
+따라서 복잡한 데이터를 분석할수록 내부적으로 복잡하게 계산을 하는 LSTM이 좀 더 잘 분석할 것으로 보인다.
+
