@@ -101,3 +101,16 @@ LSTM : (input_dim + output + 1) * output * 4
 
 따라서 복잡한 데이터를 분석할수록 내부적으로 복잡하게 계산을 하는 LSTM이 좀 더 잘 분석할 것으로 보인다.
 
+첫 LSTM layer에 input_shape를 (3,1)을 넣었을때 return_sequences = True를 주지 않으면 리턴시키는 값의 shape가 (batch_size, time_step, feature)의 형태가 아닌
+기존의 (batch_size, output)의 형태로 나오게 설정되어있다.
+연속으로 LSTM을 쓰기 위해서는 return_sequences=True를 써주어야 한다. 반대로 Dense를 쓰기 위해서는 다시 false값을 주어야한다(디폴트값)
+
+one layer에 one bias  다양한 bias가 필요하다면 LSTM을 더 만드는 것이 좋다.
+
+parameter 계산은 여전히 (input_dim + output + 1) * output * 4 이다.
+이떄 두번째 이후 input은 이전 LSTM의 output과 같다.
+
+return_sequences=True값을 준다면 LSTM의 shape형태로 출력되므로 output_shape = (none, 원래 준 time_step, output크기(output노드수 == 다음레이어의 input노드수))
+
+데이터가 단순하고 적어서 모델을 짜기가 편하고 적합이 빠르게 된다.
+LSTM보다 dense가 더 좋은 모델이라고 할수는없다.(데이터에 영향을 크게 받으므로)
