@@ -7,6 +7,7 @@ size = 5
 a = np.array(range(1,11))
 b = np.array([range(1,11), range(2,12)])
 
+
 def split_x(seq, size):
     if len(seq.shape) == 1:
         aaa = []
