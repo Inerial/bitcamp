@@ -44,14 +44,21 @@ model.add(Dense(100))
 model.add(Dense(100))
 model.add(Dense(100))
 model.add(Dense(100))
+model.add(Dense(100))
+model.add(Dense(10))
+model.add(Dense(10))
+model.add(Dense(10))
+model.add(Dense(10))
+model.add(Dense(10))
+model.add(Dense(10))
 model.add(Dense(1))
 
 model.compile(optimizer="adam", loss = 'mse')
 
 from keras.callbacks import EarlyStopping
-early = EarlyStopping(monitor='val_loss', patience = 10, mode = "auto")
+early = EarlyStopping(monitor='loss', patience = 9, mode = "auto")
 
-model.fit(x, y , epochs = 1000, callbacks=[early])
+model.fit(x, y , epochs = 10000, callbacks=[early])
 
 y_pred = model.predict(x)
 print(y_pred)
