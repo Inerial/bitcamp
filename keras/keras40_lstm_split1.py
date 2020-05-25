@@ -20,8 +20,8 @@ def split_x(seq, size):
 
 dataset = split_x(a, size)
 
-x = dataset.T[:size-1].T.reshape(len(a) - size + 1, size-1, 1)
-y = dataset.T[size-1:].T
+x = dataset[:, :size-1].reshape(len(a) - size + 1, size-1, 1) 
+y = dataset[:, size-1] ## c랑은 다르게 대괄호 안에 ,로 구분한다.
 
 
 model = Sequential()
@@ -34,7 +34,7 @@ model.add(Dense(100))
 model.add(Dense(100))
 model.add(Dense(1))
 
-model.compile(optimizer="adam", loss = 'mse')
+model.compile(optimizer="adam", loss = 'mse',metrics=['mse'])
 
 from keras.callbacks import EarlyStopping
 early = EarlyStopping(monitor='val_loss', patience = 10, mode = "auto")

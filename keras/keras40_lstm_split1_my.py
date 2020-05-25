@@ -9,37 +9,31 @@ size = 5
 
 #LSTM 모델 완성
 
-def split_x(seq, size):
+def split_all(seq, size):
     import numpy as np
-    xxx = []
-    yyy = []
+    aaa = []
     if type(seq) != np.ndarray:
         assert 1 == 2, "입력값이 array가 아님!"
         return
     elif len(seq.shape) == 1:
         for i in range(len(seq) - size + 1):
-            subset1 = seq[i:i+size-1]
-            subset2 = seq[i+size-1]
-            xxx.append(subset1)
-            yyy.append(subset2)
-        x = np.array(xxx).reshape(len(seq) - size + 1, size-1 , 1)
-        y = np.array(yyy)
-        return x, y
+            subset = seq[i:i+size]
+            aaa.append(subset)
+        aaa = np.array(aaa).reshape(len(seq) - size + 1, size , 1)
+        return aaa
     elif len(seq.shape) == 2:
         for i in range(len(seq.T) - size + 1):
-            subset1 = seq.T[i:i+size - 1]
-            subset2 = seq.T[i+size-1]
-            xxx.append(subset1)
-            yyy.append(subset2)
-        x = np.array(xxx)
-        y = np.array(yyy)
-        return x, y
+            subset = seq.T[i:i+size]
+            aaa.append(subset)
+        return np.array(aaa)
     else :
         assert 1 == 2 ,"입력값이 3차원 이상!"
         return
 
 
-x, y = split_x(a, size)
+dataset = split_all(a, size)
+x = dataset[:, :size-1]  ## c랑은 다르게 대괄호 안에 ,로 구분해서 해준다.
+y = dataset[:, size-1]
 
 
 model = Sequential()
