@@ -20,14 +20,12 @@ def split_x(seq, size):
 
 dataset = split_x(a, size)
 
-x = dataset[:, :size-1]
+x = dataset[:, :size-1].reshape(len(a) - size + 1, size-1, 1) 
 y = dataset[:, size-1] ## c랑은 다르게 대괄호 안에 ,로 구분한다.
 
 
 model = Sequential()
-model.add(Dense(100, input_dim = size-1))
-model.add(Dense(100))
-model.add(Dense(100))
+model.add(LSTM(800, input_shape=(size-1,1)))
 model.add(Dense(100))
 model.add(Dense(100))
 model.add(Dense(100))
@@ -39,7 +37,7 @@ model.add(Dense(1))
 model.compile(optimizer="adam", loss = 'mse',metrics=['mse'])
 
 from keras.callbacks import EarlyStopping
-early = EarlyStopping(monitor='loss', patience = 20, mode = "auto")
+early = EarlyStopping(monitor='val_loss', patience = 5, mode = "auto")
 
 model.fit(x, y , epochs = 1000, callbacks=[early])
 
