@@ -26,7 +26,9 @@ y = dataset[:, size-1] ## c랑은 다르게 대괄호 안에 ,로 구분한다.
 from keras.models import load_model
 model = load_model("./model/save_keras44.h5")
 
-model.add(Dense(1, name = '1'))
+model.add(Dense(10, name = '1'))
+model.add(Dense(13, name = '2'))
+model.add(Dense(1, name = '3'))
 
 model.summary()
 
@@ -35,7 +37,7 @@ model.compile(optimizer="adam", loss = 'mse',metrics=['mse'])
 from keras.callbacks import EarlyStopping
 early = EarlyStopping(monitor='val_loss', patience = 5, mode = "auto")
 
-model.fit(x, y , epochs = 1000, callbacks=[early])
+model.fit(x, y , batch_size = 1 , epochs = 30, callbacks=[early])
 
 loss, mse = model.evaluate(x,y)
 print('loss :', loss)

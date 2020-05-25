@@ -14,11 +14,6 @@ model.add(Dense(100))
 model.add(Dense(100))
 model.add(Dense(100))
 model.add(Dense(100))
-model.add(Dense(100))
-model.add(Dense(100))
-model.add(Dense(100))
-model.add(Dense(100))
-model.add(Dense(100))
 
 model.summary()
 
