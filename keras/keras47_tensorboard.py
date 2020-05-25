@@ -32,23 +32,31 @@ x_train, x_test, y_train, y_test = train_test_split(
 x_pred = dataset[-6:, :size-1]
 
 # 모델
-from keras.models import load_model
-model = load_model("./model/save_keras44.h5")
-
-model.add(Dense(100, name = '2'))
-model.add(Dense(1, name = '4'))
+model = Sequential()
+model.add(LSTM(800, input_shape=(4,1)))
+model.add(Dense(100))
+model.add(Dense(100))
+model.add(Dense(100))
+model.add(Dense(100))
+model.add(Dense(100))
+model.add(Dense(1))
 
 model.summary()
 
 #훈련
 model.compile(optimizer="adam", loss = 'mse',metrics=['acc'])
 
-from keras.callbacks import EarlyStopping
+from keras.callbacks import EarlyStopping, TensorBoard
+tb_hist = TensorBoard(log_dir = '.\graph', histogram_freq = 0, 
+                      write_graph = True, write_images = True,)
 
-early = EarlyStopping(monitor='val_loss', patience = 15, mode = "auto")
+## cmd에서 해당 폴더 들어간후 tensorboard --logdir=. 입력
+## http://127.0.0.1:6006/#scalars 그후 이곳으로 들어가면 그래프가 뜸
+
+early = EarlyStopping(monitor='val_loss', patience = 20, mode = "auto")
 
 hist = model.fit(x_train, y_train , 
-                validation_split=0.25, epochs = 1000, callbacks=[early])
+                validation_split=0.25, epochs = 1000, callbacks=[early, tb_hist])
 
 print(hist)
 print(hist.history.keys())
@@ -64,7 +72,7 @@ plt.ylabel('loss, acc')
 plt.xlabel('epoch')
 #plt.axis([0,1,0,100])
 plt.legend()
-plt.show()
+#plt.show()
 
 #4. 평가,예측
 loss, mse = model.evaluate(x_test,y_test)
@@ -74,3 +82,23 @@ print('mse :', mse)
 y_pred = model.predict(x_pred)
 print(y_pred)
 
+'''
+import os
+path = os.getcwd()
+
+def func1():
+    os.system('tensorboard --logdir=.')
+def func2():
+    os.system('start chrome http://127.0.0.1:6006/#scalars')
+
+from multiprocessing import Process
+
+p1 = Process(target=func1)
+p2 = Process(target=func2)
+
+p1.start()
+p2.start()
+
+p1.join()
+p2.join()
+'''

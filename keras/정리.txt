@@ -145,3 +145,72 @@ train_test_split
 scaler
 
 이상치를 제거하고 전처리를 해주는것이 좋다.
+
+
+lstm 시계열 데이터 분할
+
+1 2 3 4 5 6 7 8 9 10
+=>
+1 2 3 4 5
+2 3 4 5 6
+3 4 5 6 7
+4 5 6 7 8
+5 6 7 8 9
+6 7 8 9 10    형태로 분할해줌 
+
+batch_size : len(data) - time_step + 1
+time_step : time_step
+feature : 1 (시계열데이터의 종류갯수)
+
+python에서 list, array의 index 분할 방법
+list[1: , :4 , :] 방식
+
+똑같이 train_test_split, validation_split 등등 그대로 먹힘 
+ == 행기준으로 그대로 수행되므로
+
+모델의 저장 및 불러오기
+
+저장:
+model.save("./폴더/파일명.h5")
+기본적으로 라이브러리에 들어가있음 (따로 선언 x)
+
+불러오기:
+from keras.models import load_model
+model = load_model("같은 주소")
+선언 필요
+선언한 모델에 추가 입력 가능 (단 layer 이름중복 주의)
+
+
+
+history 가져오기
+기본적으로 model.fit()함수는 적합내용 데이터를 리턴해준다
+hist = model.fit()  이떄 hist는 dict 
+
+hist.history 안에 loss, metrics 값들이 들어있어 그것을 이용하여 그래프를 그리면된다.
+(validation지정시 해당 값도 출력가능)
+
+이때 import matplotlib.pyplot as plt 라는 라이브러리가 무난한 시각화 라이브러리
+자세한 시행방법은 46번파일과 구글링을 통해 연습하도록 하자 (매우 다양함)
+
+
+
+tensorboard
+
+keras.models 의 tensorboard함수를 통해 그래프를 그릴수도 있다.
+이는 선택사항, 그래프는 이쁘지만 귀찮은 과정
+
+
+from keras.callbacks import TensorBoard
+tb_hist = TensorBoard(log_dir = '.\graph', histogram_freq = 0, 
+                      write_graph = True, write_images = True,)
+
+이렇게 tb_hist를 지정해준 다음
+fit시 callbacks parameter에 tb_hist를 넣어주면 된다.
+
+log_dir 경로의 폴더에 관련 데이터들이 들어가지므로 비어있는 폴더(없으면 생성한다.)
+
+두번 이상 연속으로 시행하면 데이터들이 계속 덮어씌워지며 겹쳐진다. (지워줘야함)
+
+제데로 돌아갔다면
+cmd에서 데이터가 들어간 폴더 찾아 들어간후 tensorboard --logdir=. 입력
+그후 인터넷 주소에 http://127.0.0.1:6006/#scalars 입력시 그래프가 뜸
