@@ -2,6 +2,13 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
 
+## 만약에 keras 안에 그래프 폴더가 있다면 삭제해주는 함수(중복 방지)
+import shutil
+import os
+if os.path.isdir(os.getcwd()+'\\graph') :
+    shutil.rmtree(os.getcwd()+'\\graph')
+
+
 #1.data
 
 a = np.array(range(1,101))
@@ -47,7 +54,7 @@ model.summary()
 model.compile(optimizer="adam", loss = 'mse',metrics=['acc'])
 
 from keras.callbacks import EarlyStopping, TensorBoard
-tb_hist = TensorBoard(log_dir = '.\graph', histogram_freq = 0, 
+tb_hist = TensorBoard(log_dir = '.\keras\graph', histogram_freq = 0, 
                       write_graph = True, write_images = True,)
 
 ## cmd에서 해당 폴더 들어간후 tensorboard --logdir=. 입력
@@ -57,7 +64,7 @@ early = EarlyStopping(monitor='val_loss', patience = 20, mode = "auto")
 
 hist = model.fit(x_train, y_train , 
                 validation_split=0.25, epochs = 1000, callbacks=[early, tb_hist])
-
+'''
 print(hist)
 print(hist.history.keys())
 
@@ -73,7 +80,7 @@ plt.xlabel('epoch')
 #plt.axis([0,1,0,100])
 plt.legend()
 #plt.show()
-
+'''
 #4. 평가,예측
 loss, mse = model.evaluate(x_test,y_test)
 print('loss :', loss)
@@ -82,23 +89,11 @@ print('mse :', mse)
 y_pred = model.predict(x_pred)
 print(y_pred)
 
-'''
+## cmd 바로 켜서 명령어 실행해주고 홈페이지까지 열어주는 함수
+## ctrl + c가 먹히지 않아 ctrl + break(맨 오른쪽 구석키)로 꺼주어야 한다. <-문제점
+## 그냥 끄면 화면만 꺼지고 뒤에서 계속 돌아가는 것을 확인
 import os
-path = os.getcwd()
+asdf = os.system("start cmd /c tensorboard --logdir=. " )
+os.system('start chrome http://127.0.0.1:6006/#scalars')
 
-def func1():
-    os.system('tensorboard --logdir=.')
-def func2():
-    os.system('start chrome http://127.0.0.1:6006/#scalars')
 
-from multiprocessing import Process
-
-p1 = Process(target=func1)
-p2 = Process(target=func2)
-
-p1.start()
-p2.start()
-
-p1.join()
-p2.join()
-'''
