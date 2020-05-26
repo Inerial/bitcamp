@@ -214,3 +214,88 @@ log_dir 경로의 폴더에 관련 데이터들이 들어가지므로 비어있�
 제데로 돌아갔다면
 cmd에서 데이터가 들어간 폴더 찾아 들어간후 tensorboard --logdir=. 입력
 그후 인터넷 주소에 http://127.0.0.1:6006/#scalars 입력시 그래프가 뜸
+
+
+
+
+분류모델
+
+분류모델이란? 결과로 나오는 y값이 연속형 자료(몸무게와 같이 연속(순서)됨을 보일수 있는 자료)
+가 아닌 범주형 자료(오렌지, 사과, 배 와 같이 연관성은 있으나 연속, 순서를 보일수 없는 자료)
+로 이루어져 있는 데이터를 분류하는 방법을 분류모델이라고 한다.
+
+분류모델에서 사용하는 loss 값은 두가지로 고정!! 이때 model의 마지막 output에 들어가는 activation도 고정
+이진분류 : binary_crossentropy   - activation : "sigmoid"
+다항분류 : categorical_crossentropy - activation : "softmax"
+
+중간에 들어가는 activation은 대부분의 경우 "relu"가 유효 하지만
+데이터의 feature가 1이면서 이진분류 "sigmoid"로 끝나는 경우
+데이터가 relu 계산에 의해 0이 되버리면서 노드가 죽어버리는 오류가 발생한다.
+특히 sigmoid함수는 데이터가 0 이 들어가면 무조건 0.5가 나오기 때문에 제데로된 값이 나오지 않는다.
+
+데이터의 크기가 작을수록 이러한 현상이 자주 발생할것으로 보이며 "elu" 를 사용하면
+이러한 문제점을 해결할 수 있었다.
+
+
+다항분류의 경우 데이터의 크기에 상관없이 relu도 잘 먹히는 모습을 보였다.
+아마도 one_hot_encoding을 통해 y의 크기가 커져서 그런것으로 보인다.
+
+다항분류의 경우 y의 값을 one_hot_encoding을 통해 데이터를 전처리 해주어야 
+loss 값으로 categorical_crossentropy를 사용할 수 있었다. (아니면 오류)
+
+one_hot_encoding이란?
+1~5사이의 값을 가지는 범주형 데이터가 있을때
+
+1을 [1,0,0,0,0]
+2를 [0,1,0,0,0]과 같이 변형해주어 행렬로 만들어주는 데이터 전처리방식
+
+사용하는 함수는 keras.utils 에 있는 to_categorical(seq) 함수
+이때 넣는 seq 배열을 one_hot_encoding방식으로 바꾸어 리턴해준다.
+이때 seq배열의 max값을 찾아 (len(seq) , max+1) 만큼의 dim을 가진 행렬을 리턴
+만약 데이터의 최소값이 0이 아니라면
+음수는 배열마냥 반대편으로 넘어가 -1이 max값으로 변하게 되고
+양수이면 하나도 사용하지 않는 열이 왼쪽에 만들어지게 된다.
+
+이를 막기 위해 y의 최솟값을 기억해둔 다음
+y에 min값을 빼서 인코딩을 한다면 자연스럽게 최솟값이 0이 되어 이러한 문제점이 없어지게 된다.
+마지막 결과에 저장해둔 min값을 그대로 더해준다면 원래값으 그대로 다시 나오게 된다.
+
+분류모델의 경우 확률이 가장 높게 나오는 쪽을 선택하면 된다.
+(그래도 최대한 확률이 높게 분류해보도록 하자)
+
+
+
+CNN   Conv2D
+
+자르고 증폭시키며 사진의 특성을 찾아내는 방법
+x의 shape는 4차원 텐서 (2D)
+(batch_size, height, width, channels)
+
+Conv2D의 매개변수
+filters == output
+kernel_size == 필터의 가로세로 크기
+input_shape == 입력할 인풋 x의 shape (batch_size 제외 == 3차원텐서)
+padding == 'valid' : 기본값 적용안하는것
+            'same' : kernel_size값을 기반으로 0을 사진에 둘러준다.
+                     상대적으로 적게 적합될 수 있는 valid에 비해 더 가생이 적합가능
+
+strides == default 1, 필터를 쓰는 간격, 2를 쓰면 필터를 두칸마다 사용 데이터의 크기가 크면 계산을 줄일수 있다.
+
+
+
+MaxPooling2D : 받은 데이터에 pool_size만큼 묶어 가장 큰 값을 하나 꺼냄
+               데이터의 크기를 줄이거나 특정 데이터를 강조할수 있다.
+== 비슷한 것으로 AveragePooling2D가 존재 : 묶은 값들의 평균
+
+Flatten : 위에서 내려온 3차원 텐서를 1차원 벡터로 변경시켜준다.
+          == Conv2D종료 후 분류분석을 할때 데이터형식 변경
+
+CNN의 parameter 계산법은
+(kernel_height * kernel_width * input_channel + 1) * output_channel
+
+1은 bias
+
+filter로 사진을 조각조각 내면 그 너비만큼 channel이 곱연산으로 늘어난다.
+(윗채널 + 1) * 아랫채널 의 방식으로 방식으로는 dense와 큰 차이가 없음
+
+다만 한 노드가 나눈 사진 하나하나를 의미한다는점

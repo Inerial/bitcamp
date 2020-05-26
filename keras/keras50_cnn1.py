@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense## cnn 레이어함수
+from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense,AveragePooling2D## cnn 레이어함수
 
 ## cnn은 자르고 증폭시켜서 사진의 특성을 찾는다
 ## 
@@ -16,12 +16,17 @@ model.add(Conv2D( filters = 10, kernel_size = (2,2),
 model.add(Conv2D(7, (3,3)))
 model.add(Conv2D(5, (2,2), padding = 'same'))
 model.add(Conv2D(5, (2,2)))
-#model.add(Conv2D(5, (2,2), strindes=2))
-#model.add(Conv2D(5, (2,2), strinds=2, padding= 'same'))
-model.add(MaxPooling2D(pool_size=4))
+#model.add(Conv2D(5, (2,2), strides=2))
+#model.add(Conv2D(5, (2,2), strides=2, padding= 'same'))
+model.add(MaxPooling2D(pool_size=4,))
+## 출력데이터의 크기를 줄이거나 특정 데이터의 값을 강조하는 용도
+
 model.add(Flatten()) ## 위에서 내려오는 모든 1차원 벡터로 변경시켜줌
-#conv2d의 끝은 항상 flatten으로 끝내준다. 항상
+#conv2d의 끝은 항상 flatten으로 끝내준다. 항상 == 3차원 shape를 Dense에 넣을수 있는 1차원 dim으로 변환
+
+
 model.add(Dense(1))
+# 이후 데이터로 분류분석 시행
 
 # # padding = 'same'은 kernel_size에 맞춰 묶어주며 줄어든 높이 너비를 output시 높이 넓이를 원래 값과 같게 바꿔준다.
 
