@@ -66,8 +66,8 @@ y_predict1 += min_y
 '''
 
 y_predict2 = []
-for i in range(len(y_pred)):
-    y_predict2.append(np.argmax(y_pred[i]))
+for i in y_pred:
+    y_predict2.append(np.argmax(i))
 y_predict2 += min_y
 
 print('y_pred :\n', y_pred)
