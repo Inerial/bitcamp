@@ -27,30 +27,40 @@ y_test = np_utils.to_categorical(y_test)
 x_train = x_train.reshape(60000,28,28,1).astype('float32') / 255 ## float 안해줘도 되지 않나?
 x_test = x_test.reshape(10000,28,28,1).astype('float32') / 255
 
+
 from keras.models import Sequential
-from keras.layers import Conv2D, Dense, Flatten, MaxPool2D
+from keras.layers import Conv2D, Dense, Flatten, MaxPool2D, Dropout
 
 model = Sequential()
-model.add(Conv2D(3, (2,2),padding='same', input_shape=(28,28,1)))
-model.add(Conv2D(3, (2,2),padding='same'))
+model.add(Conv2D(20, (2,2),padding='same', input_shape=(28,28,1)))
+model.add(Dropout(0.2))
+model.add(Conv2D(20, (2,2),padding='same'))
+model.add(Dropout(0.2))
 model.add(MaxPool2D((2,2)))
-model.add(Conv2D(3, (2,2),padding='same'))
-model.add(Conv2D(3, (2,2),padding='same'))
+model.add(Conv2D(20, (2,2),padding='same'))
+model.add(Dropout(0.2))
+model.add(Conv2D(20, (2,2),padding='same'))
+model.add(Dropout(0.2))
 
 model.add(Flatten())
 
 model.add(Dense(200, activation='elu'))
+model.add(Dropout(0.2))
 model.add(Dense(200, activation='elu'))
+model.add(Dropout(0.2))
 model.add(Dense(200, activation='elu'))
+model.add(Dropout(0.2))
 model.add(Dense(200, activation='elu'))
+model.add(Dropout(0.2))
 model.add(Dense(200, activation='elu'))
+model.add(Dropout(0.2))
 model.add(Dense(200, activation='elu'))
+model.add(Dropout(0.2))
 model.add(Dense(200, activation='elu'))
-model.add(Dense(200, activation='elu'))
-model.add(Dense(200, activation='elu'))
-model.add(Dense(200, activation='elu'))
-model.add(Dense(200, activation='elu'))
+model.add(Dropout(0.2))
 model.add(Dense(10, activation='softmax'))
+
+model.summary()
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 
@@ -59,3 +69,6 @@ model.fit(x_train, y_train, batch_size = 100, epochs=30, validation_split=0.1)
 loss, acc = model.evaluate(x_test,y_test)
 print('loss :',loss)
 print('acc :',acc)
+
+## dropout : 노드를 일정 비율 비활성화시키면서 노드를 적합
+#99.25
