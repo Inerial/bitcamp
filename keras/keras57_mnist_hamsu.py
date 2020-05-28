@@ -76,4 +76,4 @@ print('loss :',loss)
 print('acc :',acc)
 
 ## dropout : 노드를 일정 비율 비활성화시키면서 노드를 적합
-#99.25
+#0.9925
