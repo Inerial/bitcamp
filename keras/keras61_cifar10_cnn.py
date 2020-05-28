@@ -1,12 +1,11 @@
 from keras.datasets import cifar10
 from keras.models import Sequential, Model
 from keras.utils import np_utils
-from keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten, Input, LSTM
+from keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten, Input, LSTM, MaxPool2D
 import matplotlib.pyplot as plt
 import numpy as np
 
 (x_train, y_train),(x_test,y_test) = cifar10.load_data()
-
 
 ## OneHotEncoding
 from keras.utils import np_utils

@@ -14,11 +14,11 @@ y_train = np_utils.to_categorical(y_train)
 y_test = np_utils.to_categorical(y_test)
 
 ## 정규화
-x_train = x_train.reshape(50000, 32,32*3).astype('float32') / 255
-x_test = x_test.reshape(10000, 32,32*3).astype('float32') / 255
+x_train = x_train.reshape(50000, 1, 32*32*3).astype('float32') / 255
+x_test = x_test.reshape(10000, 1, 32*32*3).astype('float32') / 255
 
 
-input1 = Input(shape = (32,32*3))
+input1 = Input(shape = (1, 32*32*3))
 
 lstm1 = LSTM(800, activation='elu')(input1)
 lstm1 = Dropout(0.2)(lstm1)
@@ -49,5 +49,5 @@ loss, acc = model.evaluate(x_test,y_test)
 print('loss :',loss)
 print('acc :',acc)
 
-## dropout : 노드를 일정 비율 비활성화시키면서 노드를 적합
-#0.9925
+""" loss : 1.4187040948867797
+acc : 0.5008999705314636 """
