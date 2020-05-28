@@ -64,7 +64,7 @@ model.add(Dense(10, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 
-model.fit(x_train, y_train, batch_size = 500, epochs=60, validation_split=0.3)
+model.fit(x_train, y_train, batch_size = 500, epochs=60, validation_split=0.4)
 
 loss, acc = model.evaluate(x_test,y_test)
 print('loss :',loss)

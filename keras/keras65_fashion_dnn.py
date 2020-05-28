@@ -18,19 +18,21 @@ x_test = x_test.reshape(10000,28*28).astype('float32') / 255
 
 model = Sequential()
 
-model.add(Dense(200, activation='elu'))
+model.add(Dense(784, activation='elu',input_dim = 28*28))
 model.add(Dropout(0.2))
-model.add(Dense(200, activation='elu'))
+model.add(Dense(784, activation='elu'))
 model.add(Dropout(0.2))
-model.add(Dense(200, activation='elu'))
+model.add(Dense(392, activation='elu'))
 model.add(Dropout(0.2))
-model.add(Dense(200, activation='elu'))
+model.add(Dense(392, activation='elu'))
 model.add(Dropout(0.2))
-model.add(Dense(200, activation='elu'))
+model.add(Dense(196, activation='elu'))
 model.add(Dropout(0.2))
-model.add(Dense(200, activation='elu'))
+model.add(Dense(196, activation='elu'))
 model.add(Dropout(0.2))
-model.add(Dense(200, activation='elu'))
+model.add(Dense(98, activation='elu'))
+model.add(Dropout(0.2))
+model.add(Dense(98, activation='elu'))
 model.add(Dropout(0.2))
 model.add(Dense(10, activation='softmax'))
 
@@ -44,5 +46,5 @@ loss, acc = model.evaluate(x_test,y_test)
 print('loss :',loss)
 print('acc :',acc)
 """ 
-loss : 0.35533749743700027
-acc : 0.8827999830245972 """
+loss : 0.3797635713636875
+acc : 0.8909000158309937 """
