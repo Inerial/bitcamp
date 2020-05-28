@@ -22,13 +22,13 @@ from keras.utils import np_utils
 y_train = np_utils.to_categorical(y_train)
 y_test = np_utils.to_categorical(y_test)
 
-# time_steps, size = [784 , 1]
-# time_steps, size = [392 , 2]
-# time_steps, size = [196 , 4]
-# time_steps, size = [112 , 7]
-# time_steps, size = [98 , 8]
-# time_steps, size = [56 , 14]
-time_steps, size = [49 , 16]
+# time_steps, size = [784 , 1] ## 에러
+# time_steps, size = [392 , 2] ## 에러
+# time_steps, size = [196 , 4] ## 에러
+# time_steps, size = [112 , 7] ## 0.487
+# time_steps, size = [98 , 8] ## 0.118
+# time_steps, size = [56 , 14] ## 0.988
+# time_steps, size = [49 , 16] ## 0.981
 
 # time_steps, size = [28 , 28] # 0.989
 
@@ -38,11 +38,13 @@ time_steps, size = [49 , 16]
 # time_steps, size = [7 , 112] ## 0.985
 # time_steps, size = [4 , 196] ## 0.984
 # time_steps, size = [2 , 392] ## 0.984
-# time_steps, size = [1 , 784] ## 0.980
+time_steps, size = [1 , 784] ## 0.982
 
-## time_step이 증가할수록 실행 속도가 느려진다 (증가폭에 비례하여).
-## 검정력의 차이는 그렇게 보이지 않는데
-## time_step이 특정값을 넘어가면 오류가 뜬다. (메모리를 겁나게 잡아먹는것으로 보임)
+## time_step이 증가할수록 실행 속도가 느려진다 (증가폭에 비례하는거보다 더 증가하는것으로 보임).
+## 검정력의 차이는 딱히 보이지 않는다 오히려 타임스텝이 너무 커지면 검정력이 낮아짐
+## time_step이 특정값을 넘어가면 에러가 뜬다. (메모리를 겁나게 잡아먹는것으로 보임)
+## 따라서 시계열적 특성이 없는 데이터라면 time_step을 줄 이유가 없다. 라고 볼 수 있다.
+
 
 ## 정규화
 #from sklearn.preprocessing import MinMaxScaler
