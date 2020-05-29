@@ -1,4 +1,4 @@
-from sklearn.datasets import load_boston
+from sklearn.datasets import load_diabetes
 from keras.models import Sequential, Model
 from keras.utils import np_utils
 from keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten, Input, LSTM
@@ -16,10 +16,10 @@ os.mkdir(tmp +'\\graph')
 os.mkdir(tmp +'\\model')
 
 ## 데이터
-boston = load_boston()
+diabetes = load_diabetes()
 
-x = boston.data
-y = boston.target
+x = diabetes.data
+y = diabetes.target
 
 from sklearn.preprocessing import MinMaxScaler
 scale = MinMaxScaler()
@@ -31,21 +31,22 @@ x_train, x_test, y_train,y_test = train_test_split(
     x,y, random_state=66, train_size = 0.8
 )
 
-input1 = Input(shape=(13,))
 
-dense1 = Dense(200, activation='elu')(input1)
+input1 = Input(shape=(10,))
+
+dense1 = Dense(2000, activation='elu')(input1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(200, activation='elu')(dense1)
+dense1 = Dense(2000, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(200, activation='elu')(dense1)
+dense1 = Dense(2000, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(150, activation='elu')(dense1)
+dense1 = Dense(1000, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(150, activation='elu')(dense1)
+dense1 = Dense(1000, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(100, activation='elu')(dense1)
+dense1 = Dense(500, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(100, activation='elu')(dense1)
+dense1 = Dense(500, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(100, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
@@ -63,7 +64,7 @@ tensor = TensorBoard(log_dir = '.\keras\graph', histogram_freq = 0,
 check = ModelCheckpoint(filepath='.\keras\model\{epoch:02d}-{val_loss:.5f}.hdf5',
                         monitor='val_loss',save_best_only=True)
 
-hist = model.fit(x_train, y_train, batch_size=50, epochs=1000,
+hist = model.fit(x_train, y_train, batch_size=100, epochs=100,
                 validation_split = 0.3, callbacks = [early, tensor, check])
 
 loss, mse = model.evaluate(x_test, y_test)
@@ -88,7 +89,8 @@ plt.legend()
 
 plt.show()
 
-""" loss : 14.560861461302814
-mse : 14.560861587524414
-결정계수 :  0.8271209486595283
+""" 
+loss : 3883.11711617802
+mse : 3883.1171875
+결정계수 :  0.4016806099449166
  """

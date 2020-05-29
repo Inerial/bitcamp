@@ -1,4 +1,4 @@
-from sklearn.datasets import load_boston
+from sklearn.datasets import load_diabetes
 from keras.models import Sequential, Model
 from keras.utils import np_utils
 from keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten, Input, LSTM
@@ -16,40 +16,40 @@ os.mkdir(tmp +'\\graph')
 os.mkdir(tmp +'\\model')
 
 ## 데이터
-boston = load_boston()
+diabetes = load_diabetes()
 
-x = boston.data
-y = boston.target
+x = diabetes.data
+y = diabetes.target
 
 from sklearn.preprocessing import MinMaxScaler
 scale = MinMaxScaler()
 x = scale.fit_transform(x)
 
+x = x.reshape(x.shape[0], 1, 1, x.shape[1])
 
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train,y_test = train_test_split(
     x,y, random_state=66, train_size = 0.8
 )
 
-input1 = Input(shape=(13,))
+input1 = Input(shape=(1,1,10))
 
-dense1 = Dense(200, activation='elu')(input1)
+conv1 = Conv2D(32,(2,2) ,activation='elu', padding = 'same')(input1)
+conv1 = Dropout(0.2)(conv1)
+
+conv1 = Flatten()(conv1)
+
+dense1 = Dense(200, activation='elu')(conv1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(150, activation='elu')(dense1)
+dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(150, activation='elu')(dense1)
+dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(100, activation='elu')(dense1)
-dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(100, activation='elu')(dense1)
-dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(100, activation='elu')(dense1)
-dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(100, activation='elu')(dense1)
+dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(1, activation='elu')(dense1)
 
@@ -57,13 +57,13 @@ model = Model(inputs=input1, output=dense1)
 
 model.compile(optimizer='adam', loss = 'mse', metrics=['mse'])
 
-early = EarlyStopping(monitor='val_loss', patience =20)
+early = EarlyStopping(monitor='val_loss', patience = 10)
 tensor = TensorBoard(log_dir = '.\keras\graph', histogram_freq = 0, 
                       write_graph = True, write_images = True)
 check = ModelCheckpoint(filepath='.\keras\model\{epoch:02d}-{val_loss:.5f}.hdf5',
                         monitor='val_loss',save_best_only=True)
 
-hist = model.fit(x_train, y_train, batch_size=50, epochs=1000,
+hist = model.fit(x_train, y_train, batch_size=500, epochs=1000,
                 validation_split = 0.3, callbacks = [early, tensor, check])
 
 loss, mse = model.evaluate(x_test, y_test)
@@ -87,8 +87,8 @@ plt.ylabel('mse')
 plt.legend()
 
 plt.show()
-
-""" loss : 14.560861461302814
-mse : 14.560861587524414
-결정계수 :  0.8271209486595283
- """
+""" 
+loss : 6193.81606061271
+mse : 6193.81591796875
+결정계수 :  0.04564288154110252
+"""
