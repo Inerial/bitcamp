@@ -299,3 +299,11 @@ filter로 사진을 조각조각 내면 그 너비만큼 channel이 곱연산으
 (윗채널 + 1) * 아랫채널 의 방식으로 방식으로는 dense와 큰 차이가 없음
 
 다만 한 노드가 나눈 사진 하나하나를 의미한다는점
+
+
+robust scalar 이상치 제거시 꽤 좋음
+
+PCA(주성분분석) 으로 데이터의 FEATURE를 줄여주면 이상치 제거도 되며 쓸모없는 feature도
+솎아내 볼 수 있다.
+
+sklearn.preprosessing에 다 있음
