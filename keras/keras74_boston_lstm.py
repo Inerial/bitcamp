@@ -68,6 +68,11 @@ loss, mse = model.evaluate(x_test, y_test)
 print('loss :',loss)
 print('mse :',mse)
 
+from sklearn.metrics import r2_score
+y_pred = model.predict(x_test)
+r2_y = r2_score(y_test,y_pred)
+print("결정계수 : ", r2_y)
+
 plt.subplot(2,1,1)
 plt.plot(hist.history['loss'], c = 'black',label = 'loss')
 plt.plot(hist.history['val_loss'], c = 'blue', label = 'val_loss')
@@ -81,5 +86,8 @@ plt.legend()
 
 plt.show()
 
-""" loss : 13.677233738057753
-mse : 13.677233695983887 """
+""" 
+loss : 13.69379602694044
+mse : 13.693796157836914
+결정계수 :  0.8361651727048481
+ """

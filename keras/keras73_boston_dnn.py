@@ -39,11 +39,17 @@ dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(200, activation='elu')(dense1)
+dense1 = Dense(150, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(200, activation='elu')(dense1)
+dense1 = Dense(150, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(200, activation='elu')(dense1)
+dense1 = Dense(100, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(100, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(100, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(100, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(1, activation='elu')(dense1)
 
@@ -51,7 +57,7 @@ model = Model(inputs=input1, output=dense1)
 
 model.compile(optimizer='adam', loss = 'mse', metrics=['mse'])
 
-early = EarlyStopping(monitor='val_loss', patience = 10)
+early = EarlyStopping(monitor='val_loss', patience =20)
 tensor = TensorBoard(log_dir = '.\keras\graph', histogram_freq = 0, 
                       write_graph = True, write_images = True)
 check = ModelCheckpoint(filepath='.\keras\model\{epoch:02d}-{val_loss:.5f}.hdf5',
@@ -63,6 +69,11 @@ hist = model.fit(x_train, y_train, batch_size=500, epochs=1000,
 loss, mse = model.evaluate(x_test, y_test)
 print('loss :',loss)
 print('mse :',mse)
+
+from sklearn.metrics import r2_score
+y_pred = model.predict(x_test)
+r2_y = r2_score(y_test,y_pred)
+print("결정계수 : ", r2_y)
 
 plt.subplot(2,1,1)
 plt.plot(hist.history['loss'], c = 'black',label = 'loss')
@@ -79,4 +90,5 @@ plt.show()
 
 """ loss : 14.560861461302814
 mse : 14.560861587524414
+결정계수 :  0.8271209486595283
  """

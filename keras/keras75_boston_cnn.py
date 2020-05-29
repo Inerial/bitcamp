@@ -21,18 +21,22 @@ boston = load_boston()
 x = boston.data
 y = boston.target
 
-from sklearn.preprocessing import MinMaxScaler
-scale = MinMaxScaler()
+from sklearn.preprocessing import StandardScaler
+scale = StandardScaler()
 x = scale.fit_transform(x)
 
-x = x.reshape(x.shape[0], x.shape[1], 1, 1)
+from sklearn.decomposition import PCA
+pca = PCA(8)
+x = pca.fit_transform(x)
+
+x = x.reshape(x.shape[0], 2,2,2)
 
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train,y_test = train_test_split(
     x,y, random_state=66, train_size = 0.8
 )
 
-input1 = Input(shape=(13,1,1))
+input1 = Input(shape=(2,2,2))
 
 conv1 = Conv2D(32,(2,1) ,activation='elu', padding = 'same')(input1)
 conv1 = Dropout(0.2)(conv1)
@@ -70,6 +74,11 @@ loss, mse = model.evaluate(x_test, y_test)
 print('loss :',loss)
 print('mse :',mse)
 
+from sklearn.metrics import r2_score
+y_pred = model.predict(x_test)
+r2_y = r2_score(y_test,y_pred)
+print("결정계수 : ", r2_y)
+
 plt.subplot(2,1,1)
 plt.plot(hist.history['loss'], c = 'black',label = 'loss')
 plt.plot(hist.history['val_loss'], c = 'blue', label = 'val_loss')
@@ -83,5 +92,7 @@ plt.legend()
 
 plt.show()
 """ 
-loss : 16.296516820496205
-mse : 16.29651641845703 """
+loss : 17.777094803604424
+mse : 17.7770938873291
+결정계수 :  0.7873119144845383
+"""
