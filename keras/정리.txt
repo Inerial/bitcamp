@@ -303,16 +303,11 @@ filter로 사진을 조각조각 내면 그 너비만큼 channel이 곱연산으
 
 robust scalar 이상치 제거시 꽤 좋음
 
-PCA(주성분분석) 으로 데이터의 FEATURE를 줄여주면 이상치 제거도 되며 쓸모없는 feature도
-솎아내 볼 수 있다. ## 중요 PCA전에 반드시 표준화를 해 주어야 한다.
+PCA(주성분분석) 으로 데이터의 FEATURE를 줄여주면 이상치 제거도 될 수도 있다. 
+쓸모없는 feature도 솎아내 볼 수 있다. ## 중요 PCA전에 반드시 표준화를 해 주어야 한다.
+
 
 sklearn.preprosessing에 다 있음
 
 
-월 00시까지
-숙제 dnn lstm cnn
-sklearn.dataset
-iris 76 77 78    3분류
-diabets 79 80 81  2진분류
-breast_cancer 82 83 84 2진
-
+softmax의 결과값의 합은 1
