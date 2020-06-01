@@ -311,3 +311,20 @@ sklearn.preprosessing에 다 있음
 
 
 softmax의 결과값의 합은 1
+
+
+
+
+
+
+
+
+## 모델 저장 및 로드
+model.save  :  모델및 가중치를 저장, save선언시 fit여부에 따라 모델만 저장될지, 모델과 가중치를 같이 저장할지 정할 수 있다.
+model.save_weights : 가중치만을 저장, 저장한 가중치의 모델과 똑같은 모델에서 선언해주어야 덮어씌우기가 가능하다.
+from keras.callbacks import ModelCheckpoint : callback함수중 하나, 매 epoch 마다 지금까지 시행중 최적의 weight가 나오면 모델, 가중치를 저장해준다.
+
+
+load_model : import 필요, (모델, 가중치)를 가지고있는 파일을 통째로 로드해 모델을 만든다.
+model.load_weights : 이미 컴파일까지 한 모델에 가중치를 가져와 덮어씌운다.
+

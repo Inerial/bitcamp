@@ -58,20 +58,19 @@ model.add(Dense(10, activation='softmax'))
 
 ###  3 : 훈련
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
-"""
+
+'''
 from keras.callbacks import EarlyStopping
 early = EarlyStopping(monitor='loss', patience = 5, mode = 'auto')
 
 hist = model.fit(x_train, y_train, batch_size = 100, epochs=30, validation_split=0.1, callbacks=[early])
- """
-""" model.save('./model/model_test01.h5')
-model.save_weights('./model/test_weight.h5') """
+'''
 
-
+""" model.save('./model/model_test01.h5')"""
 
 model.load_weights('./model/test_weight.h5')
-## save한 loss,acc와 load한 loss,acc가 똑같다.
-## fit 이후 save시 가중치까지 모델에 저장이 된다.
+## 저장한 모델과 로드한 모델이 동일해야지 로드가 가능하다.
+## 가중치만 가볍게 저장이 가능
 
 
 ## 4 : 평가
