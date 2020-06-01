@@ -30,3 +30,6 @@ np.save('./data/mnist_train_x.npy',arr = x_train)
 np.save('./data/mnist_train_y.npy',arr = y_train)
 np.save('./data/mnist_test_x.npy',arr = x_test)
 np.save('./data/mnist_test_y.npy',arr = y_test)
+
+## numpy는 한가지 자료형만 사용가능! 두개이상 불가능
+## => 두개이상은 pandas를 사용해야함!
