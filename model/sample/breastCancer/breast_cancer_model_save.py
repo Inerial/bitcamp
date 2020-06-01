@@ -43,6 +43,10 @@ dense1 = Dense(100, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(100, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(70, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(70, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(1, activation='sigmoid')(dense1)
 
 model = Model(inputs=input1, output=dense1)
@@ -53,13 +57,11 @@ model.save(filepath=modelpath + '/breast_cancer_model.h5')
 model.compile(optimizer='adam', loss = 'binary_crossentropy', metrics=['acc'])
 
 early = EarlyStopping(monitor='val_loss', patience =20)
-tensor = TensorBoard(log_dir = '.\keras\graph', histogram_freq = 0, 
-                      write_graph = True, write_images = True)
 check = ModelCheckpoint(filepath=modelpath + '\{epoch:02d}-{val_loss:.5f}.hdf5',
                         monitor='val_loss',save_best_only=True, save_weights_only=False)
 
 hist = model.fit(x_train, y_train, batch_size=500, epochs=1000,
-                validation_split = 0.3, callbacks = [early, tensor, check])
+                validation_split = 0.3, callbacks = [early, check])
 
 model.save_weights(filepath=modelpath + '/breast_cancer_weights.h5')
 
@@ -67,7 +69,6 @@ loss, acc = model.evaluate(x_test, y_test)
 print('loss :',loss)
 print('acc :',acc)
 
-print(os.listdir(modelpath))
 plt.subplot(2,1,1)
 plt.plot(hist.history['loss'], c = 'black',label = 'loss')
 plt.plot(hist.history['val_loss'], c = 'blue', label = 'val_loss')
