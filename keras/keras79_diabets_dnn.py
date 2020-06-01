@@ -5,6 +5,8 @@ from keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten, Input, L
 from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 import matplotlib.pyplot as plt
 import numpy as np
+
+## 리턴될 폴더 지우고 다시 생성해 안 비우기
 import shutil
 import os
 tmp = os.getcwd() + '\\keras'
@@ -21,10 +23,13 @@ diabetes = load_diabetes()
 x = diabetes.data
 y = diabetes.target
 
-from sklearn.preprocessing import MinMaxScaler
-scale = MinMaxScaler()
+from sklearn.preprocessing import MaxAbsScaler
+scale = MaxAbsScaler()
 x = scale.fit_transform(x)
 
+from sklearn.decomposition import PCA
+pca = PCA(7)
+x = pca.fit_transform(x)
 
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train,y_test = train_test_split(
@@ -32,25 +37,37 @@ x_train, x_test, y_train,y_test = train_test_split(
 )
 
 
-input1 = Input(shape=(10,))
+input1 = Input(shape=(7,))
 
-dense1 = Dense(2000, activation='elu')(input1)
+dense1 = Dense(200, activation='elu')(input1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(2000, activation='elu')(dense1)
+dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(2000, activation='elu')(dense1)
+dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(1000, activation='elu')(dense1)
+dense1 = Dense(150, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(1000, activation='elu')(dense1)
+dense1 = Dense(150, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(500, activation='elu')(dense1)
-dense1 = Dropout(0.2)(dense1)
-dense1 = Dense(500, activation='elu')(dense1)
+dense1 = Dense(150, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(100, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(100, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(100, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(150, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(150, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(150, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(200, activation='elu')(input1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(200, activation='elu')(dense1)
+dense1 = Dropout(0.2)(dense1)
+dense1 = Dense(200, activation='elu')(dense1)
 dense1 = Dropout(0.2)(dense1)
 dense1 = Dense(1, activation='elu')(dense1)
 

@@ -18,8 +18,15 @@ print(datasets.tail()) ## 아래에서 5개만 보여주는것
 
 x = datasets.values[:, :-1]
 y = datasets.values[:, -1]
-print(x) 
-print(y)
+print("=====================")
+print(datasets.dtypes)
+print(x[0, ])
+print(x.dtype)
+print(x[0, 2] + x[0, 3])
+print(x[0, 0] + x[0, 1])
+#print(x[0, 2]+x[0, 1])
+
+print(np.array([[1,2,3],[1,'b','c']], dtype=object)) ## dtype이 object면 array안에 데이터형이 섞일수 있음 => values가 각각 열을 리스트로 모아 object로 np.array 리턴해주는것
 """ 
 np.save('./data/iris_x.npy', arr = x)
 np.save('./data/iris_y.npy', arr = y) """

@@ -6,6 +6,7 @@ from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 import matplotlib.pyplot as plt
 import numpy as np
 
+## 리턴될 폴더 지우고 다시 생성해 안 비우기
 import shutil
 import os
 tmp = os.getcwd() + '\\keras'
