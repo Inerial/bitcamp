@@ -94,7 +94,7 @@ hite_x_predict = hite_split[-1, :, :].reshape(1,time_step, hite.shape[1])
 
 ## train_test_split
 y_train, y_test , samsung_x_train, samsung_x_test, hite_x_train, hite_x_test = train_test_split(
-    y, samsung_x, hite_x, shuffle= True , random_state=66, train_size=0.9
+    y, samsung_x, hite_x, shuffle= True , random_state=66, train_size=0.8
 )
 
 ## 모델
