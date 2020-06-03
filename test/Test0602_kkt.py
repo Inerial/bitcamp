@@ -5,6 +5,7 @@ from keras.models import Model, load_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, RobustScaler, MaxAbsScaler, MinMaxScaler
+from sklearn.decomposition import PCA
 import os, shutil, math
 ## 타임스텝
 time_step = 5
@@ -42,19 +43,10 @@ np.save('./test/hite.npy', arr = hite)
 
 y = samsung[time_step : ]
 
-
-## 정규화
-# scaler = StandardScaler()
-# scaler = RobustScaler()
-scaler = MaxAbsScaler()
-# scaler = MinMaxScaler()
-hite_x = scaler.fit_transform(hite)
-
-# scalerS = StandardScaler()
-# scalerS = RobustScaler()
-scalerS = MaxAbsScaler()
-# scalerS = MinMaxScaler()
-samsung_x = scalerS.fit_transform(samsung)
+fs = StandardScaler()
+hite = fs.fit_transform(hite)
+pca = PCA(1)
+hite = pca.fit_transform(hite)
 
 ## 데이터 분해
 def split_all(seq, size):
@@ -78,8 +70,8 @@ def split_all(seq, size):
         assert 1 == 2 ,"입력값이 3차원 이상!"
         return
 
-samsung_split = split_all(samsung_x, time_step)
-hite_split = split_all(hite_x, time_step)
+samsung_split = split_all(samsung, time_step)
+hite_split = split_all(hite, time_step)
 
 ## 사용할 데이터들 자르기
 ## 오늘 y가 없으므로 제외
@@ -96,6 +88,31 @@ hite_x_predict = hite_split[-1, :, :].reshape(1,time_step, hite.shape[1])
 y_train, y_test , samsung_x_train, samsung_x_test, hite_x_train, hite_x_test = train_test_split(
     y, samsung_x, hite_x, shuffle= True , random_state=66, train_size=0.8
 )
+
+hite_x_train_shape = hite_x_train.shape
+hite_x_test_shape = hite_x_test.shape
+hite_x_predict_shape = hite_x_predict.shape
+samsung_x_train_shape = samsung_x_train.shape
+samsung_x_test_shape = samsung_x_test.shape
+samsung_x_predict_shape = samsung_x_predict.shape
+## 정규화
+# scaler = StandardScaler()
+# scaler = RobustScaler()
+scaler = MaxAbsScaler()
+# scaler = MinMaxScaler()
+hite_x_train = scaler.fit_transform(
+    hite_x_train.reshape(hite_x_train_shape[0], hite_x_train_shape[1]*hite_x_train_shape[2])).reshape(hite_x_train_shape[0], hite_x_train_shape[1], hite_x_train_shape[2])
+hite_x_test = scaler.transform(hite_x_test.reshape(hite_x_test_shape[0], hite_x_test_shape[1]*hite_x_test_shape[2])).reshape(hite_x_test_shape[0], hite_x_test_shape[1], hite_x_test_shape[2])
+hite_x_predict = scaler.transform(hite_x_predict.reshape(hite_x_predict_shape[0], hite_x_predict_shape[1]*hite_x_predict_shape[2])).reshape(hite_x_predict_shape[0], hite_x_predict_shape[1], hite_x_predict_shape[2])
+
+# scalerS = StandardScaler()
+# scalerS = RobustScaler()
+scalerS = MaxAbsScaler()
+# scalerS = MinMaxScaler()
+samsung_x_train = scalerS.fit_transform(samsung_x_train.reshape(samsung_x_train_shape[0], samsung_x_train_shape[1]*samsung_x_train_shape[2])).reshape(samsung_x_train_shape[0], samsung_x_train_shape[1], samsung_x_train_shape[2])
+samsung_x_test = scalerS.transform(samsung_x_test.reshape(samsung_x_test_shape[0], samsung_x_test_shape[1]*samsung_x_test_shape[2])).reshape(samsung_x_test_shape[0], samsung_x_test_shape[1], samsung_x_test_shape[2])
+samsung_x_predict = scalerS.transform(samsung_x_predict.reshape(samsung_x_predict_shape[0], samsung_x_predict_shape[1]*samsung_x_predict_shape[2])).reshape(samsung_x_predict_shape[0], samsung_x_predict_shape[1], samsung_x_predict_shape[2])
+
 
 ## 모델
 input1 = Input(shape = (hite_x_train.shape[1], hite_x_train.shape[2]))
