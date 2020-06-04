@@ -100,9 +100,18 @@ train['AgeBand'] = pd.cut(train['Age'], 8)
 test['AgeBand'] = pd.cut(test['Age'], 8)
 # pie_chart('AgeBand')
 
-print(train[(train['Age'] <= 10).values]['Parch'].values)
-print(train[(train['Age'] > 10).values])
+print(train[(train['Age'] <= 10).values]['Parch'].values.shape)
+print(train[(train['Age'] > 10).values]['Parch'].values.shape)
+print(train.iloc[0].fillna(5))
+for i in range(len(train['Age'])):
+    if train.iloc[i].isna()['Age']:
+        if train.iloc[i]['Parch'] == 1 or train.iloc[i]['Parch'] == 2:
+            train.iloc[i]['Age'] = train.iloc[i].fillna(5)['Age']
+        else :
+            train.iloc[i]['Age'] = train.iloc[i].fillna(20)['Age']
 
+temp = train[train['Age'].isna().values]
+print(temp)
 
 ''' x = pd.DataFrame([train['Sex'] == 'female',train['Pclass'], train['SibSp_sum'],
                      train['Parch_sum'], train[Embarked_int]]).T.values

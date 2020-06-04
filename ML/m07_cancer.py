@@ -22,22 +22,16 @@ x_train, x_test, y_train, y_test = train_test_split(
 # x_test = scaler.fit_transform(x_test)
 
 ## 2. 모델
-# model = KNeighborsClassifier()  ## 0.9210
-# model = KNeighborsRegressor() ## 에러
-# model = LinearSVC() ## 0.9035
-# model = SVC() # 0.8947
-model = RandomForestClassifier() ## 0.9649
-# model = RandomForestRegressor() ## 에러
+ModelList = [KNeighborsClassifier(), KNeighborsRegressor(), LinearSVC(), SVC(), RandomForestClassifier(), RandomForestRegressor()]
+Modelnames = ['KNeighborsClassifier', 'KNeighborsRegressor', 'LinearSVC', 'SVC', 'RandomForestClassifier', 'RandomForestRegressor']
+for index, model in enumerate(ModelList):
+    ## 3. 훈련
+    model.fit(x_train, y_train)                              
 
-## 3. 훈련
-model.fit(x_train, y_train)                              
+    ## 4.평가 예측
 
-## 4.평가 예측
+    y_pred = model.predict(x_test)
 
-y_pred = model.predict(x_test)
+    score = model.score(x_test,y_test)
 
-acc = accuracy_score(y_test, y_pred)
-
-print('x_test의 예측결과 :', y_pred)
-
-print("acc = ", acc)
+    print(Modelnames[index],'의 예측 score = ', score)

@@ -22,22 +22,19 @@ x_train = scaler.fit_transform(x_train)
 x_test = scaler.fit_transform(x_test)
 
 ## 2. 모델
-# model = KNeighborsClassifier()  ## 분류모델 에러
-# model = KNeighborsRegressor() ## 0.7765
-# model = LinearSVC() # 에러
-# model = SVC() # 에러
-# model = RandomForestClassifier() # 에러
-model = RandomForestRegressor() # 0.9378
+ModelList = [KNeighborsClassifier(), KNeighborsRegressor(), LinearSVC(), SVC(), RandomForestClassifier(), RandomForestRegressor()]
+Modelnames = ['KNeighborsClassifier', 'KNeighborsRegressor', 'LinearSVC', 'SVC', 'RandomForestClassifier', 'RandomForestRegressor']
+for index, model in enumerate(ModelList):
+    ## 3. 훈련
+    try:
+        model.fit(x_train, y_train)                              
+    except ValueError:
+        print("y값이 분류형 데이터가 아님!")
+        continue
+    ## 4.평가 예측
 
-## 3. 훈련
-model.fit(x_train, y_train)                        
+    y_pred = model.predict(x_test)
 
-## 4.평가 예측
+    score = model.score(x_test,y_test)
 
-y_pred = model.predict(x_test)
-
-r2 = r2_score(y_test, y_pred)
-
-print('x_test의 예측결과 :', y_pred)
-
-print("r2 = ", r2)
+    print(Modelnames[index],'의 예측 score = ', score)
