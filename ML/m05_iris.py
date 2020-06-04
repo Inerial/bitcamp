@@ -14,7 +14,7 @@ y = data.target
 x_train, x_test, y_train, y_test = train_test_split(
     x,y, random_state = 66, train_size = 0.8
 )
-scaler = StandardScaler()
+# scaler = StandardScaler()
 # scaler = MinMaxScaler()
 # scaler = MaxAbsScaler()
 # scaler = RobustScaler()

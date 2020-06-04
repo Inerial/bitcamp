@@ -35,3 +35,8 @@ for index, model in enumerate(ModelList):
     score = model.score(x_test,y_test)
 
     print(Modelnames[index],'의 예측 score = ', score)
+
+
+## randomforest등을 위시한 머신러닝을 쓰는 이유는?
+## feature importance때문
+## 
