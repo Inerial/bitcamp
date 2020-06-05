@@ -189,11 +189,11 @@ print(x_pred)
 
 
 ## 데이터의 수가 충분하지 않다고 느껴 실제 적합에는 사용치 않는 test데이터를 안만듬
-# from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 
-# x_train,x_test,y_train,y_test = train_test_split(
-#     x, y, random_state=66, train_size = 0.8
-# )
+x_train,x_test,y_train,y_test = train_test_split(
+    x, y, random_state=66, train_size = 0.8
+)
 
 
 ## 효과가 있어보이는 표준화 적용
@@ -204,7 +204,7 @@ x = scaler.fit_transform(x)
 x_pred = scaler.transform(x_pred)
 
 
-##모델 제작
+''' ##모델 제작
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 
@@ -260,4 +260,20 @@ result = [int(np.round(i)) for i in y_pred.T[0]]  ## 캐글에서 서밋받을�
 submission = pd.DataFrame({ "PassengerId": test.index, "Survived": result}) 
 # print(submission)
 
-submission.to_csv('./kaggle/csv/submission_rf.csv', index=False) ## 제출용 csv만들기
+submission.to_csv('./kaggle/csv/submission_rf.csv', index=False) ## 제출용 csv만들기 '''
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.utils.testing import all_estimators
+from sklearn.metrics import accuracy_score
+from sklearn.datasets import load_iris
+import warnings
+
+warnings.filterwarnings('ignore')
+model = all_estimators(type_filter = 'classifier')
+
+for (name, algorithm) in model:
+    model = algorithm()
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    print(name, "의 정답률 ", accuracy_score(y_test, y_pred))
