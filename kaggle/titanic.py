@@ -3,7 +3,7 @@ import pandas as pd
 from keras.models import Model, load_model
 from keras.layers import Dense, Dropout
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler,RobustScaler
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
@@ -204,7 +204,7 @@ x = scaler.fit_transform(x)
 x_pred = scaler.transform(x_pred)
 
 
-''' ##모델 제작
+##모델 제작
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 
@@ -260,20 +260,7 @@ result = [int(np.round(i)) for i in y_pred.T[0]]  ## 캐글에서 서밋받을�
 submission = pd.DataFrame({ "PassengerId": test.index, "Survived": result}) 
 # print(submission)
 
-submission.to_csv('./kaggle/csv/submission_rf.csv', index=False) ## 제출용 csv만들기 '''
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.utils.testing import all_estimators
-from sklearn.metrics import accuracy_score
-from sklearn.datasets import load_iris
-import warnings
+submission.to_csv('./kaggle/csv/submission_rf.csv', index=False) ## 제출용 csv만들기
 
-warnings.filterwarnings('ignore')
-model = all_estimators(type_filter = 'classifier')
 
-for (name, algorithm) in model:
-    model = algorithm()
-    model.fit(x_train, y_train)
-    y_pred = model.predict(x_test)
-    print(name, "의 정답률 ", accuracy_score(y_test, y_pred))
+## kfold, cross_val_score, gridsearch등을 통한 하이퍼 파라미터 최적화로 성능을 올려보자
