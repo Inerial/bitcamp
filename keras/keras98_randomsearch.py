@@ -41,17 +41,17 @@ print(y_train.shape) # (60000, 10)
 # 2. 모델
 ## 이렇게 함수형으로 직접 만들어 그리드 서치에 넣으면 파라미터 탐색이 가능하다
 
-def build_model(drop=0.5, optimizer='adam'):
-    inputs = Input(shape=(x_train.shape[1], )) # *x_train.shape[2]* 1))
-    denses = Dense(512, activation='relu', name='hidden1')(inputs)
-    denses = Dropout(drop)(denses)
-    denses = Dense(256, activation='relu', name='hidden2')(denses)
-    denses = Dropout(drop)(denses)
-    denses = Dense(128, activation='relu', name='hidden3')(denses)
-    denses = Dropout(drop)(denses)
-    output = Dense(y_train.shape[1], activation='softmax', name='output')(denses)
+def build_model(hidden_layers = 1, nodes = 128, activation = 'relu', drop=0.5, optimizer='adam'):
+    inputs = Input(shape=(x_train.shape[1], ))
     
-    model = Model(inputs=inputs, outputs = output)
+    denses = Dense(nodes, activation= activation)(inputs)
+    denses = Dropout(drop)(denses)
+    for i in range(hidden_layers-1):
+        denses = Dense(nodes, activation= activation)(denses)
+        denses = Dropout(drop)(denses)
+    outputs = Dense(y_train.shape[1], activation=activation)(denses)
+
+    model = Model(inputs = inputs, outputs = outputs))
     model.compile(loss = 'categorical_crossentropy', optimizer=optimizer, metrics=['acc'])
     return model # 콤파일 까지 한 모델 리턴
 
