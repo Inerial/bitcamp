@@ -1,0 +1,14 @@
+*.npy
+*.h5
+*.hdf5
+*.csv
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.json
+*.exe
