@@ -54,7 +54,7 @@ pipe = Pipeline([
     ('scaler', StandardScaler()),
     ('models', model)
 ])
-search = RandomizedSearchCV(pipe, parameters, cv=5, n_iter=20)
+search = RandomizedSearchCV(pipe, parameters, cv=5, n_iter=5)
 
 search.fit(x_train, y_train)
 

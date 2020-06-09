@@ -1,4 +1,4 @@
-## 데이터가 그냥 LSTM하기엔 애매하다
+''' ## 데이터가 그냥 LSTM하기엔 애매하다
 ## Conv1D도 가능
 
 ## train test data의 각각 id 를 기준으로 375개씩 뽑은다음
@@ -109,30 +109,27 @@ print(xs.shape)
 print(ys.shape)
 print(xs_pred.shape)
 
-xs = np.concatenate([xs[i] for i in range(xs.shape[0])], axis=2)
-print(xs.shape)
-ys = np.concatenate([ys[i] for i in range(ys.shape[0])], axis=1)
-print(ys.shape)
  
-''' # 2. 1차 모델
-inputs = Input(shape=(xs.shape[1], xs.shape[2]))
-lstms = LSTM(200)(inputs)
+# 2. 1차 모델
+x_final = []
+for i in range(len(xs)):
+    inputs = Input(shape=(xs[i].shape[1], xs[i].shape[2]))
+    lstms = LSTM(200)(inputs)
 
-denses = Dense(25)(lstms)
-denses = Dense(25)(denses)
-denses = Dense(25)(denses)
-denses = Dense(25)(denses)
-denses = Dense(25)(denses)
-outputs = Dense(y.shape[1])(denses)
+    denses = Dense(25)(lstms)
+    denses = Dense(25)(denses)
+    denses = Dense(25)(denses)
+    denses = Dense(25)(denses)
+    denses = Dense(25)(denses)
+    outputs = Dense(y.shape[1])(denses)
 
-model = Model(inputs = inputs, outputs=outputs)
+    model = Model(inputs = inputs, outputs=outputs)
 
-model.compile(optimizer = 'adam', loss='mse', metrics=['mse'])
+    model.compile(optimizer = 'adam', loss='mse', metrics=['mse'])
 
-model.fit(x_train,y_train,batch_size= 500, epochs = 100, validation_split=0.2)
+    model.fit(xs[i],ys[i],batch_size= 500, epochs = 100, validation_split=0.2)
 
-y_pred = model.predict(x_test)
+    y_pred = model.predict(xs_pred[i])
 mspe = kaeri_metric(y_test, y_pred)
 print('mspe : ', mspe)
-
-# mspe :  3.3595243892423294 '''
+ '''

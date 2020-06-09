@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score
 from keras.wrappers.scikit_learn import KerasRegressor
 from keras.models import Model
@@ -13,8 +14,9 @@ from keras import backend
 
 def kaeri_metric(y_true, y_pred):
     return 0.5 * E1(y_true, y_pred) + 0.5 * E2(y_true, y_pred)
+
 def E1(y_true, y_pred):
-    _t, _p = np.array(y_true)[:,:2], np.array(y_pred)[:,:2]
+    _t, _p = np.array(y_true)[:,:2], np.array(y_pred)[:,:2] 
     return np.mean(np.sum(np.square(_t - _p), axis = 1) / 2e+04)
 def E2(y_true, y_pred):
     _t, _p = np.array(y_true)[:,2:], np.array(y_pred)[:,2:]
@@ -38,35 +40,32 @@ train1, train2, train3 = x_train.shape
 test1, test2, test3 = x_test.shape
 pred1, pred2, pred3 = x_pred.shape
 
-x_train = scaler.fit_transform(x_train.reshape(train1, train2*train3)).reshape(train1, train2, train3)
-x_test = scaler.transform(x_test.reshape(test1, test2* test3)).reshape(test1, test2, test3)
-x_pred = scaler.transform(x_pred.reshape(pred1, pred2* pred3)).reshape(pred1, pred2, pred3)
+x_train = scaler.fit_transform(x_train.reshape(train1, train2*train3)).reshape(train1, train2 * train3)
+x_test = scaler.fit_transform(x_test.reshape(test1, test2* test3)).reshape(test1, test2*test3)
+x_pred = scaler.fit_transform(x_pred.reshape(pred1, pred2* pred3)).reshape(pred1, pred2*pred3)
 
 
+
+
+parameters = {"forest__n_estimators": [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100],
+    "forest__criterion":["mae"],
+    "forest__max_depth":[None, 1,10, 100,1000,10000,100000,10000000]}
 
 
 # 2. 모델
-inputs = Input(shape=(x.shape[1], x.shape[2]))
-lstms = LSTM(200)(inputs)
-lstms = Dropout(0.3)(lstms)
+pipe = Pipeline([
+                ('scaler', MinMaxScaler()), ## 스케일러
+                ('forest', RandomForestRegressor(verbose=1))  ## 모델 순
+                # 이름   함수 
+                # 이름은 파라미터 지정용, 각각 함수에 지정한 파라미터들을 넣어준다
+])
 
-denses = Dense(25)(lstms)
-denses = Dropout(0.3)(denses)
-denses = Dense(25)(denses)
-denses = Dropout(0.3)(denses)
-denses = Dense(25)(denses)
-denses = Dropout(0.3)(denses)
-denses = Dense(25)(denses)
-denses = Dropout(0.3)(denses)
-denses = Dense(25)(denses)
-denses = Dropout(0.3)(denses)
-outputs = Dense(y.shape[1])(denses)
+model = RandomizedSearchCV(pipe, parameters, cv=5)
 
-model = Model(inputs = inputs, outputs=outputs)
+model.fit(x_train, y_train)
 
-model.compile(optimizer = 'adam', loss='mse', metrics=['mse'])
-
-model.fit(x_train,y_train,batch_size= 500, epochs = 200, validation_split=0.4)
+print("best_model :", model.best_params_)
+print("acc : ",model.score(x_test,y_test))
 
 y_pred = model.predict(x_test)
 mspe = kaeri_metric(y_test, y_pred)

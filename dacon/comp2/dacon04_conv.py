@@ -85,9 +85,9 @@ x_pred = scaler.fit_transform(x_pred.reshape(pred1, pred2* pred3)).reshape(pred1
 # 2. 모델
 inputs = Input(shape=(x.shape[1], x.shape[2]))
 
-conv = Conv1D(64, kernel_size=5, padding='same')(inputs)
+conv = Conv1D(128, kernel_size=5, padding='same')(inputs)
 conv = Dropout(0.2)(conv)
-conv = Conv1D(64, kernel_size=5, padding='same')(conv)
+conv = Conv1D(128, kernel_size=5, padding='same')(conv)
 conv = Dropout(0.2)(conv)
 
 conv = Flatten()(conv)
@@ -123,4 +123,4 @@ submissions = pd.DataFrame({
 
 submissions.to_csv('./dacon/comp2/comp2_sub.csv', index = False)
 
-# mspe :  3.3595243892423294
+구짐

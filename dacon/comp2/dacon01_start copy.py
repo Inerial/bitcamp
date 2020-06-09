@@ -32,41 +32,60 @@ x_train,x_test,y_train,y_test = train_test_split(
 # scaler = StandardScaler()
 # scaler = MinMaxScaler()
 # scaler = MaxAbsScaler()
-scaler = RobustScaler()
+# scaler = RobustScaler()
 
 train1, train2, train3 = x_train.shape
 test1, test2, test3 = x_test.shape
 pred1, pred2, pred3 = x_pred.shape
 
-x_train = scaler.fit_transform(x_train.reshape(train1, train2*train3)).reshape(train1, train2, train3)
-x_test = scaler.transform(x_test.reshape(test1, test2* test3)).reshape(test1, test2, test3)
-x_pred = scaler.transform(x_pred.reshape(pred1, pred2* pred3)).reshape(pred1, pred2, pred3)
+# x_train = scaler.fit_transform(x_train.reshape(train1, train2*train3)).reshape(train1, train2, train3)
+# x_test = scaler.fit_transform(x_test.reshape(test1, test2* test3)).reshape(test1, test2, test3)
+# x_pred = scaler.fit_transform(x_pred.reshape(pred1, pred2* pred3)).reshape(pred1, pred2, pred3)
 
 
 
 
 # 2. 모델
-inputs = Input(shape=(x.shape[1], x.shape[2]))
-lstms = LSTM(200)(inputs)
-lstms = Dropout(0.3)(lstms)
+def build_model():
+    inputs = Input(shape=(x.shape[1], x.shape[2]))
+    lstms = LSTM(200,)(inputs)
+    lstms = Dropout(0.3)(lstms)
 
-denses = Dense(25)(lstms)
-denses = Dropout(0.3)(denses)
-denses = Dense(25)(denses)
-denses = Dropout(0.3)(denses)
-denses = Dense(25)(denses)
-denses = Dropout(0.3)(denses)
-denses = Dense(25)(denses)
-denses = Dropout(0.3)(denses)
-denses = Dense(25)(denses)
-denses = Dropout(0.3)(denses)
-outputs = Dense(y.shape[1])(denses)
+    denses = Dense(25)(lstms)
+    denses = Dropout(0.3)(denses)
+    denses = Dense(25)(denses)
+    denses = Dropout(0.3)(denses)
+    denses = Dense(25)(denses)
+    denses = Dropout(0.3)(denses)
+    denses = Dense(25)(denses)
+    denses = Dropout(0.3)(denses)
+    denses = Dense(25)(denses)
+    denses = Dropout(0.3)(denses)
+    outputs = Dense(y.shape[1])(denses)
 
-model = Model(inputs = inputs, outputs=outputs)
+    model = Model(inputs = inputs, outputs=outputs)
 
-model.compile(optimizer = 'adam', loss='mse', metrics=['mse'])
+    model.compile(optimizer = 'adam', loss='mse', metrics=['mse'])
+    return model
 
-model.fit(x_train,y_train,batch_size= 500, epochs = 200, validation_split=0.4)
+model = KerasRegressor(build_fn=build_model())
+
+pipe = Pipeline([
+                ('scaler', RobustScaler()), ## 스케일러
+                ('models', model)  ## 모델 순
+                # 이름   함수 
+                # 이름은 파라미터 지정용, 각각 함수에 지정한 파라미터들을 넣어준다
+])
+
+parameters = {
+    "models__epochs":[150],
+    "models__batch_size":[500]
+}
+model = RandomizedSearchCV(pipe, parameters, cv=5)
+
+model.fit(x_train, y_train)
+
+print("best_model :", model.best_params_)
 
 y_pred = model.predict(x_test)
 mspe = kaeri_metric(y_test, y_pred)
