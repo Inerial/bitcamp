@@ -38,15 +38,15 @@ def build_model(hidden_layers = 6, nodes = 128, activation = 'relu', optimizers=
     return model
 
 def create_hyperparameters():
-    batches = [500,1000]
-    # nodes = [64,128,256]
-    # layers = range(3,20,2)
+    batches = [100, 300, 500,1000]
+    nodes = [64,128,256, 512]
+    layers = range(3,20,2)
     optimizers = ['rmsprop', 'adam', 'adadelta']
-    dropout = [0.1, 0.3, 0.5]
+    dropout = [0.1,0.2, 0.3,0.4, 0.5]
     activation = ['relu', 'elu', 'linear']
-    epochs = [150]
+    epochs = [100, 150, 200]
     return {"models__batch_size" : batches, "models__epochs": epochs, "models__optimizers": optimizers, "models__drop" : dropout , 
-            "models__activation" : activation}# , "models__nodes" :nodes, "models__hidden_layers" : layers}
+            "models__activation" : activation, "models__nodes" :nodes, "models__hidden_layers" : layers}
 model = KerasRegressor(build_fn=build_model)
 parameters = create_hyperparameters()
 
@@ -54,7 +54,7 @@ pipe = Pipeline([
     ('scaler', StandardScaler()),
     ('models', model)
 ])
-search = RandomizedSearchCV(pipe, parameters, cv=5, n_iter=5)
+search = RandomizedSearchCV(pipe, parameters, cv=5, n_iter=100)
 
 search.fit(x_train, y_train)
 

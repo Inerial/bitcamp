@@ -33,3 +33,5 @@ print(x_pred.shape)
 np.save('./dacon/comp2/x.npy', arr=x)
 np.save('./dacon/comp2/y.npy', arr=y)
 np.save('./dacon/comp2/x_pred.npy', arr=x_pred)
+
+## 위아래 진동수 변수로 줄만하지않나?

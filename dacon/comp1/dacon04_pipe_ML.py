@@ -20,16 +20,20 @@ x_train, x_test, y_train, y_test = train_test_split(
     x_train, y_train, train_size = 0.8, random_state = 66
 )
 print(x_train)
-scaler = StandardScaler()
-# scaler = MinMaxScaler()
-# scaler = MaxAbsScaler()
-# scaler = RobustScaler()
-x_train = scaler.fit_transform(x_train)
-x_test = scaler.transform(x_test)
-x_pred = scaler.transform(x_pred)
 
 # 2. model
-search = RandomForestRegressor(n_estimators = 100, criterion = 'mae', max_depth = None,verbose=1)
+parameters = {
+    'models__n_estimators':[10,50,100],
+    'models__criterion' :['mae'],
+    'models__max_depth' :[None,100,1000,10000],
+    'models__verbose' : [1],
+    'models__n_jobs' : [-1]
+}
+pipe = Pipeline([
+    ('scaler', StandardScaler()),
+    ('models', RandomForestRegressor())
+])
+search = RandomizedSearchCV(pipe, parameters, cv=5)
 
 search.fit(x_train, y_train)
 

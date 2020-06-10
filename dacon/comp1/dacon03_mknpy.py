@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score
 from keras.wrappers.scikit_learn import KerasRegressor
 from keras.models import Model
 from keras.layers import Input, Dense, Dropout
+from keras
 
 train = pd.read_csv('./data/dacon/comp1/train.csv', sep=',', index_col = 0, header = 0)
 test = pd.read_csv('./data/dacon/comp1/test.csv', sep=',', index_col = 0, header = 0)
@@ -48,3 +49,6 @@ print(x_pred.shape)
 np.save('./dacon/comp1/x_train.npy', arr=x_train)
 np.save('./dacon/comp1/y_train.npy', arr=y_train)
 np.save('./dacon/comp1/x_pred.npy', arr=x_pred)
+
+## 푸리에 변환 
+# 섞여버린 파형을 여러개으 순수한 음파로 분해하는 방법
