@@ -22,6 +22,7 @@ y = np_utils.to_categorical(y)
 x_train, x_test, y_train, y_test = train_test_split(
     x,y,random_state=43, shuffle = True, train_size = 0.8
 )
+np.
 
 def build_model(hidden_layers = 1, nodes = 128, activation = 'relu', drop=0.5, optimizer='adam'):
     backend.clear_session()

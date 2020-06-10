@@ -1,19 +1,13 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
-from sklearn.pipeline import Pipeline
-from sklearn.decomposition import PCA
-from sklearn.metrics import accuracy_score
-from keras.wrappers.scikit_learn import KerasRegressor
-from keras.models import Model
-from keras.layers import Input, Dense, Dropout
-from keras
 
+## 데이터 불러오기
 train = pd.read_csv('./data/dacon/comp1/train.csv', sep=',', index_col = 0, header = 0)
 test = pd.read_csv('./data/dacon/comp1/test.csv', sep=',', index_col = 0, header = 0)
 
+## 데이터 분해 및 columns이름 저장
 train_col = train.columns[:-4]
 test_col = test.columns
 y_train_col = train.columns[-4:]

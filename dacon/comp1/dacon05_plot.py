@@ -1,14 +1,10 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
-from sklearn.pipeline import Pipeline
-from sklearn.decomposition import PCA
-from sklearn.metrics import accuracy_score
-from keras.wrappers.scikit_learn import KerasRegressor
-from keras.models import Model
-from keras.layers import Input, Dense, Dropout
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from xgboost import XGBRegressor
+from sklearn.tree import DecisionTreeRegressor
 train = pd.read_csv('./data/dacon/comp1/train.csv', sep=',', index_col = 0, header = 0)
 test = pd.read_csv('./data/dacon/comp1/test.csv', sep=',', index_col = 0, header = 0)
 
@@ -40,14 +36,24 @@ test_dst = test.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffi
 x_train ,y_train = np.concatenate([train.values[:,0:1], train_src, train_dst], axis = 1), y_train
 x_pred = np.concatenate([test.values[:,0:1], test_src, test_dst], axis = 1)
 
-print(train.filter(regex='_dst$',axis=1))
-for i in range(50):
-    plt.subplot(2,1,1)
-    pd.DataFrame(x_train, columns=train_col).filter(regex='_src$',axis=1).iloc[i, :].plot()
-    plt.subplot(2,1,2)
-    pd.DataFrame(x_train, columns=train_col).filter(regex='_dst$',axis=1).iloc[i, :].plot()
-    plt.show()
+# print(train.filter(regex='_dst$',axis=1))
+# for i in range(5):
+#     plt.subplot(2,1,1)
+#     pd.DataFrame(x_train, columns=train_col).filter(regex='_src$',axis=1).iloc[i, :].plot()
+#     plt.subplot(2,1,2)
+#     pd.DataFrame(x_train, columns=train_col).filter(regex='_dst$',axis=1).iloc[i, :].plot()
+#     plt.show()
 
+# for i in range(5):
+#     X1 = train_src[i]
+#     X1 = np.concatenate([X1,X1,X1,X1,X1])
+#     Y1 = np.fft.fft(X1)
+#     P1 = abs(Y1/175)
+#     P1[2:-1] = 2*P1[2:-1]
+#     f = 1000*np.array(range(0,int(175)))/175
+
+#     plt.plot(f,P1)
+#     plt.show()
 
 # train[:,1:] = train[:,1:] / train[:,0].reshape(train.shape[0],1) / train[:,0].reshape(train.shape[0],1)
 # test[:,1:] = test[:,1:] / test[:,0].reshape(test.shape[0],1) / test[:,0].reshape(test.shape[0],1)
@@ -59,3 +65,42 @@ for i in range(50):
 # for i in range(10):
 #     pd.DataFrame(train).filter(regex='_dst$',axis=1).iloc[:500, i].plot()
 #     plt.show()
+
+
+
+def plot_feature_importacnes_cancer(model, title):
+    n_features = x_train.shape[1]
+    plt.barh(np.arange(n_features), model.feature_importances_, align = 'center')
+    plt.yticks(np.arange(n_features), train_col)
+    plt.title(title)
+    plt.xlabel("feature_importace")
+    plt.ylabel("Features")
+    plt.ylim(-1, n_features)
+
+model = DecisionTreeRegressor()
+model.fit(x_train,y_train)
+# print(model.feature_importances_)
+plot_feature_importacnes_cancer(model, "DecisionTree")
+plt.show()
+
+model = RandomForestRegressor()
+model.fit(x_train,y_train)
+# print(model.feature_importances_)
+plot_feature_importacnes_cancer(model, "RandomForest")
+plt.show()
+
+for i in range(4):
+    model = GradientBoostingRegressor()
+    model.fit(x_train,y_train[:,i])
+    # print(model.feature_importances_)
+    plt.subplot(2,2,i+1)
+    plot_feature_importacnes_cancer(model, "GradientBoost" + str(i))
+plt.show()
+
+for i in range(4):
+    model = XGBRegressor()
+    model.fit(x_train,y_train[:,i])
+    # print(model.feature_importances_)
+    plt.subplot(2,2,i+1)
+    plot_feature_importacnes_cancer(model, "XGBoost"+str(i))
+plt.show()

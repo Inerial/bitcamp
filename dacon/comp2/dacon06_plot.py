@@ -26,39 +26,53 @@ for i in range(int(x_pred.shape[0]/time_step)):
     tmp.append(x_pred.iloc[i*time_step : (i+1)*time_step, 1:].values)
 x_pred_LSTM = np.array(tmp)
 
-print("===========================")
-print(x_LSTM.shape)
-print(y.shape)
-print(x_pred_LSTM.shape)
-print("===========================")
+print(x_pred.shape)
 
-x_fu = []
-x_pred_fu = []
-for i in range(len(x_LSTM)):
+for i in range(5):
     X1 = x_LSTM[i,:,0]
+    X1 = np.concatenate([X1,X1,X1,X1,X1])
     Y1 = np.fft.fft(X1)
-    P1 = abs(Y1/(375))
+    P1 = abs(Y1/(5*375))
     P1[2:-1] = 2*P1[2:-1]
-    rank_X1 = np.argsort(P1[:150])[::-1][ :50]
-    x_fu.append(rank_X1)
+    rank_X1 = np.argsort(P1[:500])[::-1][ :50]
+    print(rank_X1)
+    f = 1000*np.array(range(0,int(5*375)))/(5*375)
+    plt.subplot(2,1,1)
+    plt.plot(x_LSTM[i,:,0])
+    plt.subplot(2,1,2)
+    plt.plot(f[:500],P1[:500])
+    plt.show()
 
-for i in range(len(x_pred_LSTM)):
-    X1 = x_pred_LSTM[i,:,0]
-    Y1 = np.fft.fft(X1)
-    P1 = abs(Y1/(375))
-    P1[2:-1] = 2*P1[2:-1]
-    rank_X1 = np.argsort(P1[:150])[::-1][ :50]
-    x_pred_fu.append(rank_X1)
 
-x_fu = np.array(x_fu).astype('float32')
-x_pred_fu = np.array(x_pred_fu).astype('float32')
-print(x_fu.shape)
-print(x_pred_fu.shape)
 
-np.save('./dacon/comp2/x_lstm.npy', arr=x_LSTM)
-np.save('./dacon/comp2/y.npy', arr=y)
-np.save('./dacon/comp2/x_pred_lstm.npy', arr=x_pred_LSTM)
-np.save('./dacon/comp2/x_fu.npy', arr=x_fu)
-np.save('./dacon/comp2/x_pred_fu.npy', arr=x_pred_fu)
 
-## 위아래 진동수 변수로 줄만하지않나?
+
+
+
+
+
+
+
+
+
+# # model = DecisionTreeRegressor()
+# model = RandomForestRegressor()
+
+# model.fit(x_train,y_train)
+
+# print(model.feature_importances_)
+
+# import matplotlib.pyplot as plt
+# import numpy as np
+# def plot_feature_importacnes_cancer(model):
+#     n_features = x_train.shape[1]
+#     plt.barh(np.arange(n_features), model.feature_importances_, align = 'center')
+#     plt.yticks(np.arange(n_features), train_col)
+#     plt.xlabel("feature_importace")
+#     plt.ylabel("Features")
+#     plt.ylim(-1, n_features)
+
+# plot_feature_importacnes_cancer(model)
+# plt.show()
+
+# ## 위아래 진동수 변수로 줄만하지않나?
