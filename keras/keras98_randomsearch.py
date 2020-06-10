@@ -51,7 +51,7 @@ def build_model(hidden_layers = 1, nodes = 128, activation = 'relu', drop=0.5, o
         denses = Dropout(drop)(denses)
     outputs = Dense(y_train.shape[1], activation=activation)(denses)
 
-    model = Model(inputs = inputs, outputs = outputs))
+    model = Model(inputs = inputs, outputs = outputs)
     model.compile(loss = 'categorical_crossentropy', optimizer=optimizer, metrics=['acc'])
     return model # 콤파일 까지 한 모델 리턴
 
@@ -66,6 +66,7 @@ from keras.wrappers.scikit_learn import KerasClassifier
 model = KerasClassifier(build_fn=build_model)
 
 hyperparameters = create_hyperparameters()
+hyperparameters1 = create_hyperparameters()
 
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 search = RandomizedSearchCV(estimator=model, param_distributions=hyperparameters, cv=3, n_iter=10)
