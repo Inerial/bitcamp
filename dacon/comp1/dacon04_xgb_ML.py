@@ -30,7 +30,7 @@ for i in range(4):
 
     # print(search.best_params_)
     print("MAE :", search.score(x_test,y_test[:,i]))
-    print(model.best_params_)
+    # print(model.best_params_)
 
     y_pred.append(search.predict(x_pred))
 

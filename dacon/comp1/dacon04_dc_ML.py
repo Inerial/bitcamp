@@ -36,7 +36,7 @@ search.fit(x_train, y_train)
 
 # print(search.best_params_)
 print("MAE :", search.score(x_test,y_test))
-print(model.best_params_)
+# print(model.best_params_)
 
 y_pred = search.predict(x_pred)
 

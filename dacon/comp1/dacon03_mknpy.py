@@ -20,20 +20,24 @@ test = test.values
 # train = scaler.fit_transform(train)
 # test = scaler.transform(test)
 
+
+## NaN값이 있는 train,test값을 다시 데이터 프레임으로 감싸주기
 train = pd.DataFrame(train, columns=train_col)
 test = pd.DataFrame(test, columns=test_col)
+
 
 # train[:,1:] = train[:,1:] * train[:,0:1] * train[:,0:1]
 # test[:,1:] = test[:,1:] * test[:,0:1] * test[:,0:1]
 
 # # print(train)
 
+## train에서 
 train_src = train.filter(regex='_src$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values # 선형보간법
 train_dst = train.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values # 선형보간법
 test_src = test.filter(regex='_src$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
 test_dst = test.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
 
-x_train ,y_train = np.concatenate([train.values[:,0:1], train_src, train_dst], axis = 1), y_train
+x_train = np.concatenate([train.values[:,0:1], train_src, train_dst], axis = 1)
 x_pred = np.concatenate([test.values[:,0:1], test_src, test_dst], axis = 1)
 
 print(x_train.shape)
