@@ -32,8 +32,10 @@ print(y.shape)
 print(x_pred_LSTM.shape)
 print("===========================")
 
+
 x_fu = []
 x_pred_fu = []
+t1_all,t2_all,t3_all,t4_all = [],[],[],[]
 for i in range(len(x_LSTM)):
     maxs = np.array([x_LSTM[i,:,0].max(), x_LSTM[i,:,1].max(), x_LSTM[i,:,2].max(), x_LSTM[i,:,3].max()])
     mins = np.array([x_LSTM[i,:,0].min(), x_LSTM[i,:,1].min(), x_LSTM[i,:,2].min(), x_LSTM[i,:,3].min()])
@@ -66,9 +68,38 @@ for i in range(len(x_LSTM)):
     rank_X2 = np.argsort(P2[:150])[::-1][ :20]
     rank_X3 = np.argsort(P3[:150])[::-1][ :20]
     rank_X4 = np.argsort(P4[:150])[::-1][ :20]
-    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians])
+
+    t1 = 0
+    for j in range(375):
+        if x_LSTM[i,j,0] != 0.0:
+            break
+        t1+=1
+    t1_all.append(t1)
+    t2 = 0
+    for j in range(375):
+        if x_LSTM[i,j,1] != 0.0:
+            break
+        t2+=1
+    t2_all.append(t2)
+    t3 = 0
+    for j in range(375):
+        if x_LSTM[i,j,2] != 0.0:
+            break
+        t3+=1
+    t3_all.append(t3)
+    t4 = 0
+    for j in range(375):
+        if x_LSTM[i,j,3] != 0.0:
+            break
+        t4+=1
+    t4_all.append(t4)
+
+
+
+    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians, t1_all,t2_all,t3_all,t4_all])
     x_fu.append(all_X)
 
+t1_all,t2_all,t3_all,t4_all = [],[],[],[]
 for i in range(len(x_pred_LSTM)):
     maxs = np.array([x_pred_LSTM[i,:,0].max(), x_pred_LSTM[i,:,1].max(), x_pred_LSTM[i,:,2].max(), x_pred_LSTM[i,:,3].max()])
     mins = np.array([x_pred_LSTM[i,:,0].min(), x_pred_LSTM[i,:,1].min(), x_pred_LSTM[i,:,2].min(), x_pred_LSTM[i,:,3].min()])
@@ -101,7 +132,33 @@ for i in range(len(x_pred_LSTM)):
     rank_X2 = np.argsort(P2[:150])[::-1][ :20]
     rank_X3 = np.argsort(P3[:150])[::-1][ :20]
     rank_X4 = np.argsort(P4[:150])[::-1][ :20]
-    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4, maxs, mins, means, stds, medians])
+
+    t1 = 0
+    for j in range(375):
+        if x_LSTM[i,j,0] != 0.0:
+            break
+        t1+=1
+    t1_all.append(t1)
+    t2 = 0
+    for j in range(375):
+        if x_LSTM[i,j,1] != 0.0:
+            break
+        t2+=1
+    t2_all.append(t2)
+    t3 = 0
+    for j in range(375):
+        if x_LSTM[i,j,2] != 0.0:
+            break
+        t3+=1
+    t3_all.append(t3)
+    t4 = 0
+    for j in range(375):
+        if x_LSTM[i,j,3] != 0.0:
+            break
+        t4+=1
+    t4_all.append(t4)
+
+    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4, maxs, mins, means, stds, medians, t1_all,t2_all,t3_all,t4_all])
 
     x_pred_fu.append(all_X)
 
