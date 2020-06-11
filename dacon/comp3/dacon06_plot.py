@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, Ro
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
+from xgboost import XGBRegressor
 
 x = pd.read_csv('./data/dacon/comp3/train_features.csv', sep=',', index_col = 0, header = 0)
 y = pd.read_csv('./data/dacon/comp3/train_target.csv', sep=',', index_col = 0, header = 0)
@@ -62,10 +63,10 @@ for i in range(len(x_LSTM)):
     P3[2:-1] = 2*P3[2:-1]
     P4[2:-1] = 2*P4[2:-1]
     
-    rank_X1 = np.argsort(P1[:150])[::-1][ :20]
-    rank_X2 = np.argsort(P2[:150])[::-1][ :20]
-    rank_X3 = np.argsort(P3[:150])[::-1][ :20]
-    rank_X4 = np.argsort(P4[:150])[::-1][ :20]
+    rank_X1 = np.argsort(P1[:150])[::-1][ :3]
+    rank_X2 = np.argsort(P2[:150])[::-1][ :3]
+    rank_X3 = np.argsort(P3[:150])[::-1][ :3]
+    rank_X4 = np.argsort(P4[:150])[::-1][ :3]
     all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians])
     x_fu.append(all_X)
 
@@ -97,10 +98,10 @@ for i in range(len(x_pred_LSTM)):
     P3[2:-1] = 2*P3[2:-1]
     P4[2:-1] = 2*P4[2:-1]
     
-    rank_X1 = np.argsort(P1[:150])[::-1][ :20]
-    rank_X2 = np.argsort(P2[:150])[::-1][ :20]
-    rank_X3 = np.argsort(P3[:150])[::-1][ :20]
-    rank_X4 = np.argsort(P4[:150])[::-1][ :20]
+    rank_X1 = np.argsort(P1[:150])[::-1][ :3]
+    rank_X2 = np.argsort(P2[:150])[::-1][ :3]
+    rank_X3 = np.argsort(P3[:150])[::-1][ :3]
+    rank_X4 = np.argsort(P4[:150])[::-1][ :3]
     all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4, maxs, mins, means, stds, medians])
 
     x_pred_fu.append(all_X)
@@ -110,11 +111,31 @@ x_pred_fu = np.array(x_pred_fu).astype('float32')
 print(x_fu.shape)
 print(x_pred_fu.shape)
 
-np.save('./dacon/comp3/x_lstm.npy', arr=x_LSTM)
-np.save('./dacon/comp3/y.npy', arr=y)
-np.save('./dacon/comp3/x_pred_lstm.npy', arr=x_pred_LSTM)
-np.save('./dacon/comp3/x_fu.npy', arr=x_fu)
-np.save('./dacon/comp3/x_pred_fu.npy', arr=x_pred_fu)
 
 ## 위아래 진동수 변수로 줄만하지않나?
-## max, min, mean, std, median, skew
+## max, min,   mean,   std,    median
+## 최대,최소,   평균, 표준편차 , 중심값
+
+# scaler = StandardScaler()
+# x_fu = scaler.fit_transform(x_fu)
+# pca = PCA(40)
+# x_fu = pca.fit_transform(x_fu)
+
+def plot_feature_importacnes_cancer(model, title):
+    n_features = x_fu.shape[1]
+    plt.barh(np.arange(n_features), model.feature_importances_, align = 'center')
+    plt.yticks(np.arange(n_features), range(32))
+    plt.title(title)
+    plt.xlabel("feature_importace")
+    plt.ylabel("Features")
+    plt.ylim(-1, n_features)
+
+
+
+for i in range(4):
+    model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+    model.fit(x_fu,y.values[:,i])
+    # print(model.feature_importances_)
+    plt.subplot(2,2,i+1)
+    plot_feature_importacnes_cancer(model, y.columns[i])
+plt.show()

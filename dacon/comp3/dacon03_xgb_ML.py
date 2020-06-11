@@ -29,29 +29,32 @@ x_train,x_test,y_train,y_test = train_test_split(
 )
 
 parameters = {
-    'n_estimators' : [1,5,10,20,30,50,100,1000],
+    'n_estimators' : [1,5,10,20,30,50,100,1000,10000],
     'eta' : [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],
     'max_depth' :[1,2,3,5,10,100],
     'validate_parameters' : [True, False],
     'n_jobs' : [-1]
 }
 # 2. 모델
+y_test_pred = []
 y_pred = []
 for i in range(4):
-    model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
+    model = RandomizedSearchCV(XGBRegressor(), parameters, cv=10, n_iter=50)
     model.fit(x_train, y_train[:,i])
 
     print("acc : ",model.score(x_test,y_test[:,i]))
 
-    # y_pred = model.predict(x_test)
-    # mspe = kaeri_metric(y_test, y_pred)
-    # print('mspe : ', mspe)
     print(model.best_params_)
 
+    y_test_pred.append(model.predict(x_test))
     y_pred.append(model.predict(x_pred))
     
 y_pred = np.array(y_pred).T
+y_test_pred = np.array(y_test_pred).T
 print(y_pred.shape)
+
+mspe = kaeri_metric(y_test, y_test_pred)
+print('mspe : ', mspe)
 
 submissions = pd.DataFrame({
     "id": range(2800,3500),
@@ -63,4 +66,19 @@ submissions = pd.DataFrame({
 
 submissions.to_csv('./dacon/comp3/comp3_sub.csv', index = False)
 
-# mspe :  3.3595243892423294
+# acc :  0.9157084134372458
+# {'validate_parameters': False, 'n_jobs': -1, 'n_estimators': 1000, 'max_depth': 3, 'eta': 0.2}
+# C:\Users\bitcamp\anaconda3\lib\site-packages\xgboost\core.py:444: UserWarning: Use subset (sliced data) of np.ndarray is not recommended because it will generate extra copies and increase memory consumption
+#   "because it will generate extra copies and increase " +
+# acc :  0.961304588111114
+# {'validate_parameters': True, 'n_jobs': -1, 'n_estimators': 1000, 'max_depth': 2, 'eta': 0.4}
+# C:\Users\bitcamp\anaconda3\lib\site-packages\xgboost\core.py:444: UserWarning: Use subset (sliced data) of np.ndarray is not recommended because it will generate extra copies and increase memory consumption
+#   "because it will generate extra copies and increase " +
+# acc :  0.973739901644889
+# {'validate_parameters': True, 'n_jobs': -1, 'n_estimators': 1000, 'max_depth': 1, 'eta': 0.6}
+# C:\Users\bitcamp\anaconda3\lib\site-packages\xgboost\core.py:444: UserWarning: Use subset (sliced data) of np.ndarray is not recommended because it will generate extra copies and increase memory consumption
+#   "because it will generate extra copies and increase " +
+# acc :  0.9924472524715161
+# {'validate_parameters': False, 'n_jobs': -1, 'n_estimators': 1000, 'max_depth': 2, 'eta': 0.2}
+# (700, 4)
+# mspe :  0.2127824595636973
