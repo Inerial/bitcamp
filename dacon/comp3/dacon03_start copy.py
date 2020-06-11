@@ -21,9 +21,9 @@ def E2(y_true, y_pred):
     return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
 
 
-x = np.load('./dacon/comp2/x.npy')
-y = np.load('./dacon/comp2/y.npy')
-x_pred = np.load('./dacon/comp2/x_pred.npy')
+x = np.load('./dacon/comp3/x.npy')
+y = np.load('./dacon/comp3/y.npy')
+x_pred = np.load('./dacon/comp3/x_pred.npy')
 
 x_train,x_test,y_train,y_test = train_test_split(
     x,y, train_size=0.8, random_state = 66
@@ -103,6 +103,6 @@ submissions = pd.DataFrame({
     "V": y_pred[:,3]
 })
 
-submissions.to_csv('./dacon/comp2/comp2_sub.csv', index = False)
+submissions.to_csv('./dacon/comp3/comp3_sub.csv', index = False)
 
 # mspe :  3.3595243892423294

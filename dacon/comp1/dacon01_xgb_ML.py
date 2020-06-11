@@ -24,13 +24,13 @@ parameters = {
     'n_jobs' : [-1]
 }
 y_pred = []
+search = RandomizedSearchCV(XGBRegressor(), parameters, cv = 5, n_iter=5)
+
 for i in range(4):
-    search = RandomizedSearchCV(XGBRegressor(), parameters, cv = 5, n_iter=5)
     search.fit(x_train, y_train[:,i])
 
-    # print(search.best_params_)
+    print(search.best_params_)
     print("MAE :", search.score(x_test,y_test[:,i]))
-    # print(model.best_params_)
 
     y_pred.append(search.predict(x_pred))
 

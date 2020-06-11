@@ -1,4 +1,4 @@
-''' ## 데이터가 그냥 LSTM하기엔 애매하다
+## 데이터가 그냥 LSTM하기엔 애매하다
 ## Conv1D도 가능
 
 ## train test data의 각각 id 를 기준으로 375개씩 뽑은다음
@@ -18,48 +18,22 @@ from keras.layers import Input, Dense, Dropout, Conv1D, Flatten, MaxPool1D, LSTM
 from keras import backend
 
 def kaeri_metric(y_true, y_pred):
-    '''
-    y_true: dataframe with true values of X,Y,M,V
-    y_pred: dataframe with pred values of X,Y,M,V
-    
-    return: KAERI metric
-    '''
-    
     return 0.5 * E1(y_true, y_pred) + 0.5 * E2(y_true, y_pred)
 
-
-### E1과 E2는 아래에 정의됨 ###
-
 def E1(y_true, y_pred):
-    '''
-    y_true: dataframe with true values of X,Y,M,V
-    y_pred: dataframe with pred values of X,Y,M,V
-    
-    return: distance error normalized with 2e+04
-    '''
-    
     _t, _p = np.array(y_true)[:,:2], np.array(y_pred)[:,:2]
     
     return np.mean(np.sum(np.square(_t - _p), axis = 1) / 2e+04)
 
-
 def E2(y_true, y_pred):
-    '''
-    y_true: dataframe with true values of X,Y,M,V
-    y_pred: dataframe with pred values of X,Y,M,V
-    
-    return: sum of mass and velocity's mean squared percentage error
-    '''
-    
     _t, _p = np.array(y_true)[:,2:], np.array(y_pred)[:,2:]
-    
     
     return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
 
 
-x = np.load('./dacon/comp2/x.npy')
-y = np.load('./dacon/comp2/y.npy')
-x_pred = np.load('./dacon/comp2/x_pred.npy')
+x = np.load('./dacon/comp3/x.npy')
+y = np.load('./dacon/comp3/y.npy')
+x_pred = np.load('./dacon/comp3/x_pred.npy')
 time_step = 10
 
 def split_xy(seq, size):
@@ -132,4 +106,3 @@ for i in range(len(xs)):
     y_pred = model.predict(xs_pred[i])
 mspe = kaeri_metric(y_test, y_pred)
 print('mspe : ', mspe)
- '''

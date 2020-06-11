@@ -7,9 +7,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
 
-x = pd.read_csv('./data/dacon/comp2/train_features.csv', sep=',', index_col = 0, header = 0)
-y = pd.read_csv('./data/dacon/comp2/train_target.csv', sep=',', index_col = 0, header = 0)
-x_pred = pd.read_csv('./data/dacon/comp2/test_features.csv', sep=',', index_col = 0, header = 0)
+x = pd.read_csv('./data/dacon/comp3/train_features.csv', sep=',', index_col = 0, header = 0)
+y = pd.read_csv('./data/dacon/comp3/train_target.csv', sep=',', index_col = 0, header = 0)
+x_pred = pd.read_csv('./data/dacon/comp3/test_features.csv', sep=',', index_col = 0, header = 0)
 
 print(x.shape)
 print(y.shape)

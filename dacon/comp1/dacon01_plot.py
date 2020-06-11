@@ -33,8 +33,9 @@ train_dst = train.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='f
 test_src = test.filter(regex='_src$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
 test_dst = test.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
 
-x_train ,y_train = np.concatenate([train.values[:,0:1], train_src, train_dst], axis = 1), y_train
-x_pred = np.concatenate([test.values[:,0:1], test_src, test_dst], axis = 1)
+
+x_train = np.concatenate([train.values[:,0:1], train_src, train_dst, train_src - train_dst], axis = 1)
+x_pred = np.concatenate([test.values[:,0:1], test_src, test_dst, test_src - test_dst], axis = 1)
 
 # print(train.filter(regex='_dst$',axis=1))
 # for i in range(5):
@@ -98,7 +99,7 @@ for i in range(4):
 plt.show()
 
 for i in range(4):
-    model = XGBRegressor()
+    model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
     model.fit(x_train,y_train[:,i])
     # print(model.feature_importances_)
     plt.subplot(2,2,i+1)
