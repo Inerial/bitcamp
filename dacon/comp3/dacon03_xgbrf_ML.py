@@ -35,20 +35,22 @@ parameters = {
 }
 # 2. 모델
 y_pred = []
+y_test_pred = []
 for i in range(4):
     model = RandomizedSearchCV(XGBRFRegressor(), parameters, cv=5, n_iter=50)
     model.fit(x_train, y_train[:,i])
 
     print("acc : ",model.score(x_test,y_test[:,i]))
 
-    # y_pred = model.predict(x_test)
-    # mspe = kaeri_metric(y_test, y_pred)
-    # print('mspe : ', mspe)
-    print(model.best_params_)
+    y_test_pred.append(model.predict(x_test))
     y_pred.append(model.predict(x_pred))
     
 y_pred = np.array(y_pred).T
+y_test_pred = np.array(y_test_pred).T
 print(y_pred.shape)
+
+mspe = kaeri_metric(y_test, y_test_pred)
+print('mspe : ', mspe)
 
 submissions = pd.DataFrame({
     "id": range(2800,3500),

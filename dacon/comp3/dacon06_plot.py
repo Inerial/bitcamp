@@ -67,9 +67,33 @@ for i in range(len(x_LSTM)):
     rank_X2 = np.argsort(P2[:150])[::-1][ :3]
     rank_X3 = np.argsort(P3[:150])[::-1][ :3]
     rank_X4 = np.argsort(P4[:150])[::-1][ :3]
-    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians])
+
+    t1 = 0
+    for j in range(375):
+        if x_LSTM[i,j,0] != 0.0:
+            break
+        t1+=1
+    t2 = 0
+    for j in range(375):
+        if x_LSTM[i,j,1] != 0.0:
+            break
+        t2+=1
+    t3 = 0
+    for j in range(375):
+        if x_LSTM[i,j,2] != 0.0:
+            break
+        t3+=1
+    t4 = 0
+    for j in range(375):
+        if x_LSTM[i,j,3] != 0.0:
+            break
+        t4+=1
+    t_all = np.array([t1,t2,t3,t4])
+
+    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians, t_all/t_all.sum()])
     x_fu.append(all_X)
 
+t1_all,t2_all,t3_all,t4_all = [],[],[],[]
 for i in range(len(x_pred_LSTM)):
     maxs = np.array([x_pred_LSTM[i,:,0].max(), x_pred_LSTM[i,:,1].max(), x_pred_LSTM[i,:,2].max(), x_pred_LSTM[i,:,3].max()])
     mins = np.array([x_pred_LSTM[i,:,0].min(), x_pred_LSTM[i,:,1].min(), x_pred_LSTM[i,:,2].min(), x_pred_LSTM[i,:,3].min()])
@@ -102,7 +126,30 @@ for i in range(len(x_pred_LSTM)):
     rank_X2 = np.argsort(P2[:150])[::-1][ :3]
     rank_X3 = np.argsort(P3[:150])[::-1][ :3]
     rank_X4 = np.argsort(P4[:150])[::-1][ :3]
-    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4, maxs, mins, means, stds, medians])
+
+    t1 = 0
+    for j in range(375):
+        if x_LSTM[i,j,0] != 0.0:
+            break
+        t1+=1
+    t2 = 0
+    for j in range(375):
+        if x_LSTM[i,j,1] != 0.0:
+            break
+        t2+=1
+    t3 = 0
+    for j in range(375):
+        if x_LSTM[i,j,2] != 0.0:
+            break
+        t3+=1
+    t4 = 0
+    for j in range(375):
+        if x_LSTM[i,j,3] != 0.0:
+            break
+        t4+=1
+    t_all = np.array([t1,t2,t3,t4])
+
+    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4, maxs, mins, means, stds, medians, t_all/t_all.sum()])
 
     x_pred_fu.append(all_X)
 
@@ -121,21 +168,46 @@ print(x_pred_fu.shape)
 # pca = PCA(40)
 # x_fu = pca.fit_transform(x_fu)
 
-def plot_feature_importacnes_cancer(model, title):
-    n_features = x_fu.shape[1]
-    plt.barh(np.arange(n_features), model.feature_importances_, align = 'center')
-    plt.yticks(np.arange(n_features), range(32))
+def plot_feature_importacnes_cancer(model, title, lenth):
+    plt.barh(np.arange(lenth), model.feature_importances_, align = 'center')
+    plt.yticks(np.arange(lenth))
     plt.title(title)
     plt.xlabel("feature_importace")
     plt.ylabel("Features")
-    plt.ylim(-1, n_features)
+    plt.ylim(-1, lenth)
 
 
 
-for i in range(4):
-    model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
-    model.fit(x_fu,y.values[:,i])
-    # print(model.feature_importances_)
-    plt.subplot(2,2,i+1)
-    plot_feature_importacnes_cancer(model, y.columns[i])
+# for i in range(4):
+#     model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+#     model.fit(x_fu,y.values[:,i])
+#     # print(model.feature_importances_)
+#     plt.subplot(2,2,i+1)
+#     plot_feature_importacnes_cancer(model, y.columns[i])
+
+
+model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+model.fit(x_fu[:,-4:],y.values[:,0])
+# print(model.feature_importances_)
+plt.subplot(2,2,1)
+plot_feature_importacnes_cancer(model, y.columns[0],4)
+
+model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+model.fit(x_fu[:,-4:],y.values[:,1])
+# print(model.feature_importances_)
+plt.subplot(2,2,2)
+plot_feature_importacnes_cancer(model, y.columns[1],4)
+
+model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+model.fit(x_fu[:,:-8],y.values[:,2])
+# print(model.feature_importances_)
+plt.subplot(2,2,3)
+plot_feature_importacnes_cancer(model, y.columns[2],28)
+
+model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+model.fit(x_fu[:,:-8],y.values[:,3])
+# print(model.feature_importances_)
+plt.subplot(2,2,4)
+plot_feature_importacnes_cancer(model, y.columns[3],28)
+
 plt.show()

@@ -28,13 +28,30 @@ parameters = {
 y_pred = []
 search = RandomizedSearchCV(XGBRegressor(), parameters, cv = 5, n_iter=50)
 
-for i in range(4):
-    search.fit(x_train, y_train[:,i])
+# for i in range(4):
+#     search.fit(x_train, y_train[:,i])
 
-    print(search.best_params_)
-    # print("MAE :", search.score(x_test,y_test[:,i]))
+#     print(search.best_params_)
+#     # print("MAE :", search.score(x_test,y_test[:,i]))
 
-    y_pred.append(search.predict(x_pred))
+#     y_pred.append(search.predict(x_pred))
+
+
+search.fit(x_train[:,-4:], y_train[:,0])
+print(search.best_params_)
+y_pred.append(search.predict(x_pred))
+
+search.fit(x_train[:,-4:], y_train[:,1])
+print(search.best_params_)
+y_pred.append(search.predict(x_pred))
+
+search.fit(x_train[:,:-8], y_train[:,2])
+print(search.best_params_)
+y_pred.append(search.predict(x_pred))
+
+search.fit(x_train[:,:-8], y_train[:,3])
+print(search.best_params_)
+y_pred.append(search.predict(x_pred))
 
 y_pred = np.array(y_pred)
 submissions = pd.DataFrame({
