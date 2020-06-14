@@ -1,0 +1,6 @@
+*.npy
+*.h5
+*.hdf5
+*.txt
+*.csv
+*.exe
