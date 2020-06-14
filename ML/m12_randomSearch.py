@@ -78,3 +78,15 @@ print("최종 정답률 : ", accuracy_score(y_test,y_pred))
 # [Parallel(n_jobs=9)]: Done   9 out of   9 | elapsed:    0.0s finished
 # 최종 정답률 :  0.9790209790209791
 # PS D:\Study>
+
+
+# {
+#     "python.pythonPath": "C:\\Users\\bitcamp\\anaconda3\\python.exe"
+# }
+
+
+
+## Conv1D
+## 자연어 처리 등등 나감
+## 텐서플로 1
+## 우승모델
