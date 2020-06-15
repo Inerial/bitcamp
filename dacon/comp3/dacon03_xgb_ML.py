@@ -39,21 +39,21 @@ y_test_pred = []
 y_pred = []
 for i in range(4):
     model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
-    model.fit(x_train, y_train[:,i])
-
-    print("acc : ",model.score(x_test,y_test[:,i]))
+    # model.fit(x_train, y_train[:,i])
+    model.fit(x,y[:,i])
+    # print("acc : ",model.score(x_test,y_test[:,i]))
 
     print(model.best_params_)
 
-    y_test_pred.append(model.predict(x_test))
+    # y_test_pred.append(model.predict(x_test))
     y_pred.append(model.predict(x_pred))
     
 y_pred = np.array(y_pred).T
-y_test_pred = np.array(y_test_pred).T
+# y_test_pred = np.array(y_test_pred).T
 print(y_pred.shape)
 
-mspe = kaeri_metric(y_test, y_test_pred)
-print('mspe : ', mspe)
+# mspe = kaeri_metric(y_test, y_test_pred)
+# print('mspe : ', mspe)
 
 submissions = pd.DataFrame({
     "id": range(2800,3500),

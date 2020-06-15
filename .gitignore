@@ -13,3 +13,7 @@
 *.json
 *.exe
 *.txt
+Dockerfile
+*.html
+*.md
+*.m4

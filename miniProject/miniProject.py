@@ -24,9 +24,10 @@ fp.close()
 ## 대화에서 일정개수 랜덤추출하여 단어특성으로 분류
 x_train = []
 y_train = []
-for i in range(20):
-    x_train.append(ko.morphs(text1[np.random.randint(text1.shape[0]-1)]))
-    y_train.append([np.nan])
+
+# for i in range(20):
+#     x_train.append(ko.morphs(text1[np.random.randint(text1.shape[0]-1)]))
+#     y_train.append([np.nan])
 
 class2index = {"<unk>" : 0}
 train = pd.read_csv(pypath+'//train_chatdata.csv', sep=',', index_col=None, header=None).values
@@ -72,10 +73,18 @@ model = MultiOutputClassifier(model)
 model.fit(x_train , y_train[:,1:])
 
 
+def re_Bow(seq, index):
+    word = []
+    for i in range(1,len(seq)):
+        if seq[i-1] == 1:
+            word.append(list(index.keys())[i])
+    return word
+    
+
 while True:
     print("종료 : 종료 입력시")
     text = input()
     if text == "종료":
         break
     x_pred = model.predict(np.array([make_Bow(ko.morphs(text), word2index)]))
-    print(x_pred)
+    print(re_Bow(x_pred[0], class2index))

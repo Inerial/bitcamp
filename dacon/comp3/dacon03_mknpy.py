@@ -90,7 +90,7 @@ for i in range(len(x_LSTM)):
         t4+=1
     t_all = np.array([t1,t2,t3,t4])
 
-    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians, t_all/t_all.sum()])
+    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians])#, t_all/t_all.sum()])
     x_fu.append(all_X)
 
 t1_all,t2_all,t3_all,t4_all = [],[],[],[]
@@ -149,13 +149,13 @@ for i in range(len(x_pred_LSTM)):
         t4+=1
     t_all = np.array([t1,t2,t3,t4])
 
-    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4, maxs, mins, means, stds, medians, t_all/t_all.sum()])
+    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4, maxs, mins, means, stds, medians])# t_all/t_all.sum()])
 
     x_pred_fu.append(all_X)
 
 x_fu = np.array(x_fu).astype('float32')
 x_pred_fu = np.array(x_pred_fu).astype('float32')
-print(x_fu.shape)
+print(x_fu[:,-4:])
 print(x_pred_fu.shape)
 
 np.save('./dacon/comp3/x_lstm.npy', arr=x_LSTM)
