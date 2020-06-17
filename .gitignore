@@ -17,3 +17,5 @@ Dockerfile
 *.html
 *.md
 *.m4
+*.bin
+*.pkl
