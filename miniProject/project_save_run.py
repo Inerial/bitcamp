@@ -1,32 +1,16 @@
-import gensim.downloader as api
 from gensim.models import Doc2Vec, Word2Vec
 from gensim.models import KeyedVectors
-from gensim.test.utils import common_texts
-from collections import namedtuple
 from konlpy.tag import Mecab
-from konlpy.utils import pprint
-import numpy as np
-import os
-import shutil
-import pandas as pd
-import nltk, re
+import numpy as np, os, shutil, pandas as pd, nltk, re
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
-from keras.models import Sequential, Model, load_model
+from keras.models import Model
 from keras.layers import Dense, Embedding, Flatten, Input,Dropout
 from sklearn.multioutput import MultiOutputClassifier
 from keras.wrappers.scikit_learn import KerasClassifier
-from keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.externals import joblib
 
 ko = Mecab(dicpath='C:\mecab\mecab-ko-dic')
-# print(np.array(ko.pos("10연속 사진 촬영")))
-# print(np.array(ko.pos("사진 열번 찍어")))
-# print(np.array(ko.pos("5번 찍어주지 않을래?"))) ## 단락별로 나누고 단어 특성
-# print(np.array(ko.morphs("5번 찍어주지 않을래?"))) ## 단락별로 나누고 단어 특성
-
-# input() # 입력받는 함수
-
 pypath = os.path.dirname(os.path.realpath(__file__))
 
 sentences = []
@@ -49,39 +33,24 @@ for i in range(train.shape[0]):
             class2index[token] = len(class2index)
 
 
-def make_Bow(seq, word2index):
+def make_y(seq, word2index):
     tensor = np.zeros(len(word2index))
     for w in seq:
         index = word2index.get(w)
         if index != None:
             tensor[index] += 1
-        else:
-            index = word2index['<unk>']
-            tensor[index] += 1
     return tensor
-y_train = np.array([make_Bow(y,class2index)[1:] for y in y_train])
 
+y_train = np.array([make_y(y,class2index)[1:] for y in y_train])
 
-# print(y_train)
-print(class2index)
-# print(sentences)
 
 word_model = KeyedVectors.load_word2vec_format(pypath+'/wiki_dmpv_300_no_taginfo_user_dic_word2vec_format.bin', binary=True)
-# word_model = Word2Vec.load(pypath+'/ko.bin').wv
 
 print(word_model.similarity("사진", "동영상"))
 
-# ko_texts = []
-# for i in list(word_model.vocab.keys()):
-#     koreans = re.search("[가-힣0-9]{2,}", i)
-#     if koreans is not None:
-#         ko_texts.append(koreans.group())
-# print(ko_texts)
-# print(np.array(ko_texts).shape)
 
 t = Tokenizer()
 t.fit_on_texts(sentences)
-# t.fit_on_texts(ko_texts)
 vocab_size = len(t.word_index)
 print(vocab_size)
 x_encoded = t.texts_to_sequences(sentences)
@@ -134,9 +103,6 @@ del class2index["maxlen"]
 
 model = joblib.load(pypath+'/chatModel.pkl')
 
-# print(list(class2index.keys()))
-# print(model.predict(x_train[2:3]))
-# print(y_train[2])
 
 
 def re_Bow(seq, index):
@@ -145,10 +111,7 @@ def re_Bow(seq, index):
         if seq[i] == 1:
             word.append(list(index.keys())[i+1])
     return word
-    
-print(re_Bow(model.predict(x_train[2:3])[0,0], class2index))
-print(re_Bow(y_train[2], class2index))
-print(t.word_index)
+
 
 while True:
     print("종료 : 종료 입력시")
