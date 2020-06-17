@@ -60,13 +60,7 @@ while True:
         ind = t.word_index.get(token)
         if ind is not None:
             tmp.append(ind)
-    print(tmp)
     tmp = np.array(pad_sequences([tmp], maxlen= max_len, padding='post'))
     
     x_pred = model.predict(tmp)
     print(re_Bow(x_pred[0,0], class2index))
-
-
-
-## 데이터에 없는 글자들뭉텅이로 묶어 처리할 필요성이 있다.
-## 데이터가 길어질수록 인식을 못하는경향이 보인다(데이터의 수가 너무 적나?)
