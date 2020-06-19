@@ -7,6 +7,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
 from xgboost import XGBRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 x = pd.read_csv('./data/dacon/comp3/train_features.csv', sep=',', index_col = 0, header = 0)
 y = pd.read_csv('./data/dacon/comp3/train_target.csv', sep=',', index_col = 0, header = 0)
@@ -157,8 +158,15 @@ x_fu = np.array(x_fu).astype('float32')
 x_pred_fu = np.array(x_pred_fu).astype('float32')
 print(x_fu.shape)
 print(x_pred_fu.shape)
-
-
+plt.subplot(2,2,1)
+plt.hist(x_fu[:,-4])
+plt.subplot(2,2,2)
+plt.hist(x_fu[:,-3])
+plt.subplot(2,2,3)
+plt.hist(x_fu[:,-2])
+plt.subplot(2,2,4)
+plt.hist(x_fu[:,-1])
+plt.show()
 ## 위아래 진동수 변수로 줄만하지않나?
 ## max, min,   mean,   std,    median
 ## 최대,최소,   평균, 표준편차 , 중심값
@@ -187,27 +195,55 @@ def plot_feature_importacnes_cancer(model, title, lenth):
 
 
 model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
-model.fit(x_fu[:,-4:],y.values[:,0])
+model.fit(x_fu[:,:],y.values[:,0])
 # print(model.feature_importances_)
 plt.subplot(2,2,1)
-plot_feature_importacnes_cancer(model, y.columns[0],4)
+plot_feature_importacnes_cancer(model, y.columns[0],36)
 
 model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
-model.fit(x_fu[:,-4:],y.values[:,1])
+model.fit(x_fu[:,:],y.values[:,1])
 # print(model.feature_importances_)
 plt.subplot(2,2,2)
-plot_feature_importacnes_cancer(model, y.columns[1],4)
+plot_feature_importacnes_cancer(model, y.columns[1],36)
 
 model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
-model.fit(x_fu[:,:-8],y.values[:,2])
+model.fit(x_fu[:,:],y.values[:,2])
 # print(model.feature_importances_)
 plt.subplot(2,2,3)
-plot_feature_importacnes_cancer(model, y.columns[2],28)
+plot_feature_importacnes_cancer(model, y.columns[2],36)
 
 model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
-model.fit(x_fu[:,:-8],y.values[:,3])
+model.fit(x_fu[:,:],y.values[:,3])
 # print(model.feature_importances_)
 plt.subplot(2,2,4)
-plot_feature_importacnes_cancer(model, y.columns[3],28)
+plot_feature_importacnes_cancer(model, y.columns[3],36)
+
+plt.show()
+
+
+
+model = RandomForestRegressor(n_jobs= -1, n_estimators= 1000, max_depth= 5)
+model.fit(x_fu[:,:],y.values[:,0])
+# print(model.feature_importances_)
+plt.subplot(2,2,1)
+plot_feature_importacnes_cancer(model, y.columns[0],36)
+
+model = RandomForestRegressor(n_jobs= -1, n_estimators= 1000, max_depth= 5)
+model.fit(x_fu[:,:],y.values[:,1])
+# print(model.feature_importances_)
+plt.subplot(2,2,2)
+plot_feature_importacnes_cancer(model, y.columns[1],36)
+
+model = RandomForestRegressor(n_jobs= -1, n_estimators= 1000, max_depth= 5)
+model.fit(x_fu[:,:],y.values[:,2])
+# print(model.feature_importances_)
+plt.subplot(2,2,3)
+plot_feature_importacnes_cancer(model, y.columns[2],36)
+
+model = RandomForestRegressor(n_jobs= -1, n_estimators= 1000, max_depth= 5)
+model.fit(x_fu[:,:],y.values[:,3])
+# print(model.feature_importances_)
+plt.subplot(2,2,4)
+plot_feature_importacnes_cancer(model, y.columns[3],36)
 
 plt.show()

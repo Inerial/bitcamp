@@ -5,13 +5,14 @@ import numpy as np, os, shutil, pandas as pd, nltk, re
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model
-from keras.layers import Dense, Embedding, Flatten, Input,Dropout
+from keras.layers import Dense, Embedding, Flatten, Input,Dropout, LSTM
 from sklearn.multioutput import MultiOutputClassifier
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.externals import joblib
 
 ## Mecab형태소분석이 불러오기, 현재 py파일이 있는 폴더주소 저장
 ko = Mecab(dicpath='C:\mecab\mecab-ko-dic')
+print(ko.morphs("내가가방에들어간다"))
 pypath = os.path.dirname(os.path.realpath(__file__))
 
 ## 데이터를 정리해 넣을 빈 list, dict
@@ -85,7 +86,8 @@ def build_model():
     input1 = Input(shape=(max_len, )) ## input 레이어는 LSTM과 다름
     dense1 = Embedding(vocab_size, 300, weights=[embedding_matrix], trainable=True)(input1)
     ##             (단어의 개수, 단어를 표현한 벡터의 column 수,  weight값 미리 지정, 훈련 여부)
-    dense1 = Flatten()(dense1) ## embedding의 output이 3차원으로 나오므로 Flatten으로 묶어줌
+    dense1 = LSTM(128, activation='elu')(dense1)
+    dense1 = Dropout(0.2)(dense1)
     output1 = Dense(1, activation='sigmoid')(dense1)
     model = Model(inputs=[input1], outputs=[output1])
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
@@ -94,8 +96,19 @@ def build_model():
 ## 각 키워드 별로 각각 분류를 하기 위해 사용
 model = KerasClassifier(build_fn=build_model, epochs= 400, batch_size = 100)
 model = MultiOutputClassifier(model)
+model.fit(x_train,y_train)#, validation_split=0.3)
 
-model.fit(x_train,y_train)
+
+# input1 = Input(shape=(max_len, )) ## input 레이어는 LSTM과 다름
+# dense1 = Embedding(vocab_size, 300, weights=[embedding_matrix], trainable=True)(input1)
+# ##             (단어의 개수, 단어를 표현한 벡터의 column 수,  weight값 미리 지정, 훈련 여부)
+# dense1 = LSTM(128, activation='elu')(dense1)
+# dense1 = Dropout(0.2)(dense1)
+# output1 = Dense(8, activation='sigmoid')(dense1)
+# model = Model(inputs=[input1], outputs=[output1])
+# model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
+# ## 각 키워드 별로 각각 분류를 하기 위해 사용
+# model.fit(x_train,y_train, epochs= 400, batch_size = 100)#, validation_split=0.3)
 
 ## 머신러닝 모델을 저장하기 위한 라이브러리 == 나머지 필요한것들도 저장
 joblib.dump(model, pypath+'/chatModel.pkl')

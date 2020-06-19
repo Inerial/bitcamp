@@ -6,7 +6,7 @@ import os, shutil, pandas as pd , nltk
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import load_model, Model
-from keras.layers import Input, Dense, Embedding, Flatten
+from keras.layers import Input, Dense, Embedding, Flatten, LSTM, Dropout
 from sklearn.externals import joblib
 
 pypath = os.path.dirname(os.path.realpath(__file__))
@@ -36,7 +36,8 @@ for word, i in t.word_index.items():
 def build_model():
     input1 = Input(shape=(max_len, ))
     dense1 = Embedding(vocab_size, 300, weights=[embedding_matrix])(input1)
-    dense1 = Flatten()(dense1)
+    dense1 = LSTM(128, activatio='elu')(dense1)
+    dense1 = Dropout(0.2)(dense1)
     output1 = Dense(1, activation='sigmoid')(dense1)
     model = Model(inputs=[input1], outputs=[output1])
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])

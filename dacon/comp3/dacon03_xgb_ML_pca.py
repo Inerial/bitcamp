@@ -36,14 +36,14 @@ y_train = pca.fit_transform(y_train)
 
 
 parameters = {
-    'n_estimators' : [1,5,10,20,30,50,100,1000],
-    'eta' : [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],
-    'max_depth' :[1,2,3,5,10,100],
+    'n_estimators' : [10,20,30,50,100],
+    'eta' : [0.1,0.2,0.3,0.4,0.5],
+    'max_depth' :[1,2,3,5,10],
     'validate_parameters' : [True, False],
     'n_jobs' : [-1]
 }
 # 2. 모델
-model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
+model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=30)
 model.fit(x_train, y_train)
 
 y_pred = model.predict(x_test).reshape(560,1)

@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, Ro
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from xgboost import XGBRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 def kaeri_metric(y_true, y_pred):
     return 0.5 * E1(y_true, y_pred) + 0.5 * E2(y_true, y_pred)
@@ -34,6 +35,11 @@ parameters = {
     'validate_parameters' : [True, False],
     'n_jobs' : [-1]
 }
+rand_parameters = {
+    'n_estimators' : [10,20,30,50,100],
+    'max_depth' :[1,2,3,5,10],
+    'n_jobs' : [-1]
+}
 # 2. 모델
 y_test_pred = []
 y_pred = []
@@ -48,25 +54,25 @@ y_pred = []
 #     # y_test_pred.append(model.predict(x_test))
 #     y_pred.append(model.predict(x_pred))
     
-x_train_XY ,_,y_train_XY,_ = train_test_split(
-    x_train,y_train ,train_size=1/10
-) 
-model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
-model.fit(x_train_XY[:,-4:], y_train_XY[:,0])
-y_test_pred.append(model.predict(x_test[:,-4:]))
-y_pred.append(model.predict(x_pred[:,-4:]))
+# x_train_XY ,_,y_train_XY,_ = train_test_split(
+#     x_train,y_train ,train_size=1/10
+# ) 
+model = RandomizedSearchCV(RandomForestRegressor(), rand_parameters, cv=5, n_iter=50)
+model.fit(x_train, y_train[:,0])
+y_test_pred.append(model.predict(x_test))
+y_pred.append(model.predict(x_pred))
 
-model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
-model.fit(x_train_XY[:,-4:], y_train_XY[:,1])
-y_test_pred.append(model.predict(x_test[:,-4:]))
-y_pred.append(model.predict(x_pred[:,-4:]))
+model = RandomizedSearchCV(RandomForestRegressor(), rand_parameters, cv=5, n_iter=50)
+model.fit(x_train, y_train[:,1])
+y_test_pred.append(model.predict(x_test))
+y_pred.append(model.predict(x_pred))
 
-model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
+model = RandomizedSearchCV(RandomForestRegressor(), rand_parameters,cv=5, n_iter=50)
 model.fit(x_train[:,:-4], y_train[:,2])
 y_test_pred.append(model.predict(x_test[:,:-4]))
 y_pred.append(model.predict(x_pred[:,:-4]))
 
-model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
+model = RandomizedSearchCV(RandomForestRegressor(), rand_parameters, cv=5, n_iter=50)
 model.fit(x_train[:,:-4], y_train[:,3])
 y_test_pred.append(model.predict(x_test[:,:-4]))
 y_pred.append(model.predict(x_pred[:,:-4]))

@@ -89,7 +89,7 @@ for i in range(len(x_LSTM)):
             break
         t4+=1
     t_all = np.array([t1,t2,t3,t4])
-    print(t_all/t_all.sum())
+
     all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians])#, t_all/t_all.sum()])
     x_fu.append(all_X)
 

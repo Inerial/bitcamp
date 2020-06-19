@@ -37,13 +37,19 @@ train_dst = train.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='f
 test_src = test.filter(regex='_src$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
 test_dst = test.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
 
+train_src_rank = np.argsort(train_src)[::-1][:, :3]
+train_dst_rank = np.argsort(train_dst)[::-1][:, :3]
+test_src_rank = np.argsort(test_src)[::-1][:, :3]
+test_dst_rank = np.argsort(test_dst)[::-1][:, :3]
+print(np.array(train_src - train_dst)[:2,:])
 
-x_train = np.concatenate([train.values[:,0:1], train_src, train_dst, train_src - train_dst], axis = 1)
-x_pred = np.concatenate([test.values[:,0:1], test_src, test_dst, test_src - test_dst], axis = 1)
+x_train = np.concatenate([train.values[:,0:1], train_src, train_dst, train_src - train_dst, train_src_rank, train_dst_rank], axis = 1)
+x_pred = np.concatenate([test.values[:,0:1], test_src, test_dst, test_src - test_dst, train_src_rank, train_dst_rank], axis = 1)
+# print(pd.DataFrame(np.log10(train_src.values) - np.log10(train_dst.values)))
 
-print(x_train.shape)
-print(y_train.shape)
-print(x_pred.shape)
+# print(x_train.shape)
+# print(y_train.shape)
+# print(x_pred.shape)
 
 np.save('./dacon/comp1/x_train.npy', arr=x_train)
 np.save('./dacon/comp1/y_train.npy', arr=y_train)
@@ -51,3 +57,6 @@ np.save('./dacon/comp1/x_pred.npy', arr=x_pred)
 
 ## 푸리에 변환 
 # 섞여버린 파형을 여러개으 순수한 음파로 분해하는 방법
+
+## 이미 이 데이터는 푸리에 변환이 되어있는 데이터이다?
+## 각 파장의 세기 그래프 == 푸리에변환
