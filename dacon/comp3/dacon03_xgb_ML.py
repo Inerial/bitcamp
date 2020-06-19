@@ -28,11 +28,14 @@ x_train,x_test,y_train,y_test = train_test_split(
 )
 
 parameters = {
-    'n_estimators' : [10,20,30,50,100],
+    'n_estimators' : [50,100,200,500,1000],
     'eta' : [0.1,0.2,0.3,0.4,0.5],
-    'max_depth' :[1,2,3,5,10],
+    'max_depth' :[2,3,5,10,20],
     'validate_parameters' : [True, False],
-    'n_jobs' : [-1]
+    'n_jobs' : [-1],
+    'learning_rate' : [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2],
+    'colsample_bytree' : [0.6,0.7,0.8,0.9],
+    'colsample_bylevel': [0.6,0.7,0.8,0.9]
 }
 # 2. 모델
 y_test_pred = []
@@ -55,20 +58,24 @@ model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
 model.fit(x_train_XY[:,-4:], y_train_XY[:,0])
 y_test_pred.append(model.predict(x_test[:,-4:]))
 y_pred.append(model.predict(x_pred[:,-4:]))
+print(model.best_params_)
 
 model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
 model.fit(x_train_XY[:,-4:], y_train_XY[:,1])
 y_test_pred.append(model.predict(x_test[:,-4:]))
+print(model.best_params_)
 y_pred.append(model.predict(x_pred[:,-4:]))
 
 model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
 model.fit(x_train[:,:-4], y_train[:,2])
 y_test_pred.append(model.predict(x_test[:,:-4]))
+print(model.best_params_)
 y_pred.append(model.predict(x_pred[:,:-4]))
 
 model = RandomizedSearchCV(XGBRegressor(), parameters, cv=5, n_iter=50)
 model.fit(x_train[:,:-4], y_train[:,3])
 y_test_pred.append(model.predict(x_test[:,:-4]))
+print(model.best_params_)
 y_pred.append(model.predict(x_pred[:,:-4]))
 
 

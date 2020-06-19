@@ -38,6 +38,9 @@ parameters = {
 rand_parameters = {
     'n_estimators' : [10,20,30,50,100],
     'max_depth' :[1,2,3,5,10],
+    'learning_rate' : [0.01,0.05,0.1,0.15,0.2],
+    'colsample_bytree' : [0.8,0.9,1],
+    'colsample_bylevel':  [0.8,0.9,1],
     'n_jobs' : [-1]
 }
 # 2. 모델

@@ -38,3 +38,4 @@ for index, model in enumerate(ModelList):
     score = model.score(x_test,y_test)
 
     print(Modelnames[index],'의 예측 score = ', score)
+# RandomForestRegressor 의 예측 score =  0.9376427518921181
