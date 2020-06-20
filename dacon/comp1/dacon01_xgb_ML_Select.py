@@ -19,31 +19,46 @@ print(y_train.shape)
 # print(x_test.shape)
 
 # 2. model
-y_pred = []
+final_y_pred = []
 parameter = [
-    {'n_estimators': [100,150,200,250,300],
-    'learning_rate': [0.001,0.01,0.0025,0.075],
+    {'n_estimators': [100,150,200,250,300,350,400,450,500],
+    'learning_rate': [0.001,0.0025,0.05,0.075,0.01],
     'max_depth': [4,5,6]},
-    {'n_estimators': [100,150,200,250,300],
-    'learning_rate': [0.001,0.01,0.0025,0.075],
-    'colsample_bytree':[0.6,0.68,0.9,1],
+    {'n_estimators': [100,150,200,250,300,350,400,450,500],
+    'learning_rate': [0.001,0.0025,0.05,0.075,0.01],
+    'colsample_bytree':[0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1],
     'max_depth': [4,5,6]},
-    {'n_estimators': [100,150,200,250,300],
-    'learning_rate': [0.001,0.01,0.0025,0.075],
-    'colsample_bylevel': [0.6,0.68,0.9,1],
+    {'n_estimators': [100,150,200,250,300,350,400,450,500],
+    'learning_rate': [0.001,0.0025,0.05,0.075,0.01],
+    'colsample_bylevel': [0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1],
     'max_depth': [4,5,6]}
 ]
+# parameter =[
+#     {'n_estimators': [500],
+#     'learning_rate': [0.075],
+#     'colsample_bylevel': [0.75],
+#     'max_depth': [6]},
+#     {'n_estimators': [500],
+#     'learning_rate': [0.075],
+#     'colsample_bytree': [0.75],
+#     'max_depth': [6]},
+#     {'n_estimators': [500],
+#     'learning_rate': [0.075],
+#     'max_depth': [6]}
+# ]
+    
 # 모델 컬럼별 4번
 for i in range(4):
     model = XGBRegressor()
     model.fit(x_train,y_train[:,i])
-    score = model.score(x_test,y_test[:,:i])
+    score = model.score(x_test,y_test[:,i])
     print("r2 : ", score)
-    thresholds = np.sort(model.feature_importances_)
-    
+    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,106,10)]]
+    print(thresholds)
     best_score = score
     best_model = model
     best_y_pred = model.predict(x_pred)
+    print(best_y_pred.shape)
     for thresh in thresholds:
         selection = SelectFromModel(model, threshold=thresh, prefit=True)
                                                 # median 이 둘중 하나 쓰는거 이해하면 사용 가능
@@ -54,26 +69,27 @@ for i in range(4):
 
         print(select_x_train.shape)
 
-        selection_model = GridSearchCV(XGBRegressor(), parameter, n_jobs=-1, cv = 5)
-        selection_model.fit(select_x_train, y_train[:,:i])
+        selection_model = RandomizedSearchCV(XGBRegressor(), parameter, n_jobs=-1, cv = 5,n_iter=30)
+        selection_model.fit(select_x_train, y_train[:,i])
 
         y_pred = selection_model.predict(select_x_test)
-        score = r2_score(y_test[:,:i],y_pred)
+        score = r2_score(y_test[:,i],y_pred)
+        print(selection_model.best_params_)
         if score >= best_score:
             best_score = score
             best_model = selection_model
             best_y_pred = selection_model.predict(select_x_pred)
         print("Thresh=%.3f, n=%d, R2: %.2f%%" %(thresh, select_x_train.shape[1], score*100.0))
-    y_pred.append(best_y_pred)
+    final_y_pred.append(best_y_pred)
 
 
-y_pred = np.array(y_pred)
+final_y_pred = np.array(final_y_pred)
 submissions = pd.DataFrame({
     "id": test.index,
-    "hhb": y_pred[0,:],
-    "hbo2": y_pred[1,:],
-    "ca": y_pred[2,:],
-    "na": y_pred[3,:]
+    "hhb": final_y_pred[0,:],
+    "hbo2": final_y_pred[1,:],
+    "ca": final_y_pred[2,:],
+    "na": final_y_pred[3,:]
 })
 
 submissions.to_csv('./dacon/comp1/comp1_sub.csv', index = False)

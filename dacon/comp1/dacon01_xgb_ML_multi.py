@@ -19,15 +19,14 @@ print(x_test.shape)
 
 # 2. model
 
-parameters = {
-    'n_estimators' : [1,5,10,20,30,50,100,1000],
-    'eta' : [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],
-    'max_depth' :[1,2,3,5,10,100],
-    'validate_parameters' : [True, False],
-    'n_jobs' : [-1], 'eval_metric' : ['mae']
-}
-
-search = RandomizedSearchCV(XGBRegressor(), parameters, cv = 5, n_iter=5)
+parameters =[
+    {'n_estimators': [500,1000,2000],
+    'learning_rate': [0.075,0.025,0.05,0.1],
+    'colsample_bylevel': [0.75,0.6],
+    'max_depth': [6]}
+]
+    
+search = RandomizedSearchCV(XGBRegressor( eval_metric='mae'), parameters, cv = 5, n_iter=5, n_jobs=-1)
 search = MultiOutputRegressor(search)
 
 search.fit(x_train, y_train)
