@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, KFold
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 from xgboost import XGBRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.multioutput import MultiOutputRegressor
+
 test = pd.read_csv('./data/dacon/comp1/test.csv', sep=',', header = 0, index_col = 0)
 
 x_train = np.load('./dacon/comp1/x_train.npy')
@@ -21,13 +22,13 @@ print(x_test.shape)
 # 2. model
 
 parameters =[
-    {'n_estimators': [500,1000,2000],
-    'learning_rate': [0.075,0.025,0.05,0.1],
-    'colsample_bylevel': [0.75,0.6],
+    {'n_estimators': [1000],
+    'learning_rate': [0.075],
+    'colsample_bylevel': [0.75],
     'max_depth': [6]}
 ]
-    
-search = RandomizedSearchCV(XGBRegressor( eval_metric='mae'), parameters, cv = 5, n_iter=5, n_jobs=-1)
+kfold = KFold(n_splits=5, shuffle=True, random_state=66)
+search = RandomizedSearchCV(XGBRegressor( eval_metric='mae'), parameters, cv = kfold, n_iter=1, n_jobs=-1)
 search = MultiOutputRegressor(search)
 
 search.fit(x_train, y_train)

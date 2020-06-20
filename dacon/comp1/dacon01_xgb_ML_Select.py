@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics import r2_score
-from sklearn.model_selection import train_test_split, RandomizedSearchCV, GridSearchCV
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, GridSearchCV, KFold
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 from xgboost import XGBRegressor
 test = pd.read_csv('./data/dacon/comp1/test.csv', sep=',', header = 0, index_col = 0)
@@ -46,7 +46,7 @@ parameter = [
 #     'learning_rate': [0.075],
 #     'max_depth': [6]}
 # ]
-    
+kfold = KFold(n_splits=5, shuffle=True, random_state=66)
 # 모델 컬럼별 4번
 for i in range(4):
     model = XGBRegressor()
@@ -69,7 +69,7 @@ for i in range(4):
 
         print(select_x_train.shape)
 
-        selection_model = RandomizedSearchCV(XGBRegressor(), parameter, n_jobs=-1, cv = 5,n_iter=30)
+        selection_model = RandomizedSearchCV(XGBRegressor(), parameter, n_jobs=-1, cv = kfold,n_iter=30)
         selection_model.fit(select_x_train, y_train[:,i])
 
         y_pred = selection_model.predict(select_x_test)

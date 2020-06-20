@@ -20,4 +20,4 @@ acc = accuracy_score([0,0,0,1],y_predict) ## = evaluate
 print(x_test, '의 예측결과 :', y_predict)
 print("acc = ", acc)
 
-## 이런식으로 만들어지는 모델이 많다.
+## 이런식으로 만들어지는 모델이 많
