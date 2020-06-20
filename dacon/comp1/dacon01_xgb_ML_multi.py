@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 from xgboost import XGBRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.multioutput import MultiOutputRegressor
 test = pd.read_csv('./data/dacon/comp1/test.csv', sep=',', header = 0, index_col = 0)
 
