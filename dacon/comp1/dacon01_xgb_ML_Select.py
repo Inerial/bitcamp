@@ -53,7 +53,7 @@ for i in range(4):
     model.fit(x_train,y_train[:,i])
     score = model.score(x_test,y_test[:,i])
     print("r2 : ", score)
-    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,106,10)]]
+    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,141,5)]]
     print(thresholds)
     best_score = score
     best_model = model
