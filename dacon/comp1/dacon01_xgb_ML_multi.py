@@ -34,7 +34,7 @@ search = MultiOutputRegressor(search)
 search.fit(x_train, y_train)
 
 # print(search.best_params_)
-print("MAE :", search.score(x_test,y_test))
+print("R2 :", search.score(x_test,y_test))
 
 y_pred = search.predict(x_pred)
 submissions = pd.DataFrame({
