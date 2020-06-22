@@ -26,9 +26,9 @@ train = pd.DataFrame(train, columns=train_col)
 test = pd.DataFrame(test, columns=test_col)
 
 train_src = train.filter(regex='_src$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values # 선형보간법
-train_dst = train.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values * train.values[:,0:1] * train.values[:,0:1] # 선형보간법
+train_dst = train.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values# * train.values[:,0:1] * train.values[:,0:1] # 선형보간법
 test_src = test.filter(regex='_src$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
-test_dst = test.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values * test.values[:,0:1] * test.values[:,0:1]
+test_dst = test.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values# * test.values[:,0:1] * test.values[:,0:1]
 
 max_test = 0
 max_train = 0
@@ -46,21 +46,22 @@ for i in range(10000):
         #     train_src[i,j] = 0
         #     train_dst[i,j] = 0
         if train_src[i, j] - train_dst[i, j] < 0:
-            train_dst[i,j] = train_src[i,j]
+            print(train_src(i,j))
+            train_dst[i,j] = train_src[i,j] 
         # if test_src[i, j] == 0:
         #     tmp_y += 1
         #     test_src[i,j] = 0
         #     test_dst[i,j] = 0
         if test_src[i, j] - test_dst[i, j] < 0:
-            test_dst[i,j] = test_src[i,j] 
+            test_dst[i,j] = test_src[i,j]
     if tmp_x > max_train:
         max_train = tmp_x
     if tmp_y > max_test:
         max_test = tmp_y
-    train_fu_real.append(np.fft.fft(train_dst[i]-train_dst[i].mean(), norm='ortho').real)
-    train_fu_imag.append(np.fft.fft(train_dst[i]-train_dst[i].mean(), norm='ortho').imag)
-    test_fu_real.append(np.fft.fft(test_dst[i]-test_dst[i].mean(), norm='ortho').real)
-    test_fu_imag.append(np.fft.fft(test_dst[i]-test_dst[i].mean(), norm='ortho').imag)
+    train_fu_real.append(np.fft.fft(train_dst[i]-train_dst[i].mean()).real)
+    train_fu_imag.append(np.fft.fft(train_dst[i]-train_dst[i].mean()).imag)
+    test_fu_real.append(np.fft.fft(test_dst[i]-test_dst[i].mean()).real)
+    test_fu_imag.append(np.fft.fft(test_dst[i]-test_dst[i].mean()).imag)
 print(max_train)
 print(max_test)
 # print(train_fu_real)
@@ -130,13 +131,13 @@ print(((test_src - test_dst) < 0).sum())
 
 
 
-small = 1e-10
+small = 1e-30
 
 # x_train = np.concatenate([train.values[:,0:1]**2, train_src/(train.values[:,0:1]**2), train_dst, train_src/(train.values[:,0:1]**2) - train_dst,train_src/(train.values[:,0:1]**2)/(train_dst+small)], axis = 1)
 # x_pred = np.concatenate([test.values[:,0:1]**2, test_src/(train.values[:,0:1]**2), test_dst, test_src/(train.values[:,0:1]**2) - test_dst,test_src/(train.values[:,0:1]**2)/(test_dst+small)], axis = 1)
 
-x_train = np.concatenate([train.values[:,0:1]**2,train_dst, train_src - train_dst,train_src/(train_dst+small), train_fu_real, train_fu_imag] , axis = 1)
-x_pred = np.concatenate([test.values[:,0:1]**2,test_dst,  test_src - test_dst,test_src/(test_dst+small), test_fu_real, test_fu_imag], axis = 1)
+x_train = np.concatenate([train.values[:,0:1]**2,train_dst, train_src-train_dst, train_src/(train_dst+small), train_fu_real, train_fu_imag] , axis = 1)
+x_pred = np.concatenate([test.values[:,0:1]**2,test_dst, test_src-test_dst, test_src/(test_dst+small), test_fu_real, test_fu_imag], axis = 1)
 
 # x_train = np.concatenate([train.values[:,0:1]**2, train_src, train_dst, train_src - train_dst,train_src/(train_dst+small)], axis = 1)
 # x_pred = np.concatenate([test.values[:,0:1]**2, test_src, test_dst, test_src - test_dst,test_src/(test_dst+small)], axis = 1)

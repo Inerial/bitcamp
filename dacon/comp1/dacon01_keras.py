@@ -19,17 +19,20 @@ x_train, x_test, y_train, y_test = train_test_split(
 
 input1 = Input(shape=(x_train.shape[1],))
 
-dense1 = Dense(2560, use_bias = False)(input1)
-dense1 = Dense(2560, use_bias = False)(dense1)
-dense1 = Dense(2560, use_bias = False)(dense1)
-dense1 = Dense(2560, use_bias = False)(dense1)
-dense1 = Dense(2560, use_bias = False)(dense1)
-output1 = Dense(4, use_bias = False)(dense1)
+dense1 = Dense(2560)(input1)
+dense1 = Dense(2560)(dense1)
+dense1 = Dense(2560)(dense1)
+dense1 = Dense(2560)(dense1)
+dense1 = Dense(2560)(dense1)
+output1 = Dense(4)(dense1)
 
 model = Model(inputs=[input1], outputs=[output1])
 model.compile(optimizer='adam', loss='mae', metrics=['mae'])
 
 model.fit(x_train,y_train, epochs=100, batch_size=500, validation_split=0.25)
+
+
+
 
 loss, mae = model.evaluate(x_test,y_test)
 print(loss)

@@ -22,16 +22,23 @@ print(x_test.shape)
 # 2. model
 
 parameters =[
-    {'n_estimators': [1000],
-    'learning_rate': [0.075],
+    {'n_estimators': [1],
+    'learning_rate': [0.025],
     'colsample_bylevel': [0.75],
-    'max_depth': [6]}
+    'max_depth': [6],
+    'verbose': [1],
+    'eval_metric': ['mae'],
+    'eval_set' : [(x_train, y_train), (x_test,y_test)],
+    'early_stoppint_rounds' : [20]
+    }
 ]
 kfold = KFold(n_splits=5, shuffle=True, random_state=66)
-search = RandomizedSearchCV(XGBRegressor( eval_metric='mae'), parameters, cv = kfold, n_iter=1, n_jobs=-1)
+search = RandomizedSearchCV(XGBRegressor(), parameters, cv = kfold, n_iter=1, n_jobs=-1)
 search = MultiOutputRegressor(search)
 
 search.fit(x_train, y_train)
+
+print(search.estimators_)
 
 # print(search.best_params_)
 print("R2 :", search.score(x_test,y_test))

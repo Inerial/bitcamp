@@ -21,17 +21,17 @@ print(y_train.shape)
 # 2. model
 final_y_pred = []
 parameter = [
-    {'n_estimators': [100,150,200,250,300,350,400,450,500],
-    'learning_rate': [0.001,0.0025,0.05,0.075,0.01],
-    'max_depth': [4,5,6]},
-    {'n_estimators': [100,150,200,250,300,350,400,450,500],
-    'learning_rate': [0.001,0.0025,0.05,0.075,0.01],
-    'colsample_bytree':[0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1],
-    'max_depth': [4,5,6]},
-    {'n_estimators': [100,150,200,250,300,350,400,450,500],
-    'learning_rate': [0.001,0.0025,0.05,0.075,0.01],
-    'colsample_bylevel': [0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1],
-    'max_depth': [4,5,6]}
+    {'n_estimators': [400,450,500,550,600,650],
+    'learning_rate': [0.045,0.055,0.065,0.075,0.085],
+    'max_depth': [5,6,7]},
+    {'n_estimators': [400,450,500,550,600,650],
+    'learning_rate': [0.045,0.055,0.065,0.075,0.085],
+    'colsample_bytree':[0.6,0.65,0.7,0.75,0.8,0.85],
+    'max_depth': [5,6,7]},
+    {'n_estimators': [400,450,500,550,600,650],
+    'learning_rate': [0.045,0.055,0.065,0.075,0.085],
+    'colsample_bylevel': [0.6,0.65,0.7,0.75,0.8,0.85],
+    'max_depth': [5,6,7]}
 ]
 # parameter =[
 #     {'n_estimators': [500],
@@ -53,7 +53,7 @@ for i in range(4):
     model.fit(x_train,y_train[:,i])
     score = model.score(x_test,y_test[:,i])
     print("r2 : ", score)
-    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,141,5)]]
+    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,176,35)]]
     print(thresholds)
     best_score = score
     best_model = model
@@ -76,6 +76,7 @@ for i in range(4):
         score = r2_score(y_test[:,i],y_pred)
         print(selection_model.best_params_)
         if score >= best_score:
+            print("예아~")
             best_score = score
             best_model = selection_model
             best_y_pred = selection_model.predict(select_x_pred)
