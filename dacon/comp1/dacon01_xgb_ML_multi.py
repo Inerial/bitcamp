@@ -25,13 +25,14 @@ parameters =[
     {'n_estimators': [1],
     'learning_rate': [0.025],
     'colsample_bylevel': [0.75],
-    'max_depth': [6],
-    'verbose': [1],
-    'eval_metric': ['mae'],
-    'eval_set' : [(x_train, y_train), (x_test,y_test)],
-    'early_stoppint_rounds' : [20]
+    'max_depth': [6]
     }
 ]
+settings = {
+    'verbose': True,
+    'eval_metric': 'mae',
+    'eval_set' : [(x_train, y_train), (x_test,y_test)],
+    'early_stoppint_rounds' : 20}
 kfold = KFold(n_splits=5, shuffle=True, random_state=66)
 search = RandomizedSearchCV(XGBRegressor(), parameters, cv = kfold, n_iter=1, n_jobs=-1)
 search = MultiOutputRegressor(search)
