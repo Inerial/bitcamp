@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, KFold, cross_val_score
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
-from xgboost import XGBRegressor
+from lightgbm import LGBMRegressor
 from sklearn.metrics import r2_score, mean_absolute_error as mae
 test = pd.read_csv('./data/dacon/comp1/test.csv', sep=',', header = 0, index_col = 0)
 
@@ -22,22 +22,22 @@ print(x_test.shape)
 parameters =[
     {'n_estimators': [1000],
     'learning_rate': [0.025],
-    # 'colsample_bytree': [0.75],
-    'max_depth': [6]
+    'feature_fraction' : [0.75]
     }
 ]
+fit_params = {
+    'verbose': True,
+    'eval_metric': ['logloss','mae'],
+    'eval_set' : [(x_train,y_train),(x_test,y_test)],
+    'early_stopping_rounds' : 20
+}
 kfold = KFold(n_splits=5, shuffle=True, random_state=66)
 y_test_pred = []
 y_pred = []
-search = RandomizedSearchCV(XGBRegressor(n_jobs=6), parameters, cv = kfold, n_iter=1)
+search = RandomizedSearchCV(LGBMRegressor(), parameters, cv = kfold, n_iter=1, n_jobs=-1)
 
 for i in range(4):
-    fit_params = {
-        'verbose': True,
-        'eval_metric': ['logloss','mae'],
-        'eval_set' : [(x_train,y_train[:,i]),(x_test,y_test[:,i])],
-        'early_stopping_rounds' : 5
-    }
+    fit_params['eval_set'] = [(x_train,y_train[:,i]),(x_test,y_test[:,i])]
     search.fit(x_train, y_train[:,i],**fit_params)
     y_pred.append(search.predict(x_pred))
     y_test_pred.append(search.predict(x_test))
