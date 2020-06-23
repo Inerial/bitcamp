@@ -20,3 +20,4 @@ Dockerfile
 *.bin
 *.pkl
 *.pptx
+*.dat

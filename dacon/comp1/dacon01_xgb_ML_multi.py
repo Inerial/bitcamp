@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, Ro
 from xgboost import XGBRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.multioutput import MultiOutputRegressor
+from sklearn.metrics import mean_absolute_error as mae, r2_score
 
 test = pd.read_csv('./data/dacon/comp1/test.csv', sep=',', header = 0, index_col = 0)
 
@@ -22,17 +23,13 @@ print(x_test.shape)
 # 2. model
 
 parameters =[
-    {'n_estimators': [1],
+    {'n_estimators': [1000],
     'learning_rate': [0.025],
     'colsample_bylevel': [0.75],
+    'eval_metric': ['mae'],
     'max_depth': [6]
     }
 ]
-settings = {
-    'verbose': True,
-    'eval_metric': 'mae',
-    'eval_set' : [(x_train, y_train), (x_test,y_test)],
-    'early_stoppint_rounds' : 20}
 kfold = KFold(n_splits=5, shuffle=True, random_state=66)
 search = RandomizedSearchCV(XGBRegressor(), parameters, cv = kfold, n_iter=1, n_jobs=-1)
 search = MultiOutputRegressor(search)
@@ -40,9 +37,11 @@ search = MultiOutputRegressor(search)
 search.fit(x_train, y_train)
 
 print(search.estimators_)
+y_test_pred = search.predict(x_test)
 
 # print(search.best_params_)
-print("R2 :", search.score(x_test,y_test))
+print("R2 :", r2_score(y_test,y_test_pred))
+print("mae :", mae(y_test,y_test_pred))
 
 y_pred = search.predict(x_pred)
 submissions = pd.DataFrame({

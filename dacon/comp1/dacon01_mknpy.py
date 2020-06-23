@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pywt
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 
@@ -26,9 +27,90 @@ train = pd.DataFrame(train, columns=train_col)
 test = pd.DataFrame(test, columns=test_col)
 
 train_src = train.filter(regex='_src$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values # 선형보간법
-train_dst = train.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values# * train.values[:,0:1] * train.values[:,0:1] # 선형보간법
+train_dst = train.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values * train.values[:,0:1] * train.values[:,0:1] # 선형보간법
 test_src = test.filter(regex='_src$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
-test_dst = test.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values# * test.values[:,0:1] * test.values[:,0:1]
+test_dst = test.filter(regex='_dst$',axis=1).T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values * test.values[:,0:1] * test.values[:,0:1]
+
+def outliers(data, axis= 0):
+    if len(data.shape) == 1:
+        quartile_1, quartile_3 = np.percentile(data,[25,75])
+        print("1사분위 : ", quartile_1)
+        print("3사분위 : ", quartile_3)
+        iqr = quartile_3 - quartile_1
+        lower_bound = quartile_1 - (iqr * 1.5)  ## 아래
+        upper_bound = quartile_3 + (iqr * 1.5)  ## 위
+        return np.where((data > upper_bound) | (data < lower_bound))
+    else:
+        output = []
+        for i in range(data.shape[axis]):
+            if axis == 0:
+                quartile_1, quartile_3 = np.percentile(data[i, :],[25,75])
+            else:
+                quartile_1, quartile_3 = np.percentile(data[:, i],[25,75])
+            print("1사분위 : ", quartile_1)
+            print("3사분위 : ", quartile_3)
+            iqr = quartile_3 - quartile_1
+            lower_bound = quartile_1 - (iqr * 1.5)  ## 아래
+            upper_bound = quartile_3 + (iqr * 1.5)  ## 위
+            if axis == 0:
+                output.append(np.where((data[i, :] > upper_bound) | (data[i, :] < lower_bound))[0])
+            else:
+                output.append(np.where((data[:, i] > upper_bound) | (data[:, i] < lower_bound))[0])
+    return np.array(output)
+
+
+print(outliers(train_src, 1))
+print(outliers(train_dst, 1))
+print(outliers(test_src, 1))
+print(outliers(test_dst, 1))
+# for i in range(10):
+#     plt.subplot(2,2,1)
+#     plt.plot(range(35), train_src[i])
+#     plt.subplot(2,2,2)
+#     plt.plot(range(35), train_dst[i])
+#     plt.subplot(2,2,3)
+#     plt.plot(range(35), test_src[i])
+#     plt.subplot(2,2,4)
+#     plt.plot(range(35), test_dst[i])
+#     plt.show()
+
+
+# (ca, cd) = pywt.dwt(train_src, "haar")
+# cat = pywt.threshold(ca, np.std(ca), mode="hard")
+# cdt = pywt.threshold(cd, np.std(cd), mode="hard")
+# train_src = pywt.idwt(cat, cdt, "haar")[:,:35]
+
+# scaler = MinMaxScaler()
+# train_dst = scaler.fit_transform(train_dst.T).T
+# (ca, cd) = pywt.dwt(train_dst, "haar")
+# cat = pywt.threshold(ca, np.std(ca), mode="hard")
+# cdt = pywt.threshold(cd, np.std(cd), mode="hard")
+# train_dst = pywt.idwt(cat, cdt, "haar")
+# train_dst = scaler.inverse_transform(train_dst[:,:35].T).T
+
+# (ca, cd) = pywt.dwt(test_src, "haar")
+# cat = pywt.threshold(ca, np.std(ca), mode="hard")
+# cdt = pywt.threshold(cd, np.std(cd), mode="hard")
+# test_src = pywt.idwt(cat, cdt, "haar")[:,:35]
+
+# test_dst = scaler.fit_transform(test_dst.T).T
+# (ca, cd) = pywt.dwt(test_dst, "haar")
+# cat = pywt.threshold(ca, np.std(ca), mode="hard")
+# cdt = pywt.threshold(cd, np.std(cd), mode="hard")
+# test_dst = pywt.idwt(cat, cdt, "haar")
+# test_dst = scaler.inverse_transform(test_dst[:,:35].T).T
+
+# for i in range(10):
+#     plt.subplot(2,2,1)
+#     plt.plot(range(36), train_src[i])
+#     plt.subplot(2,2,2)
+#     plt.plot(range(35), train_dst[i])
+#     plt.subplot(2,2,3)
+#     plt.plot(range(36), test_src[i])
+#     plt.subplot(2,2,4)
+#     plt.plot(range(35), test_dst[i])
+#     plt.show()
+""" 
 
 max_test = 0
 max_train = 0
@@ -46,14 +128,13 @@ for i in range(10000):
         #     train_src[i,j] = 0
         #     train_dst[i,j] = 0
         if train_src[i, j] - train_dst[i, j] < 0:
-            print(train_src(i,j))
-            train_dst[i,j] = train_src[i,j] 
+            train_src[i,j] = train_dst[i,j] 
         # if test_src[i, j] == 0:
         #     tmp_y += 1
         #     test_src[i,j] = 0
         #     test_dst[i,j] = 0
         if test_src[i, j] - test_dst[i, j] < 0:
-            test_dst[i,j] = test_src[i,j]
+            test_src[i,j] = test_dst[i,j]
     if tmp_x > max_train:
         max_train = tmp_x
     if tmp_y > max_test:
@@ -117,7 +198,7 @@ print(max_test)
 # test_src = test.filter(regex='_src$',axis=1).values#.T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
 # test_dst = test.filter(regex='_dst$',axis=1).values* test.values[:,0:1]* test.values[:,0:1]#.T.interpolate().fillna(method ='ffill').fillna(method ='bfill').T.values
 
-print(((train_src -train_dst) < 0).sum())
+print(((train_src - train_dst) < 0).sum())
 print(((test_src - test_dst) < 0).sum())
 
 # train_src_rank = np.argsort(train_src)[::-1][:, :10]
@@ -160,4 +241,8 @@ np.save('./dacon/comp1/x_pred.npy', arr=x_pred)
 
 ## 이미 이 데이터는 푸리에 변환이 되어있는 데이터이다?
 ## 각 파장의 세기 그래프 == 푸리에변환
-## 분광분석법
+## 분광분석법 
+
+
+## IQR = 4분할
+## 각 IQR*1.5의 지점을 벗어나는 값을 이상치라고 한다. """
