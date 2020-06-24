@@ -53,7 +53,7 @@ for i in range(4):
     mae = MAE(y_test[:,i], y_test_pred)
     print("r2 : ", score)
     print("mae :", mae)
-    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,176,35)]]
+    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,176,15)]]
     print("model.feature_importances_ : ", model.feature_importances_)
     print(thresholds)
     best_mae = mae
@@ -71,7 +71,7 @@ for i in range(4):
 
         print(select_x_train.shape)
 
-        selection_model = RandomizedSearchCV(LGBMRegressor(), parameter, n_jobs=1, cv = kfold,n_iter=10)
+        selection_model = RandomizedSearchCV(LGBMRegressor(), parameter, cv = kfold,n_iter=30)
         settings['eval_set'] = [(select_x_train, y_train[:,i]), (select_x_test,y_test[:,i])]
         selection_model.fit(select_x_train, y_train[:,i], **settings)
 
