@@ -150,13 +150,15 @@ for i in range(10000):
         #     train_src[i,j] = 0
         #     train_dst[i,j] = 0
         if train_src[i, j] - train_dst[i, j] < 0:
-            train_src[i,j] = train_dst[i,j] 
+            train_src[i,j] = 0
+            train_dst[i,j] = 0
         # if test_src[i, j] == 0:
         #     tmp_y += 1
         #     test_src[i,j] = 0
         #     test_dst[i,j] = 0
         if test_src[i, j] - test_dst[i, j] < 0:
-            test_src[i,j] = test_dst[i,j]
+            train_src[i,j] = 0
+            train_dst[i,j] = 0
     if tmp_x > max_train:
         max_train = tmp_x
     if tmp_y > max_test:
@@ -173,8 +175,8 @@ for i in range(10000):
     train_fu_imag.append(np.fft.fft(train_dst[i]-train_dst[i].mean(), n=80).imag)
     test_fu_real.append(np.fft.fft(test_dst[i]-test_dst[i].mean(), n=80).real)
     test_fu_imag.append(np.fft.fft(test_dst[i]-test_dst[i].mean(), n=80).imag)
-    train_ifu.append(np.fft.ifft(train_dst[i]-train_dst[i].mean(), n=80).real)
-    test_ifu.append(np.fft.ifft(test_dst[i]-test_dst[i].mean(), n=80).real)
+    train_ifu.append(np.fft.ifft(train_dst[i], n=80).real)
+    test_ifu.append(np.fft.ifft(test_dst[i], n=80).real)
 print(max_train)
 print(max_test)
 print("RHO")
@@ -256,8 +258,8 @@ small = 1e-15
 
 
 
-x_train = np.concatenate([train.values[:,0:1],  train_dst*train_damp, train_src-train_dst, train_src/(train_dst+small), train_fu_real, train_fu_imag] , axis = 1)
-x_pred = np.concatenate([train.values[:,0:1], test_dst*train_damp, test_src-test_dst, test_src/(test_dst+small),test_fu_real,test_fu_imag], axis = 1)
+x_train = np.concatenate([train.values[:,0:1],  train_dst, train_src-train_dst, train_src/(train_dst+small), train_fu_real, train_fu_imag, train_ifu] , axis = 1)
+x_pred = np.concatenate([train.values[:,0:1], test_dst, test_src-test_dst, test_src/(test_dst+small),test_fu_real,test_fu_imag, test_ifu], axis = 1)
 
 # x_train = np.concatenate([train.values[:,0:1]**2, train_src, train_dst, train_src - train_dst,train_src/(train_dst+small)], axis = 1)
 # x_pred = np.concatenate([test.values[:,0:1]**2, test_src, test_dst, test_src - test_dst,test_src/(test_dst+small)], axis = 1)
