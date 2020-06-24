@@ -22,24 +22,25 @@ print(y_train.shape)
 final_y_test_pred = []
 final_y_pred = []
 parameter = [
-    {'n_estimators': [10000],
-    'learning_rate': [0.045,0.055,0.065,0.075,0.085],
-    'max_depth' : [-1,4,5,6,7,8],
-    'num_leaves' : [500]
-    },
-    {'n_estimators': [10000],
-    'learning_rate': [0.045,0.055,0.065,0.075,0.085],
-    'feature_fraction':[0.6,0.65,0.7,0.75,0.8,0.85],
-    'max_depth' : [-1,4,5,6,7,8],
-    'num_leaves' : [500]
+    {'n_estimators': [3000],
+    'learning_rate': [0.05],
+    'max_depth': [6], 
+    'boosting_type': ['dart'], 
+    'drop_rate' : [0.3],
+    'objective': ['regression'], 
+    'metric': ['logloss','mae'], 
+    'is_training_metric': [True], 
+    'num_leaves': [144], 
+    'colsample_bytree': [0.7,0.9], 
+    'subsample': [0.7,0.9], 
+    'bagging_freq': [4,5,6], 
+    'seed': [66]
     }
 ]
 
 settings = {
     'verbose': False,
-    'eval_metric': ['logloss','mae'],
-    'eval_set' : [(x_train, y_train), (x_test,y_test)],
-    'early_stopping_rounds' : 20
+    'eval_set' : [(x_train, y_train), (x_test,y_test)]
 }
 
 kfold = KFold(n_splits=5, shuffle=True, random_state=66)
@@ -53,7 +54,7 @@ for i in range(4):
     mae = MAE(y_test[:,i], y_test_pred)
     print("r2 : ", score)
     print("mae :", mae)
-    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,176,15)]]
+    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,len(model.feature_importances_), 10)]]
     print("model.feature_importances_ : ", model.feature_importances_)
     print(thresholds)
     best_mae = mae
@@ -71,7 +72,7 @@ for i in range(4):
 
         print(select_x_train.shape)
 
-        selection_model = RandomizedSearchCV(LGBMRegressor(), parameter, cv = kfold,n_iter=30)
+        selection_model = RandomizedSearchCV(LGBMRegressor(), parameter, cv = kfold,n_iter=20)
         settings['eval_set'] = [(select_x_train, y_train[:,i]), (select_x_test,y_test[:,i])]
         selection_model.fit(select_x_train, y_train[:,i], **settings)
 

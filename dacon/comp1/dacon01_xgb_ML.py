@@ -20,10 +20,17 @@ print(x_test.shape)
 # 2. model
 
 parameters =[
-    {'n_estimators': [1000],
-    'learning_rate': [0.025],
-    # 'colsample_bytree': [0.75],
-    'max_depth': [6]
+    {'n_estimators': [3000],
+    'learning_rate': [0.1],
+    'max_depth': [6], 
+    'booster': ['dart'], 
+    'rate_drop' : [0.2],
+    'eval_metric': ['logloss','mae'], 
+    'is_training_metric': [True], 
+    'max_leaves': [144], 
+    'colsample_bytree': [0.8], 
+    'subsample': [0.8],
+    'seed': [66]
     }
 ]
 kfold = KFold(n_splits=5, shuffle=True, random_state=66)
