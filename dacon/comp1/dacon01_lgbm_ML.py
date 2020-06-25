@@ -33,8 +33,8 @@ print(x_test.shape)
 
 parameter = [
     {'n_estimators': [5000],
-    'learning_rate': [0.7],
-    'max_depth': [6], 
+    'learning_rate': [0.9],
+    'max_depth': [5], 
     'boosting_type': ['dart'], 
     'drop_rate' : [0.3],
     'objective': ['regression'], 

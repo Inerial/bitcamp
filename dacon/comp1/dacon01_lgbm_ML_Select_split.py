@@ -5,6 +5,7 @@ from sklearn.metrics import r2_score, mean_absolute_error as MAE
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, GridSearchCV, KFold
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 from lightgbm import LGBMRegressor
+import lightgbm as lgbm
 test = pd.read_csv('./data/dacon/comp1/test.csv', sep=',', header = 0, index_col = 0)
 
 x_train = np.load('./dacon/comp1/x_train.npy')
@@ -19,39 +20,56 @@ print(y_train.shape)
 # print(x_test.shape)
 
 # 2. model
+
+def train_model(x_data, y_data, k=5):
+    models = []
+    
+    k_fold = KFold(n_splits=k, shuffle=True, random_state=123)
+    
+    for train_idx, val_idx in k_fold.split(x_data):
+        x_train, y_train = x_data[train_idx,:], y_data[train_idx]
+        x_val, y_val = x_data[val_idx,:], y_data[val_idx]
+    
+        d_train = lgbm.Dataset(data = x_train, label = y_train)
+        d_val = lgbm.Dataset(data = x_val, label = y_val)
+        
+        params = {
+            'n_estimators': 5000,
+            'learning_rate': 0.7,
+            'max_depth': 5, 
+            'boosting_type': 'dart', 
+            'drop_rate' : 0.3,
+            'objective': 'regression', 
+            'metric': 'mae', 
+            'is_training_metric': True, 
+            'num_leaves': 200, 
+            'colsample_bytree': 0.7, 
+            'subsample': 0.7
+            }
+        wlist = {'train' : d_train, 'eval': d_val}
+        model = lgbm.train(params=params, train_set=d_train, valid_sets=d_val, evals_result=wlist)
+        models.append(model)
+    
+    return models
+
+y_test_pred = []
+y_pred = []
+    
 final_y_test_pred = []
 final_y_pred = []
-parameter = [
-    {'n_estimators': [3000],
-    'learning_rate': [0.05,0.06,0.07,0.08,0.09],
-    'max_depth': [6], 
-    'boosting_type': ['dart'], 
-    'drop_rate' : [0.3],
-    'objective': ['regression'], 
-    'metric': ['logloss','mae'], 
-    'is_training_metric': [True], 
-    'num_leaves': [144], 
-    'colsample_bytree': [0.7], 
-    'subsample': [0.7]
-    }
-]
 
-settings = {
-    'verbose': False,
-    'eval_set' : [(x_train, y_train), (x_test,y_test)]
-}
-
-kfold = KFold(n_splits=5, shuffle=True, random_state=66)
 # 모델 컬럼별 4번
 for i in range(4):
+    models = {}
     model = LGBMRegressor()
-    settings['eval_set'] = [(x_train, y_train[:,i]), (x_test,y_test[:,i])]
-    model.fit(x_train,y_train[:,i], **settings)
+    model.fit(x_train,y_train[:,i])
+
     y_test_pred = model.predict(x_test)
     score = model.score(x_test,y_test[:,i])
     mae = MAE(y_test[:,i], y_test_pred)
     print("r2 : ", score)
     print("mae :", mae)
+
     thresholds = np.sort(model.feature_importances_)[ [i for i in range(0,len(model.feature_importances_), 20)] ]
     print("model.feature_importances_ : ", model.feature_importances_)
     print(thresholds)
@@ -59,7 +77,7 @@ for i in range(4):
     best_model = model
     best_y_pred = model.predict(x_pred)
     best_y_test_pred = y_test_pred
-    print(best_y_pred.shape)
+
     for thresh in thresholds:
         if(thresh == 0): continue
         selection = SelectFromModel(model, threshold=thresh, prefit=True)
@@ -71,8 +89,22 @@ for i in range(4):
 
         print(select_x_train.shape)
 
-        selection_model = RandomizedSearchCV(LGBMRegressor(), parameter, cv = kfold,n_iter=4)
-        settings['eval_set'] = [(select_x_train, y_train[:,i]), (select_x_test,y_test[:,i])]
+        select_models = train_model(x_train, y_train[:,i])
+        
+        
+        y_test_pred = []
+        y_pred=[]
+        for col in select_models:
+            test_preds = []
+            preds = []
+            for model in models[col]:
+                test_preds.append(model.predict(x_test))
+                preds.append(model.predict(x_pred))
+            test_pred = np.mean(test_preds, axis=0)
+            pred = np.mean(preds, axis=0)
+
+            y_test_pred.append(test_pred)
+            y_pred.append(pred)
         selection_model.fit(select_x_train, y_train[:,i], **settings)
 
         y_pred = selection_model.predict(select_x_test)
@@ -88,6 +120,24 @@ for i in range(4):
         print("Thresh=%.3f, n=%d, MAE: %.5f R2: %.2f%%" %(thresh, select_x_train.shape[1], mae, r2*100))
     final_y_pred.append(best_y_pred)
     final_y_test_pred.append(best_y_test_pred)
+
+y_test_pred = []
+y_pred=[]
+for col in models:
+    test_preds = []
+    preds = []
+    for model in models[col]:
+        test_preds.append(model.predict(x_test))
+        preds.append(model.predict(x_pred))
+    test_pred = np.mean(test_preds, axis=0)
+    pred = np.mean(preds, axis=0)
+
+    y_test_pred.append(test_pred)
+    y_pred.append(pred)
+
+y_pred = np.array(y_pred).T
+y_test_pred = np.array(y_test_pred).T
+
 
 print('MAE :', MAE(y_test, np.array(final_y_test_pred).T))
 
