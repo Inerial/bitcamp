@@ -31,15 +31,15 @@ test = pd.DataFrame(test, columns=test_col)
 train_src = train.filter(regex='_src$',axis=1).T.interpolate(limit_direction='both').T.values # 선형보간법
 # train_damp = 1
 # train_damp = 625/train.values[:,0:1]/train.values[:,0:1]*(10**(625/train.values[:,0:1]/train.values[:,0:1] - 1))
-train_damp = np.exp(np.pi*(25 - train.values[:,0:1])/4)
+train_damp = np.exp(np.pi*(25 - train.values[:,0:1])/3.44)
 train_dst = train.filter(regex='_dst$',axis=1).T.interpolate(limit_direction='both').T.values / train_damp# 선형보간법
 
 test_src = test.filter(regex='_src$',axis=1).T.interpolate(limit_direction='both').T.values
 # test_damp = 1
 # test_damp = 625/test.values[:,0:1]/test.values[:,0:1]*(10**(625/test.values[:,0:1]/test.values[:,0:1] - 1))
-test_damp = np.exp(np.pi*(25 - test.values[:,0:1])/4)
+test_damp = np.exp(np.pi*(25 - test.values[:,0:1])/3.44)
 test_dst = test.filter(regex='_dst$',axis=1).T.interpolate(limit_direction='both').T.values / test_damp
-print(train_dst)
+
 
 
 
@@ -49,8 +49,13 @@ train_fu_real = []
 train_fu_imag = []
 test_fu_real = []
 test_fu_imag = []
-train_ifu = []
-test_ifu = []
+train_2fu_real = []
+train_2fu_imag = []
+test_2fu_real = []
+test_2fu_imag = []
+
+train_dst_mean = []
+test_dst_mean = []
 
 rho_10 = 0
 nrho_10 = 0
@@ -65,23 +70,16 @@ for i in range(10000):
     tmp_x = 0
     tmp_y = 0
     for j in range(35):
-        # if train_src[i, j] == 0:
-        #     tmp_x += 1
-        #     train_src[i,j] = 0
-        #     train_dst[i,j] = 0
-        if train_src[i, j] - train_dst[i, j] < 0:
+        if train_src[i, j] == 0 and train_dst[i,j] != 0:
+            # train_src[i,j] = 1e-10
             train_src[i,j] = train_dst[i,j]
-        # if test_src[i, j] == 0:
-        #     tmp_y += 1
-        #     test_src[i,j] = 0
-        #     test_dst[i,j] = 0
-        if test_src[i, j] - test_dst[i, j] < 0:
-            test_src[i,j] = test_dst[i,j]
+            # train_dst[i,j] = 0
 
-    if tmp_x > max_train:
-        max_train = tmp_x
-    if tmp_y > max_test:
-        max_test = tmp_y
+        if test_src[i, j] == 0 and test_dst[i,j] != 0:
+            # test_src[i,j] = 1e-10
+            test_src[i,j] = test_dst[i,j]
+            # test_dst[i,j] = 0
+
     if train['rho'][i] == 10:
         rho_10 += train_dst[i,:].sum()
         nrho_10 += 1
@@ -94,11 +92,29 @@ for i in range(10000):
     if train['rho'][i] == 25:
         rho_25 += train_dst[i,:].sum()
         nrho_25 += 1
+    plt.plot(range(35), train_src[i])
+    plt.show()
 
     train_fu_real.append(np.fft.fft(train_dst[i]-train_dst[i].mean(), n=60).real)
     train_fu_imag.append(np.fft.fft(train_dst[i]-train_dst[i].mean(), n=60).imag)
     test_fu_real.append(np.fft.fft(test_dst[i]-test_dst[i].mean(), n=60).real)
     test_fu_imag.append(np.fft.fft(test_dst[i]-test_dst[i].mean(), n=60).imag)
+    train_dst_mean.append([train_dst[i].mean()])
+    test_dst_mean.append([test_dst[i].mean()])
+
+print("==========================")
+print(((train_src - train_dst) < 0).sum())
+print(((test_src - test_dst) < 0).sum())
+print("==========================")
+
+trian_dst_mean = np.array(train_dst_mean)
+test_dst_mean = np.array(test_dst_mean)
+
+train_2fu_real = np.fft.fft(train_dst-train_dst_mean).real
+train_2fu_imag = np.fft.fft(train_dst-train_dst_mean).imag
+test_2fu_real = np.fft.fft(test_dst-test_dst_mean).real
+test_2fu_imag = np.fft.fft(test_dst-test_dst_mean).imag    
+
 print(max_train)
 print(max_test)
 print("RHO")
@@ -172,7 +188,6 @@ print(((test_src - test_dst) < 0).sum())
 
 
 
-
 small = 1e-20
 
 # x_train = np.concatenate([train.values[:,0:1]**2, train_src/(train.values[:,0:1]**2), train_dst, train_src/(train.values[:,0:1]**2) - train_dst,train_src/(train.values[:,0:1]**2)/(train_dst+small)], axis = 1)
@@ -180,8 +195,8 @@ small = 1e-20
 
 
 
-x_train = np.concatenate([train.values[:,0:1]**2, train_dst, train_dst*train_damp, train_src-train_dst, train_src/(train_dst+small), train_fu_real, train_fu_imag] , axis = 1)
-x_pred = np.concatenate([test.values[:,0:1]**2,train_dst, test_dst*test_damp, test_src-test_dst, test_src/(test_dst+small),test_fu_real,test_fu_imag], axis = 1)
+x_train = np.concatenate([train.values[:,0:1]**2,trian_dst_mean, train_damp, train_dst,  train_dst*train_damp, train_src-train_dst, train_src/(train_dst+small), train_fu_real, train_fu_imag] , axis = 1)
+x_pred = np.concatenate([test.values[:,0:1]**2,test_dst_mean, test_damp, test_dst,  test_dst*test_damp, test_src-test_dst, test_src/(test_dst+small),test_fu_real,test_fu_imag], axis = 1)
 
 # x_train = np.concatenate([train.values[:,0:1]**2, train_src, train_dst, train_src - train_dst,train_src/(train_dst+small)], axis = 1)
 # x_pred = np.concatenate([test.values[:,0:1]**2, test_src, test_dst, test_src - test_dst,test_src/(test_dst+small)], axis = 1)

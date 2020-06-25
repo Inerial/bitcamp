@@ -32,19 +32,17 @@ print(x_test.shape)
 # 2. model
 
 parameter = [
-    {'n_estimators': [3000],
-    'learning_rate': [0.05],
+    {'n_estimators': [5000],
+    'learning_rate': [0.7],
     'max_depth': [6], 
-    'boosting': ['dart'], 
+    'boosting_type': ['dart'], 
     'drop_rate' : [0.3],
     'objective': ['regression'], 
     'metric': ['logloss','mae'], 
     'is_training_metric': [True], 
-    'num_leaves': [144], 
-    'feature_fraction': [0.7], 
-    'bagging_fraction': [0.7], 
-    'bagging_freq': [5], 
-    'seed': [66]
+    'num_leaves': [200], 
+    'colsample_bytree': [0.7], 
+    'subsample': [0.7]
     }
 ]
 fit_params = {

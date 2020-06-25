@@ -23,7 +23,7 @@ final_y_test_pred = []
 final_y_pred = []
 parameter = [
     {'n_estimators': [3000],
-    'learning_rate': [0.05],
+    'learning_rate': [0.05,0.06,0.07,0.08,0.09],
     'max_depth': [6], 
     'boosting_type': ['dart'], 
     'drop_rate' : [0.3],
@@ -31,10 +31,8 @@ parameter = [
     'metric': ['logloss','mae'], 
     'is_training_metric': [True], 
     'num_leaves': [144], 
-    'colsample_bytree': [0.7,0.9], 
-    'subsample': [0.7,0.9], 
-    'bagging_freq': [4,5,6], 
-    'seed': [66]
+    'colsample_bytree': [0.7], 
+    'subsample': [0.7]
     }
 ]
 
@@ -54,7 +52,7 @@ for i in range(4):
     mae = MAE(y_test[:,i], y_test_pred)
     print("r2 : ", score)
     print("mae :", mae)
-    thresholds = np.sort(model.feature_importances_)[[i for i in range(0,len(model.feature_importances_), 10)]]
+    thresholds = np.sort(model.feature_importances_)[ [i for i in range(0,len(model.feature_importances_), 20)] ]
     print("model.feature_importances_ : ", model.feature_importances_)
     print(thresholds)
     best_mae = mae
@@ -72,7 +70,7 @@ for i in range(4):
 
         print(select_x_train.shape)
 
-        selection_model = RandomizedSearchCV(LGBMRegressor(), parameter, cv = kfold,n_iter=20)
+        selection_model = RandomizedSearchCV(LGBMRegressor(), parameter, cv = kfold,n_iter=4)
         settings['eval_set'] = [(select_x_train, y_train[:,i]), (select_x_test,y_test[:,i])]
         selection_model.fit(select_x_train, y_train[:,i], **settings)
 
@@ -86,7 +84,7 @@ for i in range(4):
             best_model = selection_model
             best_y_pred = selection_model.predict(select_x_pred)
             best_y_test_pred = y_pred
-        print("Thresh=%.3f, n=%d, MAE: %.5f" %(thresh, select_x_train.shape[1], mae))
+        print("Thresh=%.3f, n=%d, MAE: %.5f R2: %.2f%%" %(thresh, select_x_train.shape[1], mae, r2*100))
     final_y_pred.append(best_y_pred)
     final_y_test_pred.append(best_y_test_pred)
 
