@@ -11,58 +11,69 @@ import keras.backend as K
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
-def kaeri_metric(y_true, y_pred):    
+def kaeri_metric(y_true, y_pred):
     return 0.5 * E1(y_true, y_pred) + 0.5 * E2(y_true, y_pred)
 
-
-def E1(y_true, y_pred):    
+def E1(y_true, y_pred):
     _t, _p = np.array(y_true)[:,:2], np.array(y_pred)[:,:2]
-    
     return np.mean(np.sum(np.square(_t - _p), axis = 1) / 2e+04)
-
-
 def E2(y_true, y_pred):
     _t, _p = np.array(y_true)[:,2:], np.array(y_pred)[:,2:]
-    
     return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
-
-def E1_max(y_true, y_pred):    
-    _t, _p = np.array(y_true)[:,:2], np.array(y_pred)[:,:2]
-    
-    return np.max(np.sum(np.square(_t - _p), axis = 1) / 2e+04)
-
-def E2_max(y_true, y_pred):    
-    _t, _p = np.array(y_true)[:,2:], np.array(y_pred)[:,2:]
-    
-    return np.max(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
-
-
+def E2M(y_true, y_pred):
+    _t, _p = np.array(y_true)[:,2:3], np.array(y_pred)[:,2:3]
+    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
+def E2V(y_true, y_pred):
+    _t, _p = np.array(y_true)[:,3:4], np.array(y_pred)[:,3:4]
+    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
 # X_data = []
 # Y_data = []
 
-X_data = pd.DataFrame('./train_features.csv',skiprows=1,delimiter=',')
+X_data = pd.DataFrame('./data/dacon/comp3/train_features.csv',skiprows=1,delimiter=',')
 X_data = X_data[:,1:]
 print(X_data.shape)
      
     
-Y_data = np.loadtxt('./train_target.csv',skiprows=1,delimiter=',')
+Y_data = np.loadtxt('./data/dacon/comp3/train_targets.csv',skiprows=1,delimiter=',')
 Y_data = Y_data[:,1:]
 print(Y_data.shape)
 
 X_data = X_data.reshape((2800,375,5,1))
 print(X_data.shape)
 
-X_data_test = np.loadtxt('./test_features.csv',skiprows=1,delimiter=',')
+X_data_test = np.loadtxt('./data/dacon/comp3/test_features.csv',skiprows=1,delimiter=',')
 X_data_test = X_data_test[:,1:]
 X_data_test = X_data_test.reshape((700,375,5,1))
 
-X_train, X_test, Y_train, Y_test = train_test_split(
-    X_data, Y_data, test_size=0.0
-)
+data_id = 2
+
+plt.figure(figsize=(8,6))
+
+
+plt.plot(X_data[data_id,:,0,0], label="Sensor #1")
+plt.plot(X_data[data_id,:,1,0], label="Sensor #2")
+plt.plot(X_data[data_id,:,2,0], label="Sensor #3")
+plt.plot(X_data[data_id,:,3,0], label="Sensor #4")
+
+plt.xlabel("Time", labelpad=10, size=20)
+plt.ylabel("Acceleration", labelpad=10, size=20)
+plt.xticks(size=15)
+plt.yticks(size=15)
+plt.xlim(0, 400)
+plt.legend(loc=1)
+
+plt.show()
+
+from sklearn.model_selection import train_test_split
+
+
+X_train, X_test, Y_train, Y_test = train_test_split(X_data, Y_data, test_size=0.0)
 # X_train = X_data
 # Y_train = Y_data
 print(X_train.shape)
+
 
 weight1 = np.array([1,1,0,0])
 weight2 = np.array([0,0,1,1])
@@ -79,7 +90,9 @@ def my_loss_E2(y_true, y_pred):
     divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
     return K.mean(K.square(divResult)*weight2)
 
+    
 def set_model(train_target):  # 0:x,y, 1:m, 2:v
+    
     activation = 'elu'
     padding = 'valid'
     model = Sequential()
@@ -139,7 +152,7 @@ def set_model(train_target):  # 0:x,y, 1:m, 2:v
     return model
 
 def train(model,X,Y):
-    MODEL_SAVE_FOLDER_PATH = './model/'
+    MODEL_SAVE_FOLDER_PATH = './dacon/comp3'
     if not os.path.exists(MODEL_SAVE_FOLDER_PATH):
         os.mkdir(MODEL_SAVE_FOLDER_PATH)
 
@@ -211,7 +224,6 @@ def plot_error(type_id,pred,true):
     print(np.min(Err_m))
     return Err_m
 
-#  plot_error(type_id,pred,true):
 
 def load_best_model(train_target):
     
@@ -244,6 +256,7 @@ def load_best_model(train_target):
     
     return model
 
+
 submit = pd.read_csv('sample_submission.csv')
 
 for train_target in range(3):
@@ -265,5 +278,3 @@ for train_target in range(3):
     elif train_target == 2: # v 학습
         submit.iloc[:,4] = pred_data_test[:,3]
     
-
-submit.to_csv('submit.csv', index = False)
