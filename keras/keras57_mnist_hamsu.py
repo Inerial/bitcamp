@@ -66,7 +66,7 @@ Dense1 = Dropout(0.2)(Dense1)
 Dense1 = Dense(10, activation='softmax')(Dense1)
 
 model = Model(inputs = input1, outputs = Dense1)
-
+model.summary()
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 
 model.fit(x_train, y_train, batch_size = 500, epochs=60, validation_split=0.3)

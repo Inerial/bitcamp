@@ -25,7 +25,7 @@ print(x_test.shape)
 
 def train_model(x_data, y_data, k=5):
     models = []
-    
+    scores = []
     k_fold = KFold(n_splits=k, shuffle=True, random_state=123)
     
     for train_idx, val_idx in k_fold.split(x_data):
@@ -36,7 +36,7 @@ def train_model(x_data, y_data, k=5):
         d_val = lgbm.Dataset(data = x_val, label = y_val)
         
         params = {
-            'n_estimators': 50,
+            'n_estimators': 5000,
             'learning_rate': 0.8,
             'max_depth': 5, 
             'boosting_type': 'dart', 
@@ -51,32 +51,26 @@ def train_model(x_data, y_data, k=5):
         wlist = {'train' : d_train, 'eval': d_val}
         model = lgbm.train(params=params, train_set=d_train, valid_sets=d_val, evals_result=wlist)
         models.append(model)
+        scores.append(mae(y_val, model.predict(x_val)))
     
-    return models
+    return models[np.argmin(scores)]
 
 y_test_pred = []
 y_pred = []
 
 
-models = {}
+models = []
 for label in range(4):
     print('train column : ', label)
-    models[label] = train_model(x_train, y_train[:,label], k=10)
+    models.append(train_model(x_train, y_train[:,label], k=5))
 
 
 y_test_pred = []
 y_pred=[]
-for col in models:
-    test_preds = []
-    preds = []
-    for model in models[col]:
-        test_preds.append(model.predict(x_test))
-        preds.append(model.predict(x_pred))
-    test_pred = np.mean(test_preds, axis=0)
-    pred = np.mean(preds, axis=0)
+for model in models:
+    y_test_pred.append(model.predict(x_test))
+    y_pred.append(model.predict(x_pred))
 
-    y_test_pred.append(test_pred)
-    y_pred.append(pred)
 
 y_pred = np.array(y_pred).T
 y_test_pred = np.array(y_test_pred).T

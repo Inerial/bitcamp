@@ -19,6 +19,9 @@ dense1 = Dense(3)(dense1)
 
 model = Model(inputs=input1, outputs=dense1)
 
+
+model.summary()
+
 model.compile(loss='mse', optimizer='adam', metrics = ['mse'])
 
 from keras.callbacks import EarlyStopping

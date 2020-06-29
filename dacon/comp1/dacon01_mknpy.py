@@ -3,6 +3,7 @@ import pandas as pd
 import pywt
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
+import seaborn as sns
 
 ## 데이터 불러오기
 train = pd.read_csv('./data/dacon/comp1/train.csv', sep=',', index_col = 0, header = 0)
@@ -28,10 +29,13 @@ train = pd.DataFrame(train, columns=train_col)
 test = pd.DataFrame(test, columns=test_col)
 
 
+
 train_src = train.filter(regex='_src$',axis=1).T.interpolate(limit_direction='both').T.values # 선형보간법
 # train_damp = 1
 # train_damp = 625/train.values[:,0:1]/train.values[:,0:1]*(10**(625/train.values[:,0:1]/train.values[:,0:1] - 1))
 train_damp = np.exp(np.pi*(10 - train.values[:,0:1])/3.44)
+# damp_temp = [3.5,3.4,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44,3.44]
+# train_damp = np.exp(np.pi*(10 - train.values[:,0:1])/damp_temp)
 train_dst = train.filter(regex='_dst$',axis=1).T.interpolate(limit_direction='both').T.values / train_damp# 선형보간법
 
 test_src = test.filter(regex='_src$',axis=1).T.interpolate(limit_direction='both').T.values
@@ -39,18 +43,6 @@ test_src = test.filter(regex='_src$',axis=1).T.interpolate(limit_direction='both
 # test_damp = 625/test.values[:,0:1]/test.values[:,0:1]*(10**(625/test.values[:,0:1]/test.values[:,0:1] - 1))
 test_damp = np.exp(np.pi*(10 - test.values[:,0:1])/3.44)
 test_dst = test.filter(regex='_dst$',axis=1).T.interpolate(limit_direction='both').T.values / test_damp
-
-num_train = 0
-num_test = 0
-
-for i in range(10000):
-    if train_dst[i].sum() == 0:
-        num_train += 1
-    if test_dst[i].sum() == 0:
-        num_test += 1 
-
-print(num_train)
-print(num_test)
 
 
 
@@ -67,10 +59,15 @@ test_src_dst_fu = []
 train_dst_mean = []
 test_dst_mean = []
 
-rho_10 = []
-rho_15 = []
-rho_20 = []
-rho_25 = []
+# rho_10 = np.array([0.0 for i in range(35)])
+# nrho_10 = 0
+# rho_15 = np.array([0.0 for i in range(35)])
+# nrho_15 = 0
+# rho_20 = np.array([0.0 for i in range(35)])
+# nrho_20 = 0
+# rho_25 = np.array([0.0 for i in range(35)])
+# nrho_25 = 0
+
 scaler = StandardScaler()
 
 times = 70
@@ -80,49 +77,61 @@ for i in range(10000):
     tmp_y = 0
     for j in range(35):
         if train_src[i, j] == 0 and train_dst[i,j] != 0:
-            # train_src[i,j] = 1e-10
             train_src[i,j] = train_dst[i,j]
-            # train_dst[i,j] = 0
-
         if test_src[i, j] == 0 and test_dst[i,j] != 0:
-            # test_src[i,j] = 1e-10
             test_src[i,j] = test_dst[i,j]
-            # test_dst[i,j] = 0
-
-    if train['rho'][i] == 10:
-        rho_10.append(i)
-    if train['rho'][i] == 15:
-        rho_15.append(i)
-    if train['rho'][i] == 20:
-        rho_20.append(i)
-    if train['rho'][i] == 25:
-        rho_25.append(i)
-    # plt.plot(range(35), train_src[i])
-    # plt.show()
-
-    train_fu_real.append(np.fft.fft(scaler.fit_transform(train_dst[i:i+1].T).T[0], n=times).real)
-    train_fu_imag.append(np.fft.fft(scaler.fit_transform(train_dst[i:i+1].T).T[0], n=times).imag)
-    test_fu_real.append(np.fft.fft(scaler.fit_transform(test_dst[i:i+1].T).T[0], n=times).real)
-    test_fu_imag.append(np.fft.fft(scaler.fit_transform(test_dst[i:i+1].T).T[0], n=times).imag)
-    train_src_dst_fu.append(np.fft.ifft(train_src[i]-train_dst[i], n=times).real)
-    test_src_dst_fu.append(np.fft.ifft(test_src[i]-test_dst[i], n=times).real)
+    # if train['rho'][i] == 10:
+    #     rho_10 += train_dst[i]
+    #     nrho_10 += 1
+    # if train['rho'][i] == 15:
+    #     rho_15 += train_dst[i]
+    #     nrho_15 += 1
+    # if train['rho'][i] == 20:
+    #     rho_20 += train_dst[i]
+    #     nrho_20 += 1
+    # if train['rho'][i] == 25:
+    #     rho_25 += train_dst[i]
+    #     nrho_25 += 1
+    train_fu_real.append(np.fft.fft(scaler.fit_transform(train_dst[i:i+1].T).T[0], n=times).real[:35]) 
+    train_fu_imag.append(np.fft.fft(scaler.fit_transform(train_dst[i:i+1].T).T[0], n=times).imag[:35])
+    test_fu_real.append(np.fft.fft(scaler.fit_transform(test_dst[i:i+1].T).T[0], n=times).real[:35])
+    test_fu_imag.append(np.fft.fft(scaler.fit_transform(test_dst[i:i+1].T).T[0], n=times).imag[:35])
+    train_src_dst_fu.append(np.fft.ifft(train_src[i]-train_dst[i], n=times).real[:35])
+    test_src_dst_fu.append(np.fft.ifft(test_src[i]-test_dst[i], n=times).real[:35])
     train_dst_mean.append([train_dst[i].mean()])
     test_dst_mean.append([test_dst[i].mean()])
 
-print("==========================")
-print(((train_src - train_dst) < 0).sum())
-print(((test_src - test_dst) < 0).sum())
-print("==========================")
+# print(rho_10)
+# print(rho_15)
+# print(rho_20)
+# print(rho_25)
+# print("==========================")
+# print(rho_10/nrho_10)
+# print(rho_15/nrho_15)
+# print(rho_20/nrho_20)
+# print(rho_25/nrho_25)
+# print("==========================")
+# print(rho_25/nrho_25 / (rho_10/nrho_10))
+# print(rho_25/nrho_25 / (rho_15/nrho_15))
+# print(rho_25/nrho_25 / (rho_20/nrho_20))
+
+
+# for i in range(10000):
+#     if train['rho'][i] == 10:
+#         train_dst[i] *= (rho_25/nrho_25 / (rho_10/nrho_10))
+#         test_dst[i] *= (rho_25/nrho_25 / (rho_10/nrho_10))
+#     if train['rho'][i] == 15:
+#         train_dst[i] *= (rho_25/nrho_25 / (rho_15/nrho_15))
+#         test_dst[i] *= (rho_25/nrho_25 / (rho_15/nrho_15))
+#     if train['rho'][i] == 20:
+#         train_dst[i] *= (rho_25/nrho_25 / (rho_20/nrho_20))
+#         test_dst[i] *= (rho_25/nrho_25 / (rho_20/nrho_20))
+
+print(train_dst.shape)
 
 trian_dst_mean = np.array(train_dst_mean)
 test_dst_mean = np.array(test_dst_mean)
 
-seq = [10000,times]
-
-train_2fu_real = np.fft.fft2(scaler.fit_transform(train_dst.T).T, s = seq).real
-train_2fu_imag = np.fft.fft2(scaler.fit_transform(train_dst.T).T, s = seq).imag
-test_2fu_real = np.fft.fft2(scaler.fit_transform(test_dst.T).T, s = seq).real
-test_2fu_imag = np.fft.fft2(scaler.fit_transform(test_dst.T).T, s = seq).imag    
 
 print(max_train)
 print(max_test)
@@ -140,8 +149,8 @@ small = 1e-20
 
 
 
-x_train = np.concatenate([train.values[:,0:1]**2,trian_dst_mean, train_damp, train_dst, train_src-train_dst, train_src/(train_dst+small), train_fu_real, train_fu_imag] , axis = 1)
-x_pred = np.concatenate([test.values[:,0:1]**2,test_dst_mean, test_damp, test_dst, test_src-test_dst, test_src/(test_dst+small),test_fu_real,test_fu_imag], axis = 1)
+x_train = np.concatenate([train.values[:,0:1],trian_dst_mean, train_dst, train_src-train_dst, train_src/(train_dst+small), train_fu_real, train_fu_imag] , axis = 1)
+x_pred = np.concatenate([test.values[:,0:1],test_dst_mean, test_dst, test_src-test_dst, test_src/(test_dst+small),test_fu_real,test_fu_imag], axis = 1)
 
 
 # x_train = np.concatenate([train.values[:,0:1]**2, train_src, train_dst, train_src - train_dst,train_src/(train_dst+small)], axis = 1)
@@ -160,11 +169,11 @@ np.save('./dacon/comp1/x_train.npy', arr=x_train)
 np.save('./dacon/comp1/y_train.npy', arr=y_train)
 np.save('./dacon/comp1/x_pred.npy', arr=x_pred)
 
-np.save('./dacon/comp1/x_train_10.npy', arr=x_train[rho_10])
-np.save('./dacon/comp1/x_train_15.npy', arr=x_train[rho_15])
-np.save('./dacon/comp1/x_train_20.npy', arr=x_train[rho_20])
-np.save('./dacon/comp1/x_train_25.npy', arr=x_train[rho_25])
-np.save('./dacon/comp1/y_train_10.npy', arr=y_train[rho_10])
-np.save('./dacon/comp1/y_train_15.npy', arr=y_train[rho_15])
-np.save('./dacon/comp1/y_train_20.npy', arr=y_train[rho_20])
-np.save('./dacon/comp1/y_train_25.npy', arr=y_train[rho_25])
+
+
+
+train_sns = pd.DataFrame(np.concatenate([x_train, y_train], axis = 1))
+
+plt.figure(figsize=(4,12))
+sns.heatmap(train_sns.corr().loc[0:x_train.shape[1], x_train.shape[1]:train_sns.shape[1]].abs())
+plt.show()
