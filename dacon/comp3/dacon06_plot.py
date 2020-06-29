@@ -130,22 +130,22 @@ for i in range(len(x_pred_LSTM)):
 
     t1 = 0
     for j in range(375):
-        if x_LSTM[i,j,0] != 0.0:
+        if x_pred_LSTM[i,j,0] != 0.0:
             break
         t1+=1
     t2 = 0
     for j in range(375):
-        if x_LSTM[i,j,1] != 0.0:
+        if x_pred_LSTM[i,j,1] != 0.0:
             break
         t2+=1
     t3 = 0
     for j in range(375):
-        if x_LSTM[i,j,2] != 0.0:
+        if x_pred_LSTM[i,j,2] != 0.0:
             break
         t3+=1
     t4 = 0
     for j in range(375):
-        if x_LSTM[i,j,3] != 0.0:
+        if x_pred_LSTM[i,j,3] != 0.0:
             break
         t4+=1
     t_all = np.array([t1,t2,t3,t4])
@@ -193,26 +193,39 @@ def plot_feature_importacnes_cancer(model, title, lenth):
 #     plt.subplot(2,2,i+1)
 #     plot_feature_importacnes_cancer(model, y.columns[i])
 
+params = {
+            'n_estimators': 100,
+            'learning_rate': 0.8,
+            'max_depth': 5, 
+            'boosting_type': 'dart', 
+            'drop_rate' : 0.3,
+            'objective': 'regression', 
+            'metric' : 'mse',
+            'is_training_metric': True, 
+            'num_leaves': 200, 
+            'colsample_bytree': 0.7, 
+            'subsample': 0.7
+            }
 
-model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+model = XGBRegressor(validate_parameters= True, n_jobs= -1, **params)
 model.fit(x_fu[:,:],y.values[:,0])
 # print(model.feature_importances_)
 plt.subplot(2,2,1)
 plot_feature_importacnes_cancer(model, y.columns[0],36)
 
-model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+model = XGBRegressor(validate_parameters= True, n_jobs= -1, **params)
 model.fit(x_fu[:,:],y.values[:,1])
 # print(model.feature_importances_)
 plt.subplot(2,2,2)
 plot_feature_importacnes_cancer(model, y.columns[1],36)
 
-model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+model = XGBRegressor(validate_parameters= True, n_jobs= -1, **params)
 model.fit(x_fu[:,:],y.values[:,2])
 # print(model.feature_importances_)
 plt.subplot(2,2,3)
 plot_feature_importacnes_cancer(model, y.columns[2],36)
 
-model = XGBRegressor(validate_parameters= True, n_jobs= -1, n_estimators= 1000, max_depth= 5, eta= 0.1)
+model = XGBRegressor(validate_parameters= True, n_jobs= -1, **params)
 model.fit(x_fu[:,:],y.values[:,3])
 # print(model.feature_importances_)
 plt.subplot(2,2,4)
