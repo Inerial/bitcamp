@@ -18,12 +18,18 @@ print(x_pred.shape)
 time_step = int(x.shape[0] / y.shape[0])
 tmp = []
 for i in range(int(x.shape[0]/time_step)):
-    tmp.append(x.iloc[i*time_step : (i+1)*time_step, 1:].values)
+    mid = x.iloc[i*time_step : (i+1)*time_step, 1:].values
+    # for j in range(4):
+    #     mid = np.concatenate([mid, np.fft.fft(mid[:,j], n=375*2).real[:375].reshape(375,1), np.fft.fft(mid[:,j], n=375*2).imag[:375].reshape(375,1)], axis = 1)
+    tmp.append(mid)
 x_LSTM = np.array(tmp)
 
 tmp = []
 for i in range(int(x_pred.shape[0]/time_step)):
-    tmp.append(x_pred.iloc[i*time_step : (i+1)*time_step, 1:].values)
+    mid = x_pred.iloc[i*time_step : (i+1)*time_step, 1:].values
+    # for j in range(4):
+    #     mid = np.concatenate([mid, np.fft.fft(mid[:,j], n=375*2).real[:375].reshape(375,1), np.fft.fft(mid[:,j], n=375*2).imag[:375].reshape(375,1)], axis = 1)
+    tmp.append(mid)
 x_pred_LSTM = np.array(tmp)
 
 print("===========================")
@@ -31,7 +37,6 @@ print(x_LSTM.shape)
 print(y.shape)
 print(x_pred_LSTM.shape)
 print("===========================")
-
 
 x_fu = []
 x_pred_fu = []
