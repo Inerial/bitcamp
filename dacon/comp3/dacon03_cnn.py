@@ -31,10 +31,29 @@ def E2V(y_true, y_pred):
 # X_data = []
 # Y_data = []
 
+def my_loss(y_true, y_pred):
+    divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
+    return K.mean(K.square(divResult))
+
+
+def my_loss_E1X(y_true, y_pred):
+    return K.mean(K.square(y_true-y_pred))/2e+04
+
+def my_loss_E1Y(y_true, y_pred):
+    return K.mean(K.square(y_true-y_pred))/2e+04
+
+def my_loss_E2M(y_true, y_pred):
+    divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
+    return K.mean(K.square(divResult))
+
+def my_loss_E2V(y_true, y_pred):
+    divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
+    return K.mean(K.square(divResult))
+
+
 X_data = pd.DataFrame('./data/dacon/comp3/train_features.csv',skiprows=1,delimiter=',')
 X_data = X_data[:,1:]
 print(X_data.shape)
-     
     
 Y_data = np.loadtxt('./data/dacon/comp3/train_targets.csv',skiprows=1,delimiter=',')
 Y_data = Y_data[:,1:]
@@ -45,7 +64,7 @@ print(X_data.shape)
 
 X_data_test = np.loadtxt('./data/dacon/comp3/test_features.csv',skiprows=1,delimiter=',')
 X_data_test = X_data_test[:,1:]
-X_data_test = X_data_test.reshape((700,375,5,1))
+X_data_test = X_data_test.reshape((700,375,12,1))
 
 data_id = 2
 
@@ -75,8 +94,6 @@ X_train, X_test, Y_train, Y_test = train_test_split(X_data, Y_data, test_size=0.
 print(X_train.shape)
 
 
-weight1 = np.array([1,1,0,0])
-weight2 = np.array([0,0,1,1])
 
 def my_loss(y_true, y_pred):
     divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
