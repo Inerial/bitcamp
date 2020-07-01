@@ -1,0 +1,28 @@
+import os, glob, numpy as np, cv2, zipfile, pandas as pd, shutil
+from keras.models import load_model
+from keras.utils.io_utils import HDF5Matrix
+
+folder_path = os.path.dirname(os.path.realpath(__file__))
+
+# 1. 데이터
+test_list = pd.read_csv(folder_path + '/test/test_labels.csv', sep=',', header = None, index_col = None)
+x_test = HDF5Matrix(folder_path + '/data/test_data_set.h5', 'x_test')
+
+print(test_list.shape)
+print(x_test.shape)
+
+model = load_model(folder_path  + '/model_check/01-0.1281400174.hdf5')
+
+# earlystopping & modelcheckpoint
+y_pred = model.predict(x_test)
+
+if os.path.isdir(folder_path +'/pred'):
+    shutil.rmtree(folder_path +'/pred')
+
+os.mkdir(folder_path +'/pred')
+
+for index, img in enumerate(y_pred):
+    print ('image :', index)
+    cv2.imwrite(folder_path +'/pred/'+test_list.iloc[index,0], img*255)
+
+##  터미널에서  zip pred.zip -r pred 입력시 통쨰로 압축

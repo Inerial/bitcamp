@@ -21,3 +21,4 @@ Dockerfile
 *.pkl
 *.pptx
 *.dat
+*.wav
