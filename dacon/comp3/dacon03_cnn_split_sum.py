@@ -71,38 +71,46 @@ def my_split_labels_k(crit):
 def set_model(my_loss):  # 0:x,y, 1:m, 2:v
     K.clear_session()
     activation = 'elu'
-    padding = 'same'
-    fs = (3,1)
+    padding = 'valid' ## 맨앞에 0이 xy를 나타내는 중요한 값이기 때문에 패딩을 해주면 안된다.
+    model = Sequential()
+    nf = 19
+    fs = (4,1)
 
-    input1 = Input(shape=(375,4,1))
-    conv2 = Conv2D(64,fs, padding=padding, activation=activation)(input1)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf,fs, padding=padding, activation=activation,input_shape=(375,8,1)))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Conv2D(128,fs, padding=padding, activation=activation)(conv2)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf*2,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Conv2D(256,fs, padding=padding, activation=activation)(conv2)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf*4,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Conv2D(512,fs, padding=padding, activation=activation)(conv2)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf*8,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Conv2D(512,fs, padding=padding, activation=activation)(conv2)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf*16,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Flatten()(conv2)
-    conv2 = Dense(1024, activation ='elu')(conv2)
-    conv2 = Dense(256, activation ='elu')(conv2)
-    conv2 = Dense(64, activation ='elu')(conv2)
-    conv2 = Dense(4)(conv2)
+    model.add(Conv2D(nf*32,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    model = Model(inputs = input1, outputs = conv2)
-    optimizer = keras.optimizers.Adam()
+
+    model.add(Flatten())
+    model.add(Dense(256, activation ='elu'))
+    model.add(Dense(128, activation ='elu'))
+    model.add(Dense(64, activation ='elu'))
+    model.add(Dense(32, activation ='elu'))
+    model.add(Dense(16, activation ='elu'))
+    model.add(Dense(8, activation ='elu'))
+    model.add(Dense(4))
+
+    optimizer = keras.optimizers.Adam(lr = 0.0005)
        
     model.compile(loss=my_loss, optimizer=optimizer)
        
@@ -112,8 +120,8 @@ def set_model(my_loss):  # 0:x,y, 1:m, 2:v
     
 x = np.load('./dacon/comp3/x_lstm.npy')
 x_pred = np.load('./dacon/comp3/x_pred_lstm.npy')
-x = x.reshape(2800,375,4,1)
-x_pred = x_pred.reshape(700,375,4,1)
+x = x.reshape(2800,375,8,1)
+x_pred = x_pred.reshape(700,375,8,1)
 
 y = np.load('./dacon/comp3/y.npy')
 
@@ -164,12 +172,12 @@ os.mkdir(best_models_path)
 
 # kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E2',my_loss_E2)]
 # kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
-kaeri_metrics = [('my_loss_E1X',my_loss_E1X),('my_loss_E1Y',my_loss_E1Y),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
+kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E1',my_loss_E1),('my_loss_E2',my_loss_E2),('my_loss_E2',my_loss_E2)]
 
 
 for label in range(4):
     print('train column : ', label)
-    train_model(ttd[label]['x_train'], ttd[label]['y_train'], label=label, metric=kaeri_metrics[label], batch_size=512, epochs = 10000, patience=300, name = str(label))
+    train_model(ttd[label]['x_train'], ttd[label]['y_train'], label=label, metric=kaeri_metrics[label], batch_size=64, epochs = 10000, patience=300, name = str(label))
 
 
 
@@ -204,3 +212,9 @@ for i in range(4):
 submit.to_csv('./dacon/comp3/comp3_sub.csv', index = False)
 
 # mspe :  3.3595243892423294
+
+
+# E0 : 0.0004238945429891293
+# E1 : 0.05330251913017017
+# E2 : 0.002490780136772873
+# E3 : 0.038004013671489506

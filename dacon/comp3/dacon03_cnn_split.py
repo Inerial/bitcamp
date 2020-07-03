@@ -71,39 +71,47 @@ def my_split_labels_k(crit):
 
 def set_model(my_loss):  # 0:x,y, 1:m, 2:v
     K.clear_session()
-    activation = 'elu'
-    padding = 'same'
-    fs = (3,1)
+    activation = 'selu'
+    padding = 'valid' ## 맨앞에 0이 xy를 나타내는 중요한 값이기 때문에 패딩을 해주면 안된다.
+    model = Sequential()
+    nf = 19
+    fs = (5,1)
 
-    input1 = Input(shape=(375,4,1))
-    conv2 = Conv2D(64,fs, padding=padding, activation=activation)(input1)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf,fs, padding=padding, activation=activation,input_shape=(375,8,1)))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Conv2D(128,fs, padding=padding, activation=activation)(conv2)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf*2,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Conv2D(256,fs, padding=padding, activation=activation)(conv2)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf*4,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Conv2D(512,fs, padding=padding, activation=activation)(conv2)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf*8,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Conv2D(512,fs, padding=padding, activation=activation)(conv2)
-    conv2 = BatchNormalization()(conv2)
-    conv2 = MaxPooling2D(pool_size=(2, 1))(conv2)
+    model.add(Conv2D(nf*16,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    conv2 = Flatten()(conv2)
-    conv2 = Dense(1024, activation ='elu')(conv2)
-    conv2 = Dense(256, activation ='elu')(conv2)
-    conv2 = Dense(64, activation ='elu')(conv2)
-    conv2 = Dense(4)(conv2)
+    model.add(Conv2D(nf*32,fs, padding=padding, activation=activation))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 1)))
 
-    model = Model(inputs = input1, outputs = conv2)
-    optimizer = keras.optimizers.Adam()
+
+    model.add(Flatten())
+    model.add(Dense(256, activation = activation))
+    model.add(Dense(128, activation = activation))
+    model.add(Dense(64, activation = activation))
+    model.add(Dense(32, activation = activation))
+    model.add(Dense(16, activation = activation))
+    model.add(Dense(8, activation = activation))
+    model.add(Dense(4))
+
+    optimizer = keras.optimizers.Adam(lr = 0.0001)
        
     model.compile(loss=my_loss, optimizer=optimizer)
        
@@ -143,8 +151,8 @@ def train_model(x_data, y_data, label, batch_size = 32, epochs = 100, metric=('m
 
 x = np.load('./dacon/comp3/x_lstm.npy')
 x_pred = np.load('./dacon/comp3/x_pred_lstm.npy')
-x = x.reshape(2800,375,4,1)
-x_pred = x_pred.reshape(700,375,4,1)
+x = x.reshape(2800,375,8,1)
+x_pred = x_pred.reshape(700,375,8,1)
 
 y = np.load('./dacon/comp3/y.npy')
 
@@ -153,13 +161,13 @@ folder_path = os.path.dirname(os.path.realpath(__file__))
 
 best_models_path = folder_path + '/best_models'
 
-# if os.path.isdir(best_models_path):
-#     shutil.rmtree(best_models_path)
-# os.mkdir(best_models_path)
+if os.path.isdir(best_models_path):
+    shutil.rmtree(best_models_path)
+os.mkdir(best_models_path)
 
 # kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E2',my_loss_E2)]
 # kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
-kaeri_metrics = [('my_loss_E1X',my_loss_E1X),('my_loss_E1Y',my_loss_E1Y),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
+kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E1',my_loss_E1),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
 
 ttd = []
 for label in range(4):
@@ -169,9 +177,9 @@ for label in range(4):
     ttd.append({'x_train':x_tr,'x_test':x_t,'y_train':y_tr,'y_test':y_t})
 
 
-# for label in range(4):
-#     print('train column : ', label)
-#     train_model(ttd[label]['x_train'], ttd[label]['y_train'],label = label, metric=kaeri_metrics[label], batch_size=512, epochs = 10, patience=300, name = str(label))
+for label in range(4):
+    print('train column : ', label)
+    train_model(ttd[label]['x_train'], ttd[label]['y_train'],label = label, metric=kaeri_metrics[label], batch_size=64, epochs = 20000, patience=300, name = str(label))
 
 
 
@@ -198,10 +206,12 @@ for i in range(4):
     test.append(test_preds)
 
 EE = [E1X,E1Y,E2M,E2V]
+kaeri = 0
 for i in range(4):
     ee = EE[i](ttd[i]['y_test'], test[i])
     print('E' + str(i) +' :', ee)
-
+    kaeri += ee
+print('kaeri :', kaeri/4)
 
 
 submit.to_csv('./dacon/comp3/comp3_sub.csv', index = False)

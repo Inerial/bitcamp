@@ -59,8 +59,8 @@ def set_model():  # 0:x,y, 1:m, 2:v
 
     return model
     
-x = np.load('./dacon/comp3/x_lstm.npy')a
-x_pred = np.load('./dacon/comp3/x_pred_lstm.npy')a
+x = np.load('./dacon/comp3/x_lstm.npy')
+x_pred = np.load('./dacon/comp3/x_pred_lstm.npy')
 x = x.reshape(2800,375,4,1)
 x_pred = x_pred.reshape(700,375,4,1)
 
