@@ -7,14 +7,19 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
 
-x = pd.read_csv('./data/dacon/comp3/train_features.csv', sep=',', index_col = 0, header = 0)
+x = pd.read_csv('./data/dacon/comp3/train_features.csv', sep=',', index_col = None, header = 0)
 y = pd.read_csv('./data/dacon/comp3/train_target.csv', sep=',', index_col = 0, header = 0)
-x_pred = pd.read_csv('./data/dacon/comp3/test_features.csv', sep=',', index_col = 0, header = 0)
+x_pred = pd.read_csv('./data/dacon/comp3/test_features.csv', sep=',', index_col = None, header = 0)
 
 print(x.shape)
 print(y.shape)
 print(x_pred.shape)
+times = x.values[:375,0:1]
+times_pred = x_pred.values[:375,0:1]
+x = x.iloc[:,1:]
+x_pred = x_pred.iloc[:,1:]
 
+print(times.shape)
 scaler = StandardScaler()
 
 time_step = int(x.shape[0] / y.shape[0])
@@ -23,8 +28,11 @@ for i in range(int(x.shape[0]/time_step)):
     mid = x.iloc[i*time_step : (i+1)*time_step, 1:].values
     for j in range(4):
         mid = np.concatenate([mid, scaler.fit_transform(mid[:,j:j+1])], axis = 1)
-    for j in range(4):
-        mid = np.concatenate([mid, np.fft.fft(scaler.fit_transform(mid[:,j:j+1])[0], n=375*2).real[:375].reshape(375,1), np.fft.fft(scaler.fit_transform(mid[:,j:j+1])[0], n=375*2).imag[:375].reshape(375,1)], axis = 1)
+    # for j in range(4):
+    #     mid = np.concatenate([mid, np.fft.fft(mid[:,j], n=375*2).real[:375].reshape(375,1), np.fft.fft(mid[:,j], n=375*2).imag[:375].reshape(375,1)], axis = 1)
+    #for j in range(4):
+    #    mid = np.concatenate([mid, np.fft.fft(scaler.fit_transform(mid[:,j:j+1])[0], n=375*2).real[:375].reshape(375,1), np.fft.fft(scaler.fit_transform(mid[:,j:j+1])[0], n=375*2).imag[:375].reshape(375,1)], axis = 1)
+    mid = np.concatenate([mid, times], axis = 1)
     tmp.append(mid)
 x_LSTM = np.array(tmp)
 
@@ -33,8 +41,11 @@ for i in range(int(x_pred.shape[0]/time_step)):
     mid = x_pred.iloc[i*time_step : (i+1)*time_step, 1:].values
     for j in range(4):
         mid = np.concatenate([mid, scaler.fit_transform(mid[:,j:j+1])], axis = 1)
-    for j in range(4):
+    # for j in range(4):
+    #     mid = np.concatenate([mid, np.fft.fft(mid[:,j], n=375*2).real[:375].reshape(375,1), np.fft.fft(mid[:,j], n=375*2).imag[:375].reshape(375,1)], axis = 1)
+    #for j in range(4):
         mid = np.concatenate([mid, np.fft.fft(scaler.fit_transform(mid[:,j:j+1])[0], n=375*2).real[:375].reshape(375,1), np.fft.fft(scaler.fit_transform(mid[:,j:j+1])[0], n=375*2).imag[:375].reshape(375,1)], axis = 1)
+    mid = np.concatenate([mid, times_pred], axis = 1)
     tmp.append(mid)
 x_pred_LSTM = np.array(tmp)
 

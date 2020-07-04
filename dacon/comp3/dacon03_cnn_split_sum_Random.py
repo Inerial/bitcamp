@@ -69,13 +69,13 @@ def my_split_labels_k(crit):
         output.append((train_idx, val_idx))
     return output
 
-def set_model(my_loss, activation = 'elu', nf = 19, fs = (4,1), ps = (2,1), lr = 0.0003):  # 0:x,y, 1:m, 2:v
+def set_model(my_loss, activation = 'elu', nf = 19, fs = (4,1), ps = (2,1), lr = 0.0005):  # 0:x,y, 1:m, 2:v
     K.clear_session()
 
     padding = 'valid'
     model = Sequential()
 
-    model.add(Conv2D(nf,fs, padding=padding,input_shape=(375,4,2)))#, kernel_regularizer=l2(0.001)))
+    model.add(Conv2D(nf,fs, padding=padding,input_shape=(375,16,1)))#, kernel_regularizer=l2(0.001)))
     model.add(Activation(activation))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=ps))
@@ -125,8 +125,8 @@ def set_model(my_loss, activation = 'elu', nf = 19, fs = (4,1), ps = (2,1), lr =
     
 x = np.load('./dacon/comp3/x_lstm.npy')
 x_pred = np.load('./dacon/comp3/x_pred_lstm.npy')
-x = x.reshape(2800,375,4,2)
-x_pred = x_pred.reshape(700,375,4,2)
+x = x.reshape(2800,375,16,1)
+x_pred = x_pred.reshape(700,375,16,1)
 
 y = np.load('./dacon/comp3/y.npy')
 
