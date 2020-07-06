@@ -150,7 +150,7 @@ def train_model(x_data, y_data, label, batch_size = 32, epochs = 100, metric=('m
         
         early = EarlyStopping(monitor='val_loss', patience=patience, mode='auto')
         
-        lrs = [0.0003]
+        lrs = [0.0001,0.0003,0.0005,0.001,0.003,0.005]
         for i in range(len(lrs)):
             check = ModelCheckpoint(filepath=model_path + '/{val_loss:.10f}-{epoch:04d}-'+str(lrs[i])+'.hdf5', monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False)
             model = set_model(metric[1], lr =lrs[i])
@@ -175,18 +175,18 @@ for label in range(4):
 
 best_models_path = folder_path + '/best_models'
 
-if os.path.isdir(best_models_path):
-    shutil.rmtree(best_models_path)
-os.mkdir(best_models_path)
+# if os.path.isdir(best_models_path):
+#     shutil.rmtree(best_models_path)
+# os.mkdir(best_models_path)
 
 # kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E2',my_loss_E2)]
 # kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
-kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E1',my_loss_E1),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
+kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E1',my_loss_E1),('my_loss_E2',my_loss_E2),('my_loss_E2V',my_loss_E2V)]
 
 
-for label in range(4):
-    print('train column : ', label)
-    train_model(ttd[label]['x_train'], ttd[label]['y_train'], label=label, metric=kaeri_metrics[label], batch_size=64, epochs = 10000, patience=100, name = str(label))
+# for label in range(3,4):
+#     print('train column : ', label)
+#     train_model(ttd[label]['x_train'], ttd[label]['y_train'], label=label, metric=kaeri_metrics[label], batch_size=64, epochs = 10000, patience=500, name = str(label))
 
 
 
