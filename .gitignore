@@ -22,3 +22,5 @@ Dockerfile
 *.pptx
 *.dat
 *.wav
+*.tfrecord
+

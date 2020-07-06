@@ -181,7 +181,7 @@ best_models_path = folder_path + '/best_models'
 
 # kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E2',my_loss_E2)]
 # kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
-kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E1',my_loss_E1),('my_loss_E2',my_loss_E2),('my_loss_E2V',my_loss_E2V)]
+kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E1',my_loss_E1),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
 
 
 # for label in range(3,4):

@@ -15,7 +15,7 @@ token = Tokenizer()
 token.fit_on_texts(docs)
 print(token.word_index)
 
-
+token.fit_on_texts()
 
 x = token.texts_to_sequences(docs)
 print(x)

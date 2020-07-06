@@ -15,4 +15,5 @@ def vibration_show(df, idx):
     df[df.id==idx].S4.plot()
 
 for i in range(10):
-    vibration_show(x, i)
+    vibration_show(x,i)
+    plt.show()

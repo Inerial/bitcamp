@@ -76,7 +76,7 @@ def set_model(my_loss, activation = 'elu', nf = 19, fs = (4,1), ps = (2,1), lr =
     padding = 'valid'
     model = Sequential()
 
-    model.add(Conv2D(nf,fs, padding=padding,input_shape=(375,4,4)))#, kernel_regularizer=l2(0.001)))
+    model.add(Conv2D(nf,fs, padding=padding,input_shape=(200,4,2)))#, kernel_regularizer=l2(0.001)))
     model.add(Activation(activation))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=ps))
@@ -101,10 +101,10 @@ def set_model(my_loss, activation = 'elu', nf = 19, fs = (4,1), ps = (2,1), lr =
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=ps))
 
-    model.add(Conv2D(nf*32,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
-    model.add(Activation(activation))
-    model.add(BatchNormalization())
-    model.add(MaxPooling2D(pool_size=ps))
+    # model.add(Conv2D(nf*32,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
+    # model.add(Activation(activation))
+    # model.add(BatchNormalization())
+    # model.add(MaxPooling2D(pool_size=ps))
 
 
     model.add(Flatten())
@@ -127,8 +127,8 @@ def set_model(my_loss, activation = 'elu', nf = 19, fs = (4,1), ps = (2,1), lr =
     
 x = np.load('./dacon/comp3/x_lstm.npy')
 x_pred = np.load('./dacon/comp3/x_pred_lstm.npy')
-x = x.reshape(2800,375,4,4)
-x_pred = x_pred.reshape(700,375,4,4)
+x = x.reshape(2800,200,4,4)
+x_pred = x_pred.reshape(700,200,4,4)
 
 y = np.load('./dacon/comp3/y.npy')
 
@@ -150,7 +150,7 @@ def train_model(x_data, y_data, label, batch_size = 32, epochs = 100, metric=('m
         
         early = EarlyStopping(monitor='val_loss', patience=patience, mode='auto')
         
-        lrs = [0.0003]
+        lrs = [0.00003]
         for i in range(len(lrs)):
             check = ModelCheckpoint(filepath=model_path + '/{val_loss:.10f}-{epoch:04d}-'+str(lrs[i])+'.hdf5', monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False)
             model = set_model(metric[1], lr =lrs[i])
@@ -169,7 +169,10 @@ def train_model(x_data, y_data, label, batch_size = 32, epochs = 100, metric=('m
 ttd = []
 for label in range(4):
     kfold = my_split_labels_k(y[:,label])
-    x_tr, x_t = x[kfold[0][0]], x[kfold[0][1]]
+    if label <= 1:
+        x_tr, x_t = x[kfold[0][0],:,:,:2], x[kfold[0][1],:,:,:2]
+    else:
+        x_tr, x_t = x[kfold[0][0],:,:,2:], x[kfold[0][1],:,:,2:]
     y_tr, y_t = y[kfold[0][0]], y[kfold[0][1]]
     ttd.append({'x_train':x_tr,'x_test':x_t,'y_train':y_tr,'y_test':y_t})
 
@@ -220,10 +223,3 @@ for i in range(4):
 
 submit.to_csv('./dacon/comp3/comp3_sub.csv', index = False)
 
-# mspe :  3.3595243892423294
-
-
-# E0 : 0.0004238945429891293
-# E1 : 0.05330251913017017
-# E2 : 0.002490780136772873
-# E3 : 0.038004013671489506

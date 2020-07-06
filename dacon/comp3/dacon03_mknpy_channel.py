@@ -22,11 +22,11 @@ tmp = []
 for i in range(int(x.shape[0]/time_step)):
     mid = []
     for j in range(4):
-        asdf = x.iloc[i*time_step : (i+1)*time_step, j+1].values
+        asdf = x.iloc[i*time_step : i*time_step + 200, j+1].values
         mid.append(asdf)
-        mid.append(scaler.fit_transform(asdf.reshape(375,1))[:,0])
-        mid.append(np.fft.fft(asdf, n=375*2).real[:375])
-        mid.append(np.fft.fft(asdf, n=375*2).imag[:375])
+        mid.append(scaler.fit_transform(asdf.reshape(200,1))[:,0])
+        mid.append(np.fft.fft(asdf, n=200*2).real[:200])
+        mid.append(np.fft.fft(asdf, n=200*2).imag[:200])
     #for j in range(4):
     #    mid = np.concatenate([mid, np.fft.fft(scaler.fit_transform(mid[:,j:j+1])[0], n=375*2).real[:375].reshape(375,1), np.fft.fft(scaler.fit_transform(mid[:,j:j+1])[0], n=375*2).imag[:375].reshape(375,1)], axis = 1)
         # mid.append(x.iloc[i*time_step : (i+1)*time_step, 0].values)
@@ -38,11 +38,11 @@ tmp = []
 for i in range(int(x_pred.shape[0]/time_step)):
     mid = []
     for j in range(4):
-        asdf = x_pred.iloc[i*time_step : (i+1)*time_step, j+1].values
+        asdf = x_pred.iloc[i*time_step : i*time_step + 200, j+1].values
         mid.append(asdf)
-        mid.append(scaler.fit_transform(asdf.reshape(375,1))[:,0])
-        mid.append(np.fft.fft(asdf, n=375*2).real[:375])
-        mid.append(np.fft.fft(asdf, n=375*2).imag[:375])
+        mid.append(scaler.fit_transform(asdf.reshape(200,1))[:,0])
+        mid.append(np.fft.fft(asdf, n=200*2).real[:200])
+        mid.append(np.fft.fft(asdf, n=200*2).imag[:200])
     # for j in range(4):
     #     mid = np.concatenate([mid, np.fft.fft(mid[:,j], n=375*2).real[:375].reshape(375,1), np.fft.fft(mid[:,j], n=375*2).imag[:375].reshape(375,1)], axis = 1)
     #for j in range(4):

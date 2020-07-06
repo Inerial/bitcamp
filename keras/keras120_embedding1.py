@@ -10,9 +10,10 @@ print(token.word_index)
 x = token.texts_to_sequences([text])
 print(x)
 
+print(token.sequences_to_texts(x))
+
 from keras.utils import to_categorical
 
 word_size = len(token.word_index) + 1
 x = to_categorical(x, num_classes=word_size)
 print(x)
-
