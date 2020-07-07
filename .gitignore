@@ -23,4 +23,6 @@ Dockerfile
 *.dat
 *.wav
 *.tfrecord
-
+*.ckpt
+*.npz
+*.pyc
