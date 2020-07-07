@@ -2,74 +2,76 @@ import tensorflow as tf
 import numpy as np
 import IPython.display as display
 import os
+from scipy.io.wavfile import write
+from sklearn.decomposition import PCA
 
-data = tf.data.TFRecordDataset('./0A.tfrecord', compression_type="GZIP").map(from_tfrecord)
+audio_record = 'D:/Study/big_project/0A.tfrecord'
+vid_ids = []
+labels = []
+start_time_seconds = [] # in secondes
+end_time_seconds = []
+feat_audio = []
+count = 0
+for example in tf.python_io.tf_record_iterator(audio_record):
+    tf_example = tf.train.Example.FromString(example)
+    #print(tf_example)
+    vid_ids.append(tf_example.features.feature['video_id'].bytes_list.value[0].decode(encoding='UTF-8'))
+    labels.append(tf_example.features.feature['labels'].int64_list.value)
+    start_time_seconds.append(tf_example.features.feature['start_time_seconds'].float_list.value)
+    end_time_seconds.append(tf_example.features.feature['end_time_seconds'].float_list.value)
+
+    tf_seq_example = tf.train.SequenceExample.FromString(example)
+    n_frames = len(tf_seq_example.feature_lists.feature_list['audio_embedding'].feature)
+
+    sess = tf.InteractiveSession()
+    rgb_frame = []
+    audio_frame = []
+    # iterate through frames
+    for i in range(n_frames):
+        audio_frame.append(tf.cast(tf.decode_raw(
+                tf_seq_example.feature_lists.feature_list['audio_embedding'].feature[i].bytes_list.value[0],tf.uint8)
+                       ,tf.float32).eval())
+
+    sess.close()
+    feat_audio.append([])
+
+    feat_audio[count].append(audio_frame)
+    count+=1
 
 
-def _int64_feature(value):
-    if not isinstance(value, list):
-        value = [value]
-    return tf.train.Feature(int64_list=tf.train.BytesList(value=value))
+# for i in range(0,1):
+#     print(vid_ids[i])
+#     print(labels[i])
+#     print(start_time_seconds[i])
+#     print(end_time_seconds[i])
+#     print(len(feat_audio[i]))
+#     print(feat_audio[i][0])
+#     print(feat_audio[i][0][0])
 
-def _float_feature(value):
-    if not isinstance(value, list):
-        value = [value]
-    return tf.train.Feature(float_list=tf.train.FloatList(value=value))
+# print(count)
+# pca = PCA(44110)
+# print(pca.fit_transform(np.array(feat_audio[0][0][0]).reshape(1,128)))
+# write('./test.wav', 128, pca.fit_transform(np.array(feat_audio[0][0][0]).reshape(128,1)))
 
-def _bytes_feature(value):
-    if not isinstance(value, list):
-        value = [value]
-    return tf.train.Feature(bytes_list=tf.train.BytesList(value=value))
+# asdf = np.load('D:/Study/hamsu/vggish/vggish_pca_params.npz')
+# print(asdf)
+# # ['pca_means', 'pca_eigen_vectors']
 
-def _validate_text(text):
-    if isinstance(text, str):
-        return text
-    elif isinstance(text, 'unicode'):
-        return text.encode('utf8', 'ignore')
-    else:
-        return str(text)
-tf.compat.v1.Fix
-string_set = tf.train.Example(features=tf.train.Features(feature={
-    'video_id': _int64_feature(image.shape[0]),
-    'start_time_seconds': _int64_feature(image.shape[1]),
-    'end_time_seconds': _bytes_feature(_binary_image),
-    'labels': _bytes_feature(_binary_label),
-    '': _float_feature(image.mean().astype(np.float32)),
-    'std': _float_feature(image.std().astype(np.float32)),
-    'filename': _bytes_feature(str.encode(filename)),
-}))
+params = np.load('D:/Study/hamsu/vggish/vggish_pca_params.npz')
+pca_matrix = params['pca_eigen_vectors']
+pca_means = params['pca_means'].reshape(-1, 1)
+pca_matrix_inv = np.linalg.inv(pca_matrix)
 
-def read_and_decode(filename_queue):
-    reader = tf.TFRecordReader()
-    _, serialized_example = reader.read(filename_queue)
-    features = tf.parse_single_example(
-        serialized_example,
-        # Defaults are not specified since both keys are required.
-        features={
-            'image_raw': tf.FixedLenFeature([], tf.string),
-            'label': tf.FixedLenFeature([], tf.int64),
-            'height': tf.FixedLenFeature([], tf.int64),
-            'width': tf.FixedLenFeature([], tf.int64),
-            'depth': tf.FixedLenFeature([], tf.int64)
-        })
-    image = tf.decode_raw(features['image_raw'], tf.uint8)
-    label = tf.cast(features['label'], tf.int32)
-    height = tf.cast(features['height'], tf.int32)
-    width = tf.cast(features['width'], tf.int32)
-    depth = tf.cast(features['depth'], tf.int32)
-    return image, label, height, width, depth
+clipped_embeddings = np.array(feat_audio[0][0]) / (255.0 / 4.0) - 2.0
+# print(clipped_embeddings)
+embedding_batch = (np.dot(pca_matrix_inv, clipped_embeddings.T) + pca_means).T
+# embedding_tensor = sess.graph.get_tensor_by_name('vggish/embedding' + ':0')
+# [embedding_batch] = sess.run([embedding_tensor],feed_dict={features_tensor: input_batch})
+# pca_applied = np.dot(pca_matrix,(embeddings_batch.T - pca_means)).T
 
-with tf.Session() as sess:
-    filename_queue = tf.train.string_input_producer(["../data/svhn/svhn_train.tfrecords"])
-    image, label, height, width, depth = read_and_decode(filename_queue)
-    image = tf.reshape(image, tf.pack([height, width, 3]))
-    image.set_shape([32,32,3])
-    init_op = tf.initialize_all_variables()
-    sess.run(init_op)
-    coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(coord=coord)
-    for i in range(1000):
-        example, l = sess.run([image, label])
-        print (example,l)
-    coord.request_stop()
-    coord.join(threads)
+# clipped_embeddings = np.clip(pca_applied, -2.0, 2.0)
+
+
+
+# quantized_embeddings = quantized_embeddings.astype(np.uint8)
+

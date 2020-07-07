@@ -11,7 +11,7 @@ from keras.layers import Input, Dense, Dropout, Conv2D, Flatten, MaxPooling2D, L
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.regularizers import l1, l2 ,l1_l2
 
-
+import c:\Users\bitcamp\models\research\audioset\vggish
 weight1 = np.array([1,1,0,0])
 weight2 = np.array([0,0,1,1])
 weight1X = np.array([1,0,0,0])
@@ -70,13 +70,13 @@ def my_split_labels_k(crit):
         output.append((train_idx, val_idx))
     return output
 
-def set_model(my_loss, activation = 'elu', nf = 19, fs = (4,1), ps = (2,1), lr = 0.001):  # 0:x,y, 1:m, 2:v
+def set_model(my_loss, activation = 'elu', nf = 19, fs = (4,1), ps = (2,1), lr = 0.001, shape= None):  # 0:x,y, 1:m, 2:v
     K.clear_session()
 
     padding = 'valid'
     model = Sequential()
 
-    model.add(Conv2D(nf,fs, padding=padding,input_shape=(200,4,2)))#, kernel_regularizer=l2(0.001)))
+    model.add(Conv2D(nf,fs, padding=padding,input_shape=shape))#, kernel_regularizer=l2(0.001)))
     model.add(Activation(activation))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=ps))
@@ -127,8 +127,8 @@ def set_model(my_loss, activation = 'elu', nf = 19, fs = (4,1), ps = (2,1), lr =
     
 x = np.load('./dacon/comp3/x_lstm.npy')
 x_pred = np.load('./dacon/comp3/x_pred_lstm.npy')
-x = x.reshape(2800,200,4,4)
-x_pred = x_pred.reshape(700,200,4,4)
+x = x.reshape(2800,375,4,5)
+x_pred = x_pred.reshape(700,375,4,5)
 
 y = np.load('./dacon/comp3/y.npy')
 
@@ -150,10 +150,10 @@ def train_model(x_data, y_data, label, batch_size = 32, epochs = 100, metric=('m
         
         early = EarlyStopping(monitor='val_loss', patience=patience, mode='auto')
         
-        lrs = [0.00003]
+        lrs = [0.002,0.001,0.0005,0.0003,0.0001]
         for i in range(len(lrs)):
             check = ModelCheckpoint(filepath=model_path + '/{val_loss:.10f}-{epoch:04d}-'+str(lrs[i])+'.hdf5', monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False)
-            model = set_model(metric[1], lr =lrs[i])
+            model = set_model(metric[1], lr =lrs[i], shape=(x_train.shape[1],x_train.shape[2],x_train.shape[3]))
             model.fit(x_train, y_train, batch_size = batch_size, epochs=epochs, validation_data=(x_val,y_val), verbose=1, callbacks=[early, check])
         
         best_model = os.listdir(model_path)[0]
@@ -170,9 +170,9 @@ ttd = []
 for label in range(4):
     kfold = my_split_labels_k(y[:,label])
     if label <= 1:
-        x_tr, x_t = x[kfold[0][0],:,:,:2], x[kfold[0][1],:,:,:2]
+        x_tr, x_t = x[kfold[0][0],:,:,:], x[kfold[0][1],:,:,:]
     else:
-        x_tr, x_t = x[kfold[0][0],:,:,2:], x[kfold[0][1],:,:,2:]
+        x_tr, x_t = x[kfold[0][0],:,:,:], x[kfold[0][1],:,:,:]
     y_tr, y_t = y[kfold[0][0]], y[kfold[0][1]]
     ttd.append({'x_train':x_tr,'x_test':x_t,'y_train':y_tr,'y_test':y_t})
 
@@ -198,7 +198,10 @@ test = []
 
 for i in range(4):
     k_folds = my_split_labels_k(ttd[i]['y_train'][:,i])
-
+    if i <= 1:
+        uses_x_pred = x_pred[:,:,:,:]
+    else:
+        uses_x_pred = x_pred[:,:,:,:]
     test_preds = np.zeros(shape=(ttd[i]['y_test'].shape[0],4))
     preds = np.zeros(shape=(700,4))
     for j in range(len(k_folds)):
@@ -207,7 +210,7 @@ for i in range(4):
         read_name = str(i) + '-' + str(j) + '.hdf5'
         model = load_model(best_models_path + '/' + read_name, custom_objects={kaeri_metrics[i][0]:kaeri_metrics[i][1]})
         test_preds += model.predict(ttd[i]['x_test'])
-        preds += model.predict(x_pred)
+        preds += model.predict(uses_x_pred)
     test_preds /= len(k_folds)
     preds /= len(k_folds)
 
