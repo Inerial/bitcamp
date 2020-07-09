@@ -19,11 +19,13 @@ time_step = int(x.shape[0] / y.shape[0])
 tmp = []
 for i in range(int(x.shape[0]/time_step)):
     tmp.append(x.iloc[i*time_step : (i+1)*time_step, 1:].values)
+
 x_LSTM = np.array(tmp)
 
 tmp = []
 for i in range(int(x_pred.shape[0]/time_step)):
     tmp.append(x_pred.iloc[i*time_step : (i+1)*time_step, 1:].values)
+
 x_pred_LSTM = np.array(tmp)
 
 print("===========================")
@@ -90,7 +92,7 @@ for i in range(len(x_LSTM)):
         t4+=1
     t_all = np.array([t1,t2,t3,t4])
 
-    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians])#, t_all/t_all.sum()])
+    all_X = np.concatenate([rank_X1, rank_X2, rank_X3, rank_X4 , maxs, mins, means, stds, medians, [t1],[t2],[t3],[t4]])
     x_fu.append(all_X)
 
 t1_all,t2_all,t3_all,t4_all = [],[],[],[]
@@ -158,11 +160,14 @@ x_pred_fu = np.array(x_pred_fu).astype('float32')
 print(x_fu[:,-4:])
 print(x_pred_fu.shape)
 
-np.save('./dacon/comp3/x_lstm.npy', arr=x_LSTM)
-np.save('./dacon/comp3/y.npy', arr=y)
-np.save('./dacon/comp3/x_pred_lstm.npy', arr=x_pred_LSTM)
-np.save('./dacon/comp3/x_fu.npy', arr=x_fu)
-np.save('./dacon/comp3/x_pred_fu.npy', arr=x_pred_fu)
+s3s2 = x_fu[:,-2] - x_fu[:,-1]
+print(s3s2[(y['Y'] == 0).values & (y['X'] == -400).values])
+
+# np.save('./dacon/comp3/x_lstm.npy', arr=x_LSTM)
+# np.save('./dacon/comp3/y.npy', arr=y)
+# np.save('./dacon/comp3/x_pred_lstm.npy', arr=x_pred_LSTM)
+# np.save('./dacon/comp3/x_fu.npy', arr=x_fu)
+# np.save('./dacon/comp3/x_pred_fu.npy', arr=x_pred_fu)
 
 ## 위아래 진동수 변수로 줄만하지않나?
 ## max, min, mean, std, median, skew

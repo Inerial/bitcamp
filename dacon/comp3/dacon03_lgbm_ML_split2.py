@@ -23,21 +23,17 @@ def E1(y_true, y_pred):
     return np.mean(np.sum(np.square(_t - _p), axis = 1) / 2e+04)
 
 def E1X(y_true, y_pred):
-    _t, _p = np.array(y_true)[:,0:1], np.array(y_pred)[:,0:1] 
-    return np.mean(np.sum(np.square(_t - _p), axis = 1) / 2e+04)
+    return np.mean(np.sum(np.square(y_true - y_pred)) / 2e+04)
 def E1Y(y_true, y_pred):
-    _t, _p = np.array(y_true)[:,1:2], np.array(y_pred)[:,1:2] 
-    return np.mean(np.sum(np.square(_t - _p), axis = 1) / 2e+04)
+    return np.mean(np.sum(np.square(y_true - y_pred)) / 2e+04)
 
 def E2(y_true, y_pred):
     _t, _p = np.array(y_true)[:,2:], np.array(y_pred)[:,2:]
-    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
+    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06))))
 def E2M(y_true, y_pred):
-    _t, _p = np.array(y_true)[:,2:3], np.array(y_pred)[:,2:3]
-    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
+    return np.mean(np.sum(np.square((y_true - y_pred) / (y_true + 1e-06))))
 def E2V(y_true, y_pred):
-    _t, _p = np.array(y_true)[:,3:4], np.array(y_pred)[:,3:4]
-    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
+    return np.mean(np.sum(np.square((y_true - y_pred) / (y_true + 1e-06))))
 
 def my_loss(y_true, y_pred):
     divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
@@ -70,16 +66,37 @@ x_pred = np.load('./dacon/comp3/x_pred_fu.npy')
 #         print(x[i,-2]/x[i,-1])
 #         print(x[i,-4]/x[i,-3])
 
-x_train,x_test,y_train,y_test = train_test_split(
-    x,y, train_size=0.8, random_state = 66
-)
+def my_split_labels_k(crit):
+    s1 = set()
+    s1.update(crit)
+    s1 = list(s1)
+    output = []
+    for i in range(len(s1)):
+        train_idx = crit != s1[i]
+        val_idx = crit == s1[i]
+        output.append((train_idx, val_idx))
+    return output
+
+# x_train,x_test,y_train,y_test = train_test_split(
+#     x,y, train_size=0.8, random_state = 66
+# )
+
+ttd = []
+for label in range(4):
+    kfold = my_split_labels_k(y[:,label])
+    if label <= 1:
+        x_tr, x_t = x[kfold[0][0], -4:], x[kfold[0][1], -4:]
+    else:
+        x_tr, x_t = x[kfold[0][0]], x[kfold[0][1]]
+    y_tr, y_t = y[kfold[0][0]], y[kfold[0][1]]
+    ttd.append({'x_train':x_tr,'x_test':x_t,'y_train':y_tr[:,label],'y_test':y_t[:,label]})
 
 def train_model(x_data, y_data, k=5, metric='mae'):
     models = []
+    print(y_data.shape)
+    k_fold = my_split_labels_k(y_data)
     
-    k_fold = KFold(n_splits=k, shuffle=True, random_state=123)
-    
-    for train_idx, val_idx in k_fold.split(x_data):
+    for train_idx, val_idx in k_fold:
         x_train, y_train = x_data[train_idx,:], y_data[train_idx]
         x_val, y_val = x_data[val_idx,:], y_data[val_idx]
     
@@ -89,13 +106,13 @@ def train_model(x_data, y_data, k=5, metric='mae'):
         params = {
             'n_estimators': 1000,
             'learning_rate': 0.8,
-            'max_depth': 10, 
+            'max_depth': 5, 
             'boosting_type': 'dart', 
             'drop_rate' : 0.3,
             'objective': 'regression', 
             # 'metric' : metric,
             'is_training_metric': True, 
-            'num_leaves': 1000, 
+            'num_leaves': 200, 
             'colsample_bytree': 0.7, 
             'subsample': 0.7
             }
@@ -109,41 +126,35 @@ y_test_pred = []
 y_pred = []
 
 
-models = {}
+models = []
 kaeri_metrics = [my_loss_E1X,my_loss_E1Y,my_loss_E2M,my_loss_E2V]
 for label in range(4):
     print('train column : ', label)
-    models[label] = train_model(x_train, y_train[:,label], k=10, metric=kaeri_metrics[label])
+    models.append(train_model(ttd[label]['x_train'], ttd[label]['y_train'], k=10, metric=kaeri_metrics[label]))
 
 
-y_test_pred = []
 y_pred=[]
-for col in models:
-    test_preds = []
-    preds = []
-    for model in models[col]:
-        test_preds.append(model.predict(x_test))
-        preds.append(model.predict(x_pred))
-    test_pred = np.mean(test_preds, axis=0)
-    pred = np.mean(preds, axis=0)
+EE = [E1X,E1Y,E2M,E2V]
 
-    y_test_pred.append(test_pred)
-    y_pred.append(pred)
+for label, model_list in enumerate(models):
+
+    label_predict = np.zeros(shape=(ttd[label]['y_test'].shape[0],))
+    real_predict = np.zeros(shape=(700,))
+
+    for i, model in enumerate(model_list):
+        print(label, i)
+        label_predict += model.predict(ttd[label]['x_test'])
+        real_predict += model.predict(x_pred)
+    label_predict /= len(model_list)
+    print(ttd[label]['y_test'].shape, label_predict.shape)
+    ee = EE[label](ttd[label]['y_test'], label_predict)
+    print('E' + str(i) +' :', ee)
+    real_predict /= len(model_list)
+    y_pred.append(real_predict)
 
 y_pred = np.array(y_pred).T
-y_test_pred = np.array(y_test_pred).T
 print(y_pred.shape)
 
-mspe = kaeri_metric(y_test, y_test_pred)
-e1 = E1(y_test, y_test_pred)
-e2 = E2(y_test, y_test_pred)
-e2m = E2M(y_test, y_test_pred)
-e2v = E2V(y_test, y_test_pred)
-print('mspe : ', mspe)
-print('E1 : ', e1)
-print('E2 : ', e2)
-print('E2M : ', e2m)
-print('E2V : ', e2v)
 
 submissions = pd.DataFrame({
     "id": range(2800,3500),

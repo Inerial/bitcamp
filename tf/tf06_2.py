@@ -22,7 +22,7 @@ hypothesis = x * w + b
 
 cost = tf.reduce_mean(tf.square(hypothesis - y))
 
-lr = 0.01
+lr = 0.175
 train = tf.train.GradientDescentOptimizer(learning_rate=lr).minimize(cost)
 ## 해당 옵티마이저의 코스트를 최소로 만드는것
 
@@ -30,7 +30,7 @@ with tf.Session() as sess: ## with 안에서만 쓰는거, enter와 exit를 해�
     sess.run(tf.global_variables_initializer())
     sess.run(tf.global_variables_initializer())
 
-    for step in range(50001):
+    for step in range(300):
         _, cost_val, w_val, b_val = sess.run([train, cost, w, b], feed_dict={x:x_train, y:y_train})
         # sess.run(feed)
         if step % 20 == 0:

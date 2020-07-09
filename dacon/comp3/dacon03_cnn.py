@@ -13,42 +13,52 @@ from keras.models import load_model
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-def kaeri_metric(y_true, y_pred):
+weight1 = np.array([1,1,0,0])
+weight2 = np.array([0,0,1,1])
+weight1X = np.array([1,0,0,0])
+weight1Y = np.array([0,1,0,0])
+weight2M = np.array([0,0,1,0])
+weight2V = np.array([0,0,0,1])
+def kaeri_metric(y_true, y_pred):    
     return 0.5 * E1(y_true, y_pred) + 0.5 * E2(y_true, y_pred)
-
 def E1(y_true, y_pred):
     _t, _p = np.array(y_true)[:,:2], np.array(y_pred)[:,:2]
     return np.mean(np.sum(np.square(_t - _p), axis = 1) / 2e+04)
+def E1X(y_true, y_pred):
+    _t, _p = np.array(y_true)[:,:2], np.array(y_pred)[:,:2]
+    return np.mean(np.sum(np.square(_t - _p)*np.array([1,0]), axis = 1) / 2e+04)
+def E1Y(y_true, y_pred):
+    _t, _p = np.array(y_true)[:,:2], np.array(y_pred)[:,:2]
+    return np.mean(np.sum(np.square(_t - _p)*np.array([0,1]), axis = 1) / 2e+04)
+
 def E2(y_true, y_pred):
     _t, _p = np.array(y_true)[:,2:], np.array(y_pred)[:,2:]
     return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
 def E2M(y_true, y_pred):
-    _t, _p = np.array(y_true)[:,2:3], np.array(y_pred)[:,2:3]
-    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
+    _t, _p = np.array(y_true)[:,2:], np.array(y_pred)[:,2:]
+    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06))*np.array([1,0]), axis = 1))
 def E2V(y_true, y_pred):
-    _t, _p = np.array(y_true)[:,3:4], np.array(y_pred)[:,3:4]
-    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06)), axis = 1))
-# X_data = []
-# Y_data = []
+    _t, _p = np.array(y_true)[:,2:], np.array(y_pred)[:,2:]
+    return np.mean(np.sum(np.square((_t - _p) / (_t + 1e-06))*np.array([0,1]), axis = 1))
 
 def my_loss(y_true, y_pred):
     divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
     return K.mean(K.square(divResult))
-
-
+def my_loss_E1(y_true, y_pred):
+    return K.mean(K.square(y_true-y_pred)*weight1)/2e+04
 def my_loss_E1X(y_true, y_pred):
-    return K.mean(K.square(y_true-y_pred))/2e+04
-
+    return K.mean(K.square(y_true-y_pred)*weight1X)/2e+04
 def my_loss_E1Y(y_true, y_pred):
-    return K.mean(K.square(y_true-y_pred))/2e+04
-
+    return K.mean(K.square(y_true-y_pred)*weight1Y)/2e+04
+def my_loss_E2(y_true, y_pred):
+    divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
+    return K.mean(K.square(divResult)*weight2)
 def my_loss_E2M(y_true, y_pred):
     divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
-    return K.mean(K.square(divResult))
-
+    return K.mean(K.square(divResult)*weight2M)
 def my_loss_E2V(y_true, y_pred):
     divResult = Lambda(lambda x: x[0]/x[1])([(y_pred-y_true),(y_true+0.000001)])
-    return K.mean(K.square(divResult))
+    return K.mean(K.square(divResult)*weight2V)
 
 
 X_data = pd.DataFrame('./data/dacon/comp3/train_features.csv',skiprows=1,delimiter=',')
