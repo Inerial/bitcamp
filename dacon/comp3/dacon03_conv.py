@@ -62,8 +62,8 @@ def my_loss_E2V(y_true, y_pred):
     
 x = np.load('./dacon/comp3/x_lstm.npy')
 x_pred = np.load('./dacon/comp3/x_pred_lstm.npy')
-x = x.reshape(2800,375,4,7)
-x_pred = x_pred.reshape(700,375,4,7)
+x = x.reshape(2800,375,28,1)
+x_pred = x_pred.reshape(700,375,28,1)
 
 y = np.load('./dacon/comp3/y.npy')
 
@@ -74,51 +74,69 @@ x_train,x_test,y_train,y_test = train_test_split(
 )
 
 # 2. 모델
-def set_model(my_loss, activation = 'elu', nf = 19, fs = (3,1), ps = (2,1), lr = 0.0001, shape= None):  # 0:x,y, 1:m, 2:v
+
+def set_model(my_loss, activation = 'elu', nf = 19, fs = (3,1), ps = (2,1), lr = 0.001, shape= None):  # 0:x,y, 1:m, 2:v
     K.clear_session()
 
     padding = 'valid'
     model = Sequential()
 
     model.add(Conv2D(nf,fs, padding=padding,input_shape=shape))#, kernel_regularizer=l2(0.001)))
+    model.add(Dropout(0.2))
     model.add(Activation(activation))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*2,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
+    model.add(Dropout(0.2))
     model.add(Activation(activation))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*4,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
+    model.add(Dropout(0.2))
     model.add(Activation(activation))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*8,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
+    model.add(Dropout(0.2))
     model.add(Activation(activation))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*16,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
+    model.add(Dropout(0.2))
     model.add(Activation(activation))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*32,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
+    model.add(Dropout(0.2))
     model.add(Activation(activation))
     model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=ps))
+
+    # model.add(Conv2D(nf*64,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
+    # model.add(Dropout(0.2))
+    # model.add(Activation(activation))
+    # model.add(BatchNormalization())
 
 
     model.add(Flatten())
-    # model.add(Dense(1024, activation='elu'))
-    # model.add(Dense(512, activation='elu'))
-    # model.add(Dense(256, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(4096, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(1024, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(256, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(64, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(16, activation ='elu'))#, kernel_regularizer=l2(0.001)))
+   
+    model.add(Dense(1024, activation=activation))
+    model.add(Dropout(0.2))
+    
+    model.add(Dense(512, activation=activation))
+    model.add(Dropout(0.2))
+    
+    model.add(Dense(128, activation =activation))#, kernel_regularizer=l2(0.001)))
+    model.add(Dropout(0.2))
+    
+    model.add(Dense(32, activation =activation))#, kernel_regularizer=l2(0.001)))
+    model.add(Dropout(0.2))
+    
     model.add(Dense(4))
 
     optimizer = keras.optimizers.Adam(lr = lr)
@@ -128,7 +146,6 @@ def set_model(my_loss, activation = 'elu', nf = 19, fs = (3,1), ps = (2,1), lr =
     model.summary()
 
     return model
-    
 
 kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E2M',my_loss_E2M),('my_loss_E2V',my_loss_E2V)]
 
@@ -139,7 +156,7 @@ final_y_pred = []
 for i in range(3):
     check = ModelCheckpoint(filepath='./best_model.hdf5', monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False)
     model = set_model(my_loss= kaeri_metrics[i][1], shape = (x_train.shape[1], x_train.shape[2], x_train.shape[3]))
-    model.fit(x_train,y_train,batch_size=64,epochs=1000, shuffle=True, validation_split=0.2, callbacks=[check])
+    model.fit(x_train,y_train,batch_size=128,epochs=50, shuffle=True, validation_split=0.2, callbacks=[check])
 
     model = load_model('./best_model.hdf5', custom_objects={kaeri_metrics[i][0]:kaeri_metrics[i][1]})
 

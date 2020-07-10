@@ -7,8 +7,8 @@ tf.set_random_seed(777)
 
 (x_train, y_train),(x_test, y_tests) = mnist.load_data()
 
-x_train = x_train.reshape(-1,28*28)/255
-x_test = x_test.reshape(-1,28*28)/255
+x_train = x_train.reshape(-1,28,28,1)/255
+x_test = x_test.reshape(-1,28,28,1)/255
 
 with tf.Session() as sess:
     y_train = sess.run(tf.one_hot(y_train,10))
@@ -27,45 +27,27 @@ batch_size = 100
 total_batch = int(60000/batch_size)
 
 x = tf.placeholder(tf.float32, shape = [None, 28*28])
+x_imag = tf.reshape(x, [-1,28,28,1])
 y = tf.placeholder(tf.float32, shape = [None, 10])
 keep_prob = tf.placeholder(tf.float32)
 
-w1 = tf.get_variable("w1", shape=[784,2048],initializer=tf.contrib.layers.xavier_initializer())
-print(w1)
-# <tf.Variable 'w1:0' shape=(784, 2048) dtype=float32_ref>
-b1 = tf.Variable(tf.random_normal([2048]), tf.float32)
-print(b1)
-# <tf.Variable 'Variable:0' shape=(2048,) dtype=float32_ref>
-L1 = tf.nn.selu(tf.matmul(x,w1) + b1)
-print(L1)
-# Tensor("Selu:0", shape=(?, 2048), dtype=float32)
+w1 = tf.get_variable("w1", shape=[3,3,1,32],initializer=tf.contrib.layers.xavier_initializer())
+L1 = tf.nn.conv2d(x_imag, w1, strides=[1,1,1,1], padding='SAME')
+L1 = tf.nn.selu(L1)
 L1 = tf.nn.dropout(L1, keep_prob=keep_prob)
-print(L1)
-# Tensor("dropout/mul_1:0", shape=(?, 2048), dtype=float32)
+L1 = tf.nn.max_pool2d(L1,(1,2,2,1), strides = [1,2,2,1], padding='SAME')
 
-w2 = tf.get_variable("w2", shape=[2048,2048],initializer=tf.contrib.layers.xavier_initializer())
-b2 = tf.Variable(tf.random_normal([2048]), tf.float32)
-L2 = tf.nn.selu(tf.matmul(L1,w2) + b2)
+w2 = tf.get_variable("w2", shape=[3,3,32,64],initializer=tf.contrib.layers.xavier_initializer())
+L2 = tf.nn.conv2d(L1, w2, strides=[1,1,1,1], padding='SAME')
+L2 = tf.nn.selu(L2)
 L2 = tf.nn.dropout(L2, keep_prob=keep_prob)
+L2 = tf.nn.max_pool2d(L2,(1,2,2,1), strides = [1,2,2,1], padding='SAME')
 
-w3 = tf.get_variable("w3", shape=[2048,1024],initializer=tf.contrib.layers.xavier_initializer())
-b3 = tf.Variable(tf.random_normal([1024]), tf.float32)
-L3 = tf.nn.selu(tf.matmul(L2,w3) + b3)
-L3 = tf.nn.dropout(L3, keep_prob=keep_prob)
+L2= tf.reshape(L2, [-1, 7*7*64])
 
-w4 = tf.get_variable("w4", shape=[1024,512],initializer=tf.contrib.layers.xavier_initializer())
-b4 = tf.Variable(tf.random_normal([512]), tf.float32)
-L4 = tf.nn.selu(tf.matmul(L3,w4) + b4)
-L4 = tf.nn.dropout(L4, keep_prob=keep_prob)
-
-w5 = tf.get_variable("w5", shape=[512,512],initializer=tf.contrib.layers.xavier_initializer())
-b5 = tf.Variable(tf.random_normal([512]), tf.float32)
-L5 = tf.nn.selu(tf.matmul(L4,w5) + b5)
-L5 = tf.nn.dropout(L5, keep_prob=keep_prob)
-
-w6 = tf.get_variable("w6", shape=[512,256],initializer=tf.contrib.layers.xavier_initializer())
+w6 = tf.get_variable("w6", shape=[7*7*64,256],initializer=tf.contrib.layers.xavier_initializer())
 b6 = tf.Variable(tf.random_normal([256]), tf.float32)
-L6 = tf.nn.selu(tf.matmul(L5,w6) + b6)
+L6 = tf.nn.selu(tf.matmul(L2,w6) + b6)
 L6 = tf.nn.dropout(L6, keep_prob=keep_prob)
 
 w7 = tf.get_variable("w7", shape=[256,128],initializer=tf.contrib.layers.xavier_initializer())
@@ -82,6 +64,7 @@ w9 = tf.get_variable("w9", shape=[64,32],initializer=tf.contrib.layers.xavier_in
 b9 = tf.Variable(tf.random_normal([32]), tf.float32)
 L9 = tf.nn.selu(tf.matmul(L8,w9) + b9)
 L9 = tf.nn.dropout(L9, keep_prob=keep_prob)
+
 
 w10 = tf.get_variable("w10", shape=[32,10],initializer=tf.contrib.layers.xavier_initializer())
 b10 = tf.Variable(tf.random_normal([10]), tf.float32)
@@ -100,12 +83,12 @@ with tf.Session() as sess:
         avg_cost = 0
         for batch in range(total_batch):
             batch_xs, batch_ys = x_train[batch*batch_size : (batch+1)*batch_size], y_train[batch*batch_size : (batch+1)*batch_size]
-            feed_dict = {x:batch_xs, y:batch_ys, keep_prob:0.8}
+            feed_dict = {x_imag:batch_xs, y:batch_ys, keep_prob:0.8}
             cost_val, _ = sess.run([cost, train], feed_dict=feed_dict)
             print(step, 'cost :', cost_val)#, '\n',hyp_val)
             avg_cost += cost_val/total_batch
         print('Epo :', '%04d' %(step+1), 'cost :', '{:.9f}'.format(avg_cost))
-    hy, pred = sess.run([hypothesis ,predicted], feed_dict={x:x_test, y:y_test, keep_prob:0.8})
+    hy, pred = sess.run([hypothesis ,predicted], feed_dict={x_imag:x_test, y:y_test, keep_prob:0.8})
     # print(hy)
     print(pred)
     # print(y_test)

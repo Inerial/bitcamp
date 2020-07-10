@@ -8,7 +8,8 @@ from keras import backend as K
 import keras
 from keras.models import Model, Sequential, load_model
 from keras.layers import Input, Dense, Dropout, Conv2D, Flatten, MaxPooling2D, LSTM, BatchNormalization, Lambda, Activation, AveragePooling2D
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D, S
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateaum 
 from keras.regularizers import l1, l2 ,l1_l2
 
 weight1 = np.array([1,1,0,0])
@@ -76,44 +77,54 @@ def set_model(my_loss, activation = 'elu', nf = 19, fs = (3,1), ps = (2,1), lr =
     model = Sequential()
 
     model.add(Conv2D(nf,fs, padding=padding,input_shape=shape))#, kernel_regularizer=l2(0.001)))
-    model.add(BatchNormalization())
     model.add(Activation(activation))
-    model.add(AveragePooling2D(pool_size=ps))
+    model.add(BatchNormalization())
+    # model.add(Dropout(0.2))
+    model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*2,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
-    model.add(BatchNormalization())
     model.add(Activation(activation))
-    model.add(AveragePooling2D(pool_size=ps))
+    model.add(BatchNormalization())
+    # model.add(Dropout(0.2))
+    model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*4,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
-    model.add(BatchNormalization())
     model.add(Activation(activation))
-    model.add(AveragePooling2D(pool_size=ps))
+    model.add(BatchNormalization())
+    # model.add(Dropout(0.2))
+    model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*8,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
-    model.add(BatchNormalization())
     model.add(Activation(activation))
-    model.add(AveragePooling2D(pool_size=ps))
+    model.add(BatchNormalization())
+    # model.add(Dropout(0.2))
+    model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*16,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
-    model.add(BatchNormalization())
     model.add(Activation(activation))
-    model.add(AveragePooling2D(pool_size=ps))
+    model.add(BatchNormalization())
+    # model.add(Dropout(0.2))
+    model.add(MaxPooling2D(pool_size=ps))
 
     model.add(Conv2D(nf*32,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
     model.add(Activation(activation))
     model.add(BatchNormalization())
+    # model.add(Dropout(0.2))
+    model.add(MaxPooling2D(pool_size=ps))
+
+    model.add(Conv2D(nf*64,fs, padding=padding))#, kernel_regularizer=l2(0.001)))
+    model.add(Activation(activation))
+    # model.add(Dropout(0.2))
+    model.add(BatchNormalization())
 
 
     model.add(Flatten())
-    # model.add(Dense(1024, activation='elu'))
-    # model.add(Dense(512, activation='elu'))
-    # model.add(Dense(256, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(4096, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(1024, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(256, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(64, activation ='elu'))#, kernel_regularizer=l2(0.001)))
-    model.add(Dense(16, activation ='elu'))#, kernel_regularizer=l2(0.001)))
+    model.add(Dense(512, activation='elu'))
+    # model.add(Dense(256, activation='elu'))
+    model.add(Dense(128, activation ='elu'))#, kernel_regularizer=l2(0.001)))
+    # model.add(Dense(64, activation ='elu'))#, kernel_regularizer=l2(0.001)))
+    model.add(Dense(32, activation ='elu'))#, kernel_regularizer=l2(0.001)))
+    # model.add(Dense(16, activation ='elu'))#, kernel_regularizer=l2(0.001)))
     model.add(Dense(4))
 
     optimizer = keras.optimizers.Adam(lr = lr)
@@ -126,8 +137,8 @@ def set_model(my_loss, activation = 'elu', nf = 19, fs = (3,1), ps = (2,1), lr =
     
 x = np.load('./dacon/comp3/x_lstm.npy')
 x_pred = np.load('./dacon/comp3/x_pred_lstm.npy')
-x = x.reshape(2800,375,4,5)
-x_pred = x_pred.reshape(700,375,4,5)
+x = x.reshape(2800,375,28,1)
+x_pred = x_pred.reshape(700,375,28,1)
 
 y = np.load('./dacon/comp3/y.npy')
 
@@ -188,7 +199,7 @@ kaeri_metrics = [('my_loss_E1',my_loss_E1),('my_loss_E1',my_loss_E1),('my_loss_E
 
 for label in range(4):
     print('train column : ', label)
-    train_model(ttd[label]['x_train'], ttd[label]['y_train'], label=label, metric=kaeri_metrics[label], batch_size=64, epochs = 100, patience=500, name = str(label))
+    train_model(ttd[label]['x_train'], ttd[label]['y_train'], label=label, metric=kaeri_metrics[label], batch_size=128, epochs = 100, patience=100, name = str(label))
 
 
 

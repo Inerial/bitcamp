@@ -227,6 +227,7 @@ cmd에서 데이터가 들어간 폴더 찾아 들어간후 tensorboard --logdir
 분류모델에서 사용하는 loss 값은 두가지로 고정!! 이때 model의 마지막 output에 들어가는 activation도 고정
 이진분류 : binary_crossentropy   - activation : "sigmoid"
 다항분류 : categorical_crossentropy - activation : "softmax"
+          sparse_categorical_crossentropy : 상황에 따라 이게 더 좋기도 함
 
 중간에 들어가는 activation은 대부분의 경우 "relu"가 유효 하지만
 데이터의 feature가 1이면서 이진분류 "sigmoid"로 끝나는 경우
@@ -358,3 +359,27 @@ tree 형태의 방식은 전처리가 필요없다.
 PCA -> 적합 -> 예측 -> PCA 원상복귀
 
 콜백함수 직접 만들어보기 (핸즈온 393p)
+
+
+gridsearch (전부)
+randomizedsearch (랜덤 일부)
+\
+Conv1d == LSTM대신 쓰이기도 함, 성능이 더 좋다는 소리도 많음
+
+optimizer = Adam(lr=0.001) # loss : 4.91854962092475e-06
+optimizer = RMSprop(lr=0.001) # loss : 0.006224682554602623
+optimizer = SGD(lr=0.001) # loss : 0.003473188728094101
+optimizer = Adadelta(lr=0.001) # loss : 4.1884589195251465
+optimizer = Adagrad(lr=0.001) # loss : 4.360927505331347e-06
+optimizer = Nadam(lr=0.001) # loss : 0.25854504108428955
+optimizer = Adam(lr=0.001) # loss : 4.91854962092475e-06
+
+옵티마이저 함수
+데이터의 형식, 상황에 따라 더 좋은 옵티마이저가 있을수 있다.(보통은 아담)
+옵티마이저 내부의 learning rate가 데이터에 따라 요구되는 크기가 다르다
+
+
+아웃풋 별로 요구되는 로스값이 다른경우가 있다.
+이때 한번에 loss 두개를 넣는것은 심각한 성능저하를 부른다.
+각각 따로 fit해서 합치는것이 현재로써 최선책으로 보임
+
