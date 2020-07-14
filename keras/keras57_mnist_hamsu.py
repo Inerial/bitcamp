@@ -32,19 +32,22 @@ from keras.models import Model
 from keras.layers import Conv2D, Dense, Flatten, MaxPool2D, Dropout, Input
 
 input1 = Input(shape = (28,28,1))
-Conv1 = Conv2D(32, (3,3),activation='elu', input_shape=(28,28,1))(input1)
+Conv1 = Conv2D(32, (3,3),activation='elu', padding = 'same', input_shape=(28,28,1))(input1)
 Conv1 = Dropout(0.2)(Conv1)
-Conv1 = Conv2D(32, (3,3),activation='elu')(Conv1)
+Conv1 = Conv2D(32, (3,3),padding = 'same',activation='elu')(Conv1)
 Conv1 = Dropout(0.2)(Conv1)
 
 Conv1 = MaxPool2D((2,2))(Conv1)
-Conv1 = Conv2D(32, (3,3),activation='elu')(Conv1)
+Conv1 = Conv2D(64, (3,3),padding = 'same',activation='elu')(Conv1)
 Conv1 = Dropout(0.2)(Conv1)
-Conv1 = Conv2D(32, (3,3),activation='elu')(Conv1)
+Conv1 = Conv2D(64, (3,3),padding = 'same',activation='elu')(Conv1)
 Conv1 = Dropout(0.2)(Conv1)
-Conv1 = Conv2D(32, (3,3),activation='elu')(Conv1)
+
+Conv1 = MaxPool2D((2,2))(Conv1)
+
+Conv1 = Conv2D(128, (3,3),padding = 'same',activation='elu')(Conv1)
 Conv1 = Dropout(0.2)(Conv1)
-Conv1 = Conv2D(32, (3,3),activation='elu')(Conv1)
+Conv1 = Conv2D(128, (3,3),padding = 'same',activation='elu')(Conv1)
 Conv1 = Dropout(0.2)(Conv1)
 
 Conv1 = Flatten()(Conv1)
