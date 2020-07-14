@@ -21,8 +21,8 @@ y_test=y_test.reshape(-1,10)
 print(x_train.shape, x_test.shape)
 print(y_train.shape, y_test.shape)
 
-lr = 0.0005
-training_epochs = 20
+lr = 0.00015
+training_epochs = 50
 batch_size = 500
 total_batch = int(50000/batch_size)
 
@@ -121,7 +121,13 @@ with tf.Session() as sess:
 
     ## keras에서 평가시에는 dropout이 적용되지 않는다.
 
-# 19 cost : 0.9871731
-# Epo : 0020 cost : 1.018452462
-# [3. 8. 8. ... 5. 4. 7.]
-# 0.6345
+# 49 cost : 0.44937414
+# 49 cost : 0.39924458
+# 49 cost : 0.43283626
+# 49 cost : 0.3728475
+# 49 cost : 0.48546007
+# 49 cost : 0.42134932
+# Epo : 0050 cost : 0.463952407
+# [5. 8. 8. ... 5. 4. 7.]
+# 0.7519
+# PS D:\Study>
