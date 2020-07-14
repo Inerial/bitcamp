@@ -26,3 +26,4 @@ Dockerfile
 *.ckpt
 *.npz
 *.pyc
+naver
