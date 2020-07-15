@@ -14,7 +14,6 @@
 *.exe
 *.txt
 Dockerfile
-*.html
 *.md
 *.m4
 *.bin
@@ -27,3 +26,5 @@ Dockerfile
 *.npz
 *.pyc
 naver
+*.db
+*.sqlite3
