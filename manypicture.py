@@ -1,3 +1,7 @@
+#############################################
+################## mkh5.py ##################
+#############################################
+
 import os, glob, numpy as np, cv2, pandas as pd
 from sklearn.model_selection import train_test_split
 import h5py
@@ -83,6 +87,11 @@ print(train_list.shape)
 print(test_list.shape)
 print(val_list.shape)
 
+
+#############################################
+############## makemodel.py #################
+#############################################
+
 import os, glob, numpy as np, cv2
 from keras.models import Model, Sequential
 from keras.layers import Input, Conv2D, Conv2DTranspose,MaxPooling2D, Dense, Flatten, Dropout, concatenate, AveragePooling2D, BatchNormalization, Add
@@ -160,6 +169,11 @@ hist = model.fit(x_train_32, y_train_32, epochs=40, batch_size=500, validation_d
 ## 저장은 modelcheckpoint
 
 
+
+
+#############################################
+############## load_model.py ################
+#############################################
 import os, glob, numpy as np, cv2, zipfile, pandas as pd, shutil
 from keras.models import load_model
 from keras.utils.io_utils import HDF5Matrix

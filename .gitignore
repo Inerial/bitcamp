@@ -28,3 +28,7 @@ Dockerfile
 naver
 *.db
 *.sqlite3
+*.mp4
+*.old
+*.xml
+*.jpg

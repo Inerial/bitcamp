@@ -37,16 +37,16 @@ print (x_test.shape)
 # viz_img(y_pred)
 
 
-model = TSNE(learning_rate=300)
-transformed = model.fit_transform(x_train)
+# model = TSNE(learning_rate=300)
+# transformed = model.fit_transform(x_train)
 
 from sklearn.cluster import DBSCAN
 model = DBSCAN(eps=2.4, min_samples=100, n_jobs=6)
-predict = model.fit(transformed, verbose=1)
+predict = model.fit(x_train)
 y_pred = predict.labels_
 
 # Assign result to df
-dataset = pd.DataFrame({'Column1':transformed[:,0],'Column2':transformed[:,1]})
-dataset['cluster_num'] = pd.Series(predict.labels_)
+# dataset = pd.DataFrame({'Column1':transformed[:,0],'Column2':transformed[:,1]})
+# dataset['cluster_num'] = pd.Series(predict.labels_)
 
 viz_img(y_pred)
