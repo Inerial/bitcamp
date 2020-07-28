@@ -1,52 +1,39 @@
-from sklearn.manifold import TSNE
-from keras.datasets import mnist
-from sklearn.cluster import KMeans
-from sklearn.metrics import accuracy_score
-import matplotlib.pyplot as plt
-import numpy as np, pandas as pd
+from keras.applications.xception import preprocess_input
+from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 
-def viz_img(y_pred):
-    n = 10
-    fig = plt.figure(1)
-    box_index = 1
-    for cluster in range(10):
-        result = np.where(y_pred == cluster)
-        for i in np.random.choice(result[0].tolist(), n, replace=False):
-            ax = fig.add_subplot(n, n, box_index)
-            plt.imshow(x_train[i].reshape(28, 28))
-            plt.gray()
-            ax.get_xaxis().set_visible(False)
-            ax.get_yaxis().set_visible(False)
-            box_index += 1
-    plt.show()
+datagen = ImageDataGenerator(
+            preprocessing_function=preprocess_input,
+            horizontal_flip=True,
+            zoom_range=0.2,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            shear_range=0.2,
+            validation_split=0.2
+        )
 
+# img = load_img('D:/Study/data/dog_cat/cat.jpg')  # PIL 이미지
+# x = img_to_array(img)  # (3, 150, 150) 크기의 NumPy 배열
+# x = x.reshape((1,) + x.shape)  # (1, 3, 150, 150) 크기의 NumPy 배열
 
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
-x_train = x_train.astype('float32') / 255.
-x_test = x_test.astype('float32') / 255.
-x_train = x_train.reshape((len(x_train), np.prod(x_train.shape[1:])))
-x_test = x_test.reshape((len(x_test), np.prod(x_test.shape[1:])))
-print (x_train.shape)
-print (x_test.shape)
+i = 0
 
-
-# model = KMeans(init="k-means++", n_clusters=10, random_state=0)
-# model.fit(x_train)
-# y_pred = model.labels_
-    
-# viz_img(y_pred)
+for batch in datagen.flow_from_directory(
+            directory='D:/Study/data/dog_cat',
+            shuffle=False,
+            batch_size=1,
+            subset='training',
+            save_to_dir='D:/Study/data/preview'):
+            i+=1
+            print(batch)
+            if i is 30:
+                break
 
 
-# model = TSNE(learning_rate=300)
-# transformed = model.fit_transform(x_train)
-
-from sklearn.cluster import DBSCAN
-model = DBSCAN(eps=2.4, min_samples=100, n_jobs=6)
-predict = model.fit(x_train)
-y_pred = predict.labels_
-
-# Assign result to df
-# dataset = pd.DataFrame({'Column1':transformed[:,0],'Column2':transformed[:,1]})
-# dataset['cluster_num'] = pd.Series(predict.labels_)
-
-viz_img(y_pred)
+# # 아래 .flow() 함수는 임의 변환된 이미지를 배치 단위로 생성해서
+# # 지정된 `preview/` 폴더에 저장합니다.
+# i = 0
+# for batch in datagen.flow(x, batch_size=1,
+#                           save_to_dir='D:/Study/data/dog_cat/preview', save_prefix='cat', save_format='jpeg'):
+#     i += 1
+#     if i > 20:
+#         break  # 이미지 20장을 생성하고 마칩니다

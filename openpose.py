@@ -7,14 +7,19 @@ VideoSignal.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 VideoSignal.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 # YOLO 가중치 파일과 CFG 파일 로드
 YOLO_net = cv2.dnn.readNet("C:\\Users\\bitcamp\\darkflow-master\\bin\\yolov2.weights","C:\\Users\\bitcamp\\darkflow-master\\cfg\\yolo.cfg")
+# YOLO_net = cv2.dnn.readNet("C:\\Users\\bitcamp\\Downloads\\darknet-master\\bin\\yolov4.weights","C:\\Users\\bitcamp\\Downloads\\darknet-master\\cfg\\yolov4.cfg")
+YOLO_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+YOLO_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
+YOLO_net
 
+print(YOLO_net)
 # YOLO NETWORK 재구성
 classes = []
 with open("C:\\Users\\bitcamp\\darkflow-master\\cfg\\coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 print(classes)
 layer_names = YOLO_net.getLayerNames()
-print(layers_names)
+print(layer_names)
 output_layers = [layer_names[i[0] - 1] for i in YOLO_net.getUnconnectedOutLayers()]
 print(output_layers)
 while True:
