@@ -46,8 +46,8 @@ parameter = [
     }
 ]
 fit_params = {
-    'verbose': True,
-    'eval_set' : [(x_train,y_train),(x_test,y_test)],
+    'verbose': 1,
+    'eval_set' : [(x_train,y_train)],
     # 'early_stopping_rounds' : 5
 }
 kfold = KFold(n_splits=5, shuffle=True, random_state=66)

@@ -10,7 +10,6 @@ YOLO_net = cv2.dnn.readNet("C:\\Users\\bitcamp\\darkflow-master\\bin\\yolov2.wei
 # YOLO_net = cv2.dnn.readNet("C:\\Users\\bitcamp\\Downloads\\darknet-master\\bin\\yolov4.weights","C:\\Users\\bitcamp\\Downloads\\darknet-master\\cfg\\yolov4.cfg")
 YOLO_net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
 YOLO_net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
-YOLO_net
 
 print(YOLO_net)
 # YOLO NETWORK 재구성
@@ -78,3 +77,4 @@ while True:
 
     if cv2.waitKey(100) > 0:
         break
+

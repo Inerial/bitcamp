@@ -5,10 +5,10 @@ datagen = ImageDataGenerator(
             preprocessing_function=preprocess_input,
             horizontal_flip=True,
             zoom_range=0.2,
+            brightness_range = [0.00001,1.3],
             width_shift_range=0.2,
             height_shift_range=0.2,
-            shear_range=0.2,
-            validation_split=0.2
+            shear_range=0.2
         )
 
 # img = load_img('D:/Study/data/dog_cat/cat.jpg')  # PIL 이미지
@@ -20,12 +20,11 @@ i = 0
 for batch in datagen.flow_from_directory(
             directory='D:/Study/data/dog_cat',
             shuffle=False,
-            batch_size=1,
-            subset='training',
+            batch_size=20,
             save_to_dir='D:/Study/data/preview'):
             i+=1
             print(batch)
-            if i is 30:
+            if i is 100:
                 break
 
 

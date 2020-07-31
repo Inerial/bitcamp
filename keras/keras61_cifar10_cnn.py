@@ -1,7 +1,7 @@
-from keras.datasets import cifar10
-from keras.models import Sequential, Model
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.models import Sequential, Model
 from keras.utils import np_utils
-from keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten, Input, LSTM, MaxPool2D
+from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten, Input, LSTM, MaxPool2D
 import matplotlib.pyplot as plt
 import numpy as np
 
