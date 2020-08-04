@@ -2,7 +2,6 @@ from flask import Flask, render_template, Response
 # emulated camera
 import cv2, numpy as np
 from threading import Thread
-import cv2
 
 YOLO_net = cv2.dnn.readNet("C:\\Users\\bitcamp\\darkflow-master\\bin\\yolov2.weights","C:\\Users\\bitcamp\\darkflow-master\\cfg\\yolo.cfg")
 
@@ -14,7 +13,6 @@ layer_names = YOLO_net.getLayerNames()
 output_layers = [layer_names[i[0] - 1] for i in YOLO_net.getUnconnectedOutLayers()]
 
 class WebcamVideoStream:
-
        def __init__(self, src=0):
            # initialize the video camera stream and read the first frame
            # from the stream
@@ -136,4 +134,4 @@ def video_feed():
 
 
 if __name__ == '__main__':
-       app.run(host='127.0.0.1', port=5010, debug=True, threaded=True)
+       app.run(host='192.168.0.125', debug=True, threaded=True)
