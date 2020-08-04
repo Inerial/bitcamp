@@ -60,7 +60,7 @@ random_images = random.sample(range(output1.shape[0]), 5)
 for i,axs in enumerate(ax):
     for j , axss in enumerate(axs):
         axss.imshow(datas[i][random_images[j]].reshape(28,28), cmap='gray')
-        if i == 0:
+        if j == 0:
             axss.set_ylabel(labels[i], size=40)
         axss.grid(False)
         axss.set_xticks([])
