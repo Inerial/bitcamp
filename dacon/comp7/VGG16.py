@@ -3,10 +3,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, KFold, cross_val_score
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 from keras.models import Model, load_model
-from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dropout, Dense, BatchNormalization,ELU
+from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dropout, Dense, BatchNormalization,ELU, UpSampling2D
 from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
 import matplotlib.pyplot as plt
+from keras.applications import VGG16
 train = pd.read_csv('./data/dacon/comp7/train.csv', sep=',', header = 0, index_col = 0)
 test = pd.read_csv('./data/dacon/comp7/test.csv', sep=',', header = 0, index_col = 0)
 submit = pd.read_csv('./data/dacon/comp7/submission.csv', sep=',', header = 0, index_col = 0)
@@ -32,30 +33,14 @@ x_real[x_real == 2] = 0.2
 
 print(x_real.shape)
 input1 = Input(shape=(28,28,1))
-conv1 = Conv2D(64,(,5),padding='same', activation='elu')(input1)
-conv1 = BatchNormalization()(conv1)
-conv1 = Conv2D(32,(5,5),padding='same', activation='elu')(conv1)
-conv1 = BatchNormalization()(conv1)
-
-conv1 = MaxPooling2D((2,2))(conv1)
-
-conv1 = Conv2D(64,(5,5),padding='same', activation='elu')(input1)
-conv1 = BatchNormalization()(conv1)
-conv1 = Conv2D(64,(5,5),padding='same', activation='elu')(conv1)
-conv1 = BatchNormalization()(conv1)
-
-conv1 = MaxPooling2D((2,2))(conv1)
-
-conv1 = Conv2D(128,(5,5),padding='same', activation='elu')(input1)
-conv1 = BatchNormalization()(conv1)
-conv1 = Conv2D(128,(5,5),padding='same', activation='elu')(conv1)
-conv1 = BatchNormalization()(conv1)
-
+conv1 = UpSampling2D((2,2))(input1)
+conv1 = VGG16(weights=None, include_top =False, input_shape=(56,56,1))(conv1)
 conv1 = Flatten()(conv1)
-
 conv1 = Dense(10, activation='softmax')(conv1)
 
 model = Model(inputs=input1, outputs= conv1)
+model.summary()
+
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 
 check = ModelCheckpoint('./dacon/comp7/bestcheck.hdf5', monitor='val_loss',save_best_only=True)
