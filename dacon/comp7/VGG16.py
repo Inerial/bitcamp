@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from skimage.transform import resize
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, KFold, cross_val_score
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 from keras.models import Model, load_model
@@ -12,10 +13,11 @@ train = pd.read_csv('./data/dacon/comp7/train.csv', sep=',', header = 0, index_c
 test = pd.read_csv('./data/dacon/comp7/test.csv', sep=',', header = 0, index_col = 0)
 submit = pd.read_csv('./data/dacon/comp7/submission.csv', sep=',', header = 0, index_col = 0)
 
-x_train = train.values[:, 2:].reshape(-1, 28,28,1)/255
-x_train[x_train < 0.2] = 2
-x_train[x_train < 0.6] = 0
-x_train[x_train == 2] = 0.2
+x_train = train.values[:, 2:].reshape(-1, 28,28,1).astype(int)
+new_x_train = []
+for img in range(len(x_train)):
+    new_x_train.append(resize(x_train[img], (56,56)))
+x_train = np.array(new_x_train)
 
 y_train = train.values[:,0] ## 숫자 
 
@@ -26,14 +28,15 @@ y_train = train.values[:,0] ## 숫자
 y_train = np_utils.to_categorical(y_train)
 # y.append(train.values[i,1]) ## 알파벳
     
-x_real = test.values[:, 1:].reshape(-1, 28,28,1)/255
-x_real[x_real < 0.2] = 2
-x_real[x_real < 0.60] = 0
-x_real[x_real == 2] = 0.2
+x_real = test.values[:, 1:].reshape(-1, 28,28,1).astype(int)
+new_x_real = []
+for img in range(len(x_real)):
+    new_x_real.append(resize(x_real[img], (56,56)))
+x_real = np.array(new_x_real)
 
 print(x_real.shape)
-input1 = Input(shape=(28,28,1))
-conv1 = UpSampling2D((2,2))(input1)
+input1 = Input(shape=(56,56,1))
+conv1 = BatchNormalization()(input1)
 conv1 = VGG16(weights=None, include_top =False, input_shape=(56,56,1))(conv1)
 conv1 = Flatten()(conv1)
 conv1 = Dense(10, activation='softmax')(conv1)

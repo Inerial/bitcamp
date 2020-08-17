@@ -2,32 +2,23 @@ from flask import Flask, render_template, Response
 # emulated camera
 import cv2, numpy as np
 from threading import Thread
+from darknet import darknet
 
-YOLO_net = cv2.dnn.readNet("C:\\Users\\bitcamp\\darkflow-master\\bin\\yolov2.weights","C:\\Users\\bitcamp\\darkflow-master\\cfg\\yolo.cfg")
-
-# YOLO NETWORK 재구성
-classes = []
-with open("C:\\Users\\bitcamp\\darkflow-master\\cfg\\coco.names", "r") as f:
-    classes = [line.strip() for line in f.readlines()]
-layer_names = YOLO_net.getLayerNames()
-output_layers = [layer_names[i[0] - 1] for i in YOLO_net.getUnconnectedOutLayers()]
+net = darknet.load_net(b"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/cfg/yolov3.cfg", b"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/weight/yolov3.weights", 0) 
+meta = darknet.load_meta(b"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/data/coco.data") 
+cap = cv2.VideoCapture("C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/26-4_cam01_assault01_place01_night_spring.mp4") 
 
 class WebcamVideoStream:
        def __init__(self, src=0):
-           # initialize the video camera stream and read the first frame
-           # from the stream
            print("init")
            self.stream = cv2.VideoCapture(src)
            (self.grabbed, self.frame) = self.stream.read()
 
-           # initialize the variable used to indicate if the thread should
-           # be stopped
            self.stopped = False
 
 
        def start(self):
            print("start thread")
-           # start the thread to read frames from the video stream
            t = Thread(target=self.update, args=())
            t.daemon = True
            t.start()
@@ -35,88 +26,57 @@ class WebcamVideoStream:
 
        def update(self):
            print("read")
-           # keep looping infinitely until the thread is stopped
            while True:
-               # if the thread indicator variable is set, stop the thread
                if self.stopped:
                    return
 
-
-               # otherwise, read the next frame from the stream
                (self.grabbed, self.frame) = self.stream.read()
 
        def read(self):
-           # return the frame most recently read
            return self.frame
 
        def stop(self):
-           # indicate that the thread should be stopped
            self.stopped = True
 
 app = Flask(__name__, template_folder='C:\coding\streamingserver\templates')
 
 @app.route('/')
 def index():
-       """Video streaming home page."""
        return render_template('camera.html')
 
 
 def gen(camera):
         """Video streaming generator function."""
         while True:
-            frame = camera.read()
+            image = camera.read()
+            image = cv2.resize(image, dsize=(640, 480), interpolation=cv2.INTER_AREA)
+            frame = darknet.nparray_to_image(image)
+            r = darknet.detect_image(net, meta, frame, thresh=.5, hier_thresh=.5, nms=.45, debug= False)
+            boxes = [] 
 
-            h, w, c = frame.shape
+            for k in range(len(r)): 
+                width = r[k][2][2] 
+                height = r[k][2][3] 
+                center_x = r[k][2][0] 
+                center_y = r[k][2][1] 
+                bottomLeft_x = center_x - (width / 2) 
+                bottomLeft_y = center_y - (height / 2) 
+                x, y, w, h = bottomLeft_x, bottomLeft_y, width, height 
+                boxes.append((x, y, w, h))
 
-            # YOLO 입력
-            blob = cv2.dnn.blobFromImage(frame, 0.00392, (416, 416), (0, 0, 0),
-            True, crop=False)
-            YOLO_net.setInput(blob)
-            outs = YOLO_net.forward(output_layers)
+            for k in range(len(boxes)): 
+                x, y, w, h = boxes[k] 
+                top = max(0, np.floor(x + 0.5).astype(int)) 
+                left = max(0, np.floor(y + 0.5).astype(int)) 
+                right = min(image.shape[1], np.floor(x + w + 0.5).astype(int)) 
+                bottom = min(image.shape[0], np.floor(y + h + 0.5).astype(int)) 
+                cv2.rectangle(image, (top, left), (right, bottom), (255, 0, 0), 2) 
+                cv2.line(image, (top + int(w / 2), left), (top + int(w / 2), left + int(h)), (0,255,0), 3) 
+                cv2.line(image, (top, left + int(h / 2)), (top + int(w), left + int(h / 2)), (0,255,0), 3) 
+                cv2.circle(image, (top + int(w / 2), left + int(h / 2)), 2, tuple((0,0,255)), 5)
 
-            class_ids = []
-            confidences = []
-            boxes = []
-            print(1)
-            for out in outs:
-
-                for detection in out:
-
-                    scores = detection[5:]
-                    class_id = np.argmax(scores)
-                    confidence = scores[class_id]
-
-                    if confidence > 0.5:
-                        # Object detected
-                        center_x = int(detection[0] * w)
-                        center_y = int(detection[1] * h)
-                        dw = int(detection[2] * w)
-                        dh = int(detection[3] * h)
-                        # Rectangle coordinate
-                        x = int(center_x - dw / 2)
-                        y = int(center_y - dh / 2)
-                        boxes.append([x, y, dw, dh])
-                        confidences.append(float(confidence))
-                        class_ids.append(class_id)
-            print(2)
-
-            indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.45, 0.4)
-
-            print(3)
-
-            for i in range(len(boxes)):
-                if i in indexes:
-                    x, y, w, h = boxes[i]
-                    label = str(classes[class_ids[i]])
-                    score = confidences[i]
-
-                    # 경계상자와 클래스 정보 이미지에 입력
-                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 5)
-                    cv2.putText(frame, label, (x, y - 20), cv2.FONT_ITALIC, 0.5, 
-                    (255, 255, 255), 1)
-
-            ret, jpeg = cv2.imencode('.jpg', frame)
-            
+            ret, jpeg = cv2.imencode('.jpg', image)
+            darknet.free_image(frame)
             # print("after get_frame")
             if jpeg is not None:
                 yield (b'--frame\r\n'
@@ -129,7 +89,7 @@ def gen(camera):
 @app.route('/video_feed')
 def video_feed():
        """Video streaming route. Put this in the src attribute of an img tag."""
-       return Response(gen(WebcamVideoStream().start()),
+       return Response(gen(WebcamVideoStream(src="C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/26-4_cam01_assault01_place01_night_spring.mp4").start()),
                        mimetype='multipart/x-mixed-replace; boundary=frame')
 
 

@@ -3,11 +3,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, KFold, cross_val_score
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler
 from keras.models import Model, load_model
-from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dropout, Dense, BatchNormalization,ReLU, Concatenate, GlobalMaxPooling2D, GlobalAveragePooling2D, AveragePooling2D
+from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dropout, Dense, BatchNormalization,ReLU, Concatenate, LeakyReLU, RepeatVector, Multiply
 from keras.callbacks import ModelCheckpoint
 from keras.utils import to_categorical
 import matplotlib.pyplot as plt
-from keras.optimizers import Adam
+from keras.optimizers import Adam, RMSprop
 train = pd.read_csv('./data/dacon/comp7/train.csv', sep=',', header = 0, index_col = 0)
 test = pd.read_csv('./data/dacon/comp7/test.csv', sep=',', header = 0, index_col = 0)
 submit = pd.read_csv('./data/dacon/comp7/submission.csv', sep=',', header = 0, index_col = 0)
@@ -45,57 +45,60 @@ x_real_let = to_categorical(x_real_let)
 
 
 print(x_real.shape)
+
+
+########################################
+################ 모델링 #################
+########################################
 input1 = Input(shape=(28,28,1))
-conv1 = Conv2D(64,(3,3),padding='valid')(input1)
-# conv1 = Dropout(0.2)(conv1)
-conv1 = BatchNormalization()(conv1)
-conv1 = ReLU()(conv1)
-# conv1 = Conv2D(64,(3,3),padding='valid')(conv1)
-# conv1 = Dropout(0.2)(conv1)
-# conv1 = BatchNormalization()(conv1)
-# conv1 = ReLU()(conv1)
-
-conv1 = AveragePooling2D((2,2), padding='same')(conv1)
-
-conv1 = Conv2D(128,(3,3),padding='valid')(conv1)
-# conv1 = Dropout(0.2)(conv1)
-conv1 = BatchNormalization()(conv1)
-conv1 = ReLU()(conv1)
-# conv1 = Conv2D(128,(3,3),padding='valid')(conv1)
-# conv1 = Dropout(0.2)(conv1)
-# conv1 = BatchNormalization()(conv1)
-# conv1 = ReLU()(conv1)
-
-conv1 = AveragePooling2D((2,2), padding='same')(conv1)
-
-conv1 = Conv2D(256,(3,3),padding='valid')(conv1)
-# conv1 = Dropout(0.2)(conv1)
-conv1 = BatchNormalization()(conv1)
-conv1 = ReLU()(conv1)
-# conv1 = Conv2D(256,(3,3),padding='valid')(conv1)
-# conv1 = Dropout(0.2)(conv1)
-# conv1 = BatchNormalization()(conv1)
-# conv1 = ReLU()(conv1)
-
-conv1 = AveragePooling2D((2,2), padding='same')(conv1)
-
-conv1 = Conv2D(512,(2,2),padding='valid')(conv1)
-# conv1 = Dropout(0.2)(conv1)
-conv1 = BatchNormalization()(conv1)
-conv1 = ReLU()(conv1)
-conv1 = Conv2D(512,(3,3),padding='valid')(conv1)
-# conv1 = Dropout(0.2)(conv1)
-conv1 = BatchNormalization()(conv1)
-conv1 = ReLU()(conv1)
-
-conv1 = Flatten()(conv1)
 input2 = Input(shape=(26,))
 
-conv1 = Concatenate()([conv1, input2])
+conv1 = Conv2D(64,(3,3))(input1)
+# conv1 = BatchNormalization()(conv1)
+conv1 = LeakyReLU()(conv1)
+conv1 = Conv2D(64,(3,3))(conv1)
+# conv1 = BatchNormalization()(conv1)
+conv1 = LeakyReLU()(conv1)
+conv1 = Conv2D(64,(5,5),strides=2,padding='same')(conv1)
+# conv1 = BatchNormalization()(conv1)
+conv1 = LeakyReLU()(conv1)
+# conv1 = Dropout(0.25)(conv1)
+conv1 = BatchNormalization()(conv1)
 
-conv1 = Dense(10, activation='softmax')(conv1)
+conv1 = Conv2D(128,(3,3))(conv1)
+# conv1 = BatchNormalization()(conv1)
+conv1 = LeakyReLU()(conv1)
+conv1 = Conv2D(128,(3,3))(conv1)
+# conv1 = BatchNormalization()(conv1)
+conv1 = LeakyReLU()(conv1)
+conv1 = Conv2D(128,(5,5),strides=2,padding='same')(conv1)
+# conv1 = BatchNormalization()(conv1)
+conv1 = LeakyReLU()(conv1)
+# conv1 = Dropout(0.25)(conv1)
+conv1 = BatchNormalization()(conv1)
 
-model = Model(inputs=[input1, input2], outputs= conv1)
+conv1 = Conv2D(256,(4,4))(conv1)
+# conv1 = BatchNormalization()(conv1)
+conv1 = LeakyReLU()(conv1)
+
+conv1 = Flatten()(conv1)
+conv1 = RepeatVector(26)(conv1)
+conv1 = Flatten()(conv1)
+# conv1 = Dropout(0.25)(conv1)
+# conv1 = BatchNormalization()(conv1)
+
+conv2 = RepeatVector(256)(input2)
+conv2 = Flatten()(conv2)
+
+outputs = Multiply()([conv1, conv2])
+outputs = ReLU()(outputs)
+conv1 = Dropout(0.25)(conv1)
+
+outputs = Dense(256, activation='relu')(outputs)
+conv1 = Dropout(0.25)(conv1)
+outputs = Dense(10, activation='softmax')(outputs)
+
+model = Model(inputs=[input1, input2], outputs= outputs)
 model.summary()
 
 model.compile(optimizer= RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0), loss='categorical_crossentropy', metrics=['acc'])

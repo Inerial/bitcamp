@@ -4,18 +4,18 @@ import numpy as np
 
 def autoencoder(hidden_layer_size):
     model = Sequential()
-    model.add(Conv2D(64, (3,3),padding='valid',activation='elu', input_shape=(32,32,3)))
+    model.add(Conv2D(128, (3,3),padding='valid',activation='elu', input_shape=(32,32,3)))
     model.add(MaxPooling2D((2,2)))
-    model.add(Conv2D(16, (3,3),padding='valid',activation='elu'))
+    model.add(Conv2D(32, (3,3),padding='valid',activation='elu'))
     model.add(MaxPooling2D((2,2)))
     model.add(Conv2D(8, (3,3),padding='valid',activation='elu'))
 
 
     model.add(Conv2DTranspose(8,(3,3),padding='valid',activation='elu'))
     model.add(UpSampling2D((2,2)))
-    model.add(Conv2DTranspose(16,(4,4),padding='valid',activation='elu'))
+    model.add(Conv2DTranspose(32,(4,4),padding='valid',activation='elu'))
     model.add(UpSampling2D((2,2)))
-    model.add(Conv2DTranspose(64,(3,3),padding='valid',activation='elu'))
+    model.add(Conv2DTranspose(128,(3,3),padding='valid',activation='elu'))
     model.add(Conv2D(3,(1,1),padding='valid',activation='sigmoid'))
     model.summary()
     return model
@@ -58,7 +58,7 @@ for i , ax in enumerate([ax1,ax2,ax3,ax4,ax5]):
 for i , ax in enumerate([ax6,ax7,ax8,ax9,ax10]):
     ax.imshow(output[random_images[i]].reshape(32,32,3), cmap='gray')
     if i == 0:
-        ax.set_ylabel("NOISE", size=30)
+        ax.set_ylabel("OUTPUT", size=30)
     ax.grid(False)
     ax.set_xticks([])
     ax.set_yticks([])
