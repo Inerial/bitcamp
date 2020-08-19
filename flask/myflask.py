@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 # emulated camera
 import cv2, numpy as np
 from threading import Thread
@@ -15,7 +15,6 @@ class WebcamVideoStream:
            (self.grabbed, self.frame) = self.stream.read()
 
            self.stopped = False
-
 
        def start(self):
            print("start thread")
@@ -38,11 +37,23 @@ class WebcamVideoStream:
        def stop(self):
            self.stopped = True
 
-app = Flask(__name__, template_folder='C:\coding\streamingserver\templates')
+video = [(0,0),(1,"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/26-4.mp4"),(2,"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/22-2.mp4")]
+app = Flask(__name__)
 
 @app.route('/')
+def run():
+    # conn = sqlite3.connect('./data/wanggun.db')
+    # c = conn.cursor()
+    # c.execute("SELECT * FROM general;")
+    rows = video#c.fetchall()
+    return render_template("camera_index.html", rows=rows)
+
+@app.route('/index')
 def index():
-       return render_template('camera.html')
+        ids = request.args.get('id')
+        print(ids)
+        rows = video
+        return render_template('camera.html', rows=[rows[int(ids)]])
 
 
 def gen(camera):
@@ -86,12 +97,14 @@ def gen(camera):
 
 
 
-@app.route('/video_feed')
+@app.route('/index/video_feed')
 def video_feed():
-       """Video streaming route. Put this in the src attribute of an img tag."""
-       return Response(gen(WebcamVideoStream(src="C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/26-4_cam01_assault01_place01_night_spring.mp4").start()),
+        ids = request.args.get('id')
+        print(ids)
+        """Video streaming route. Put this in the src attribute of an img tag."""
+        return Response(gen(WebcamVideoStream(src=video[int(ids)][1]).start()),
                        mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 if __name__ == '__main__':
-       app.run(host='192.168.0.125', debug=True, threaded=True)
+       app.run(host='192.168.0.125', debug=False, threaded=True)

@@ -17,6 +17,7 @@ while(cap.isOpened()):
         break 
     frame = darknet.nparray_to_image(image)
     r = darknet.detect_image(net, meta, frame, thresh=.5, hier_thresh=.5, nms=.45, debug= False)
+    print(r)
     boxes = [] 
 
     for k in range(len(r)): 

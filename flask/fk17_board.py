@@ -15,15 +15,18 @@ def run():
     c = conn.cursor()
     c.execute("SELECT * FROM general;")
     rows = c.fetchall()
+    print(rows)
     return render_template("board_index.html", rows=rows)
 
 @app.route('/modi')
 def modi():
     ids = request.args.get('id')
+    print(ids)
     conn = sqlite3.connect('./data/wanggun.db')
     c = conn.cursor()
     c.execute('SELECT * FROM general where id = (?)', str(ids))
     rows = c.fetchall()
+    print(rows)
     return render_template('board_modi.html', rows=rows)
 
 @app.route('/addrec', methods=['POST', 'GET'])
