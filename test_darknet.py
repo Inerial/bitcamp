@@ -2,8 +2,8 @@ from darknet import darknet
 import cv2, numpy as np, sys
 from ctypes import *
 
-net = darknet.load_net(b"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/cfg/yolov3.cfg", b"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/weight/yolov3.weights", 0) 
-meta = darknet.load_meta(b"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/data/coco.data") 
+net = darknet.load_net(b"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/cfg/myyolov3.cfg", b"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/weight/myyolov3_final.weights", 0) 
+meta = darknet.load_meta(b"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/weight/my.data") 
 cap = cv2.VideoCapture(0)#"C:/Users/bitcamp/anaconda3/Lib/site-packages/darknet/26-4_cam01_assault01_place01_night_spring.mp4") 
 print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))

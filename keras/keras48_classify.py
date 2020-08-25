@@ -15,7 +15,7 @@ model.add(Dense(1, activation='elu', input_dim=1))
 model.add(Lambda(lambda x: x%2))
 model.add(Dense(1, activation='sigmoid'))
 ## 마지막 activation을 sigmoid같은 0~1사이가 나오는 것을 주어야 한다.
-model.compile(loss='binary_crossentropy', optimizer='adamax', metrics = ['acc'])
+model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics = ['acc'])
 
 ## binary_crossentropy == 이진분류의 loss값은 이것 하나밖에 없음
 

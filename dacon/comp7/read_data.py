@@ -50,7 +50,7 @@ for i, img in enumerate(gen.flow(x_train,y=np.array([train.values[:,0], train.va
     if img[1][0][1] != 'A': continue
     print(img[1])
     print(img[0][0].shape)
-    img[0][0] = img[0][0]*2
+    img[0][0] = img[0][0]*3
     img[0][0][img[0][0] > 255] = 255
     plt.imshow(img[0].reshape(28,28).astype(int) ,cmap='gray')
     plt.show()

@@ -47,4 +47,4 @@ def addrec():
             conn.close()
             return render_template("board_result.html", msg=msg)
 
-app.run(host='127.0.0.1', port=2345, debug=False)
+app.run(host='0.0.0.0', port=4321, debug=False)

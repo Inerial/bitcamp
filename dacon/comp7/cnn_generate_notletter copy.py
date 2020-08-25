@@ -42,19 +42,17 @@ submit = pd.read_csv('./data/dacon/comp7/submission.csv', sep=',', header = 0, i
 
 from keras.preprocessing.image import ImageDataGenerator
 gen = ImageDataGenerator(
-    # samplewise_center=True,
-    # featurewise_std_normalization=True,
-    # samplewise_std_normalization=True,
-    # zca_whitening=True,
     # shear_range=0.05,
     rotation_range=5, 
     zoom_range = 0.05,  
     width_shift_range=0.05, 
     height_shift_range=0.05,
-    # validation_split = 0.2,
     )  # randomly flip images
 
 x_train = train.values[:, 2:].reshape(-1, 28,28,1)/255
+x_letters = train.values[:, 2:]*3
+x_letters[x_letters > 255] = 255
+x_letters = x_letters.reshape(-1, 28,28,1)/255
 # x_train[x_train < 0.2] = 2
 # x_train[x_train < 0.6] = 0
 # x_train[x_train == 2] = 0.2
@@ -71,7 +69,6 @@ y_train = to_categorical(y_train)
 # x_train, x_val, y_train, y_val = train_test_split(
 #     x_train,y_train, train_size=0.9, shuffle=True, random_state=66
 # )
-
 gen.fit(x_train)
 
 x_real = test.values[:, 1:].reshape(-1, 28,28,1)/255
@@ -145,11 +142,15 @@ check = ModelCheckpoint('./dacon/comp7/bestcheck.hdf5', monitor='loss',save_best
 
 batch_size = 32
 epoch = 500
+model.fit_generator(gen.flow(x_letters, y_train,batch_size=batch_size),
+                    steps_per_epoch=int(x_train.shape[0]/batch_size), epochs=epoch,
+                    callbacks=[check, reduction])
+
+model = load_model('./dacon/comp7/bestcheck.hdf5')
+
 model.fit_generator(gen.flow(x_train, y_train,batch_size=batch_size),
                     steps_per_epoch=int(x_train.shape[0]/batch_size), epochs=epoch,
-                    # validation_data=(x_val,y_val),
-                    # validation_data=gen.flow(x_train, y_train,batch_size=batch_size,subset='validation'),
-                    callbacks=[check, reduction])#, validation_steps=int(x_val.shape[0]/batch_size))
+                    callbacks=[check, reduction])
 
 model = load_model('./dacon/comp7/bestcheck.hdf5')
 y_pred = model.predict(x_real)
